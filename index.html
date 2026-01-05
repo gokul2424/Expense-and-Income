@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sure | Ultimate Personal Finance</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Base Theme */
+        :root {
+            --bg-body: #111827;       /* Gray 900 */
+            --bg-card: #1F2937;       /* Gray 800 */
+            --border-glass: rgba(255,255,255,0.08);
+            --text-main: #F9FAFB;
+            --text-muted: #9CA3AF;
+            --accent-blue: #3B82F6;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Smooth View Transitions */
+        .view-section {
+            display: none;
+            animation: fadeIn 0.2s ease-in-out;
+        }
+        .view-section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Utilities */
+        .glass-panel {
+            background: linear-gradient(180deg, rgba(31, 41, 55, 0.6) 0%, rgba(17, 24, 39, 0.8) 100%);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(8px);
+        }
+        
+        .nav-item.active {
+            background-color: #1F2937;
+            color: #fff;
+            border: 1px solid var(--border-glass);
+        }
+
+        /* Chart Container */
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #111827; }
+        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 2px; }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- DESKTOP SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-64 bg-gray-900 border-r border-white/5 z-20">
+        <div class="p-6">
+            <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+                <i class="fas fa-layer-group text-blue-500"></i> Sure.
+            </h1>
+        </div>
+        <nav class="flex-1 px-4 space-y-1">
+            <button onclick="router('dashboard')" id="nav-dashboard" class="nav-item w-full flex items-center px-4 py-2.5 text-sm font-medium text-gray-400 rounded-lg hover:text-white hover:bg-white/5 transition-all">
+                <i class="fas fa-chart-pie w-6"></i> Dashboard
+            </button>
+            <button onclick="router('accounts')" id="nav-accounts" class="nav-item w-full flex items-center px-4 py-2.5 text-sm font-medium text-gray-400 rounded-lg hover:text-white hover:bg-white/5 transition-all">
+                <i class="fas fa-wallet w-6"></i> Accounts
+            </button>
+            <button onclick="router('transactions')" id="nav-transactions" class="nav-item w-full flex items-center px-4 py-2.5 text-sm font-medium text-gray-400 rounded-lg hover:text-white hover:bg-white/5 transition-all">
+                <i class="fas fa-list w-6"></i> Transactions
+            </button>
+        </nav>
+        <div class="p-4 border-t border-white/5">
+            <button onclick="router('settings')" class="flex items-center gap-3 w-full p-2 rounded-lg hover:bg-white/5 transition">
+                <div class="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs font-bold text-white">ME</div>
+                <div class="text-left">
+                    <div class="text-sm font-medium text-white">My Finances</div>
+                    <div class="text-xs text-gray-500">Local Data</div>
+                </div>
+            </button>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="flex-1 relative flex flex-col h-full overflow-hidden bg-gray-900">
+        
+        <!-- MOBILE HEADER -->
+        <header class="md:hidden flex items-center justify-between p-4 bg-gray-900 border-b border-white/5 shrink-0 z-30">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-layer-group text-blue-500 text-lg"></i>
+                <span class="font-bold text-white">Sure.</span>
+            </div>
+            <!-- Mobile Menu Toggle (Simplified as a dropdown for this demo) -->
+            <div class="flex gap-4 text-gray-400">
+                <button onclick="router('dashboard')"><i class="fas fa-chart-pie"></i></button>
+                <button onclick="router('accounts')"><i class="fas fa-wallet"></i></button>
+                <button onclick="router('transactions')"><i class="fas fa-list"></i></button>
+                <button onclick="router('settings')"><i class="fas fa-cog"></i></button>
+            </div>
+        </header>
+
+        <!-- VIEW: DASHBOARD -->
+        <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <!-- Header -->
+                <div class="flex justify-between items-end">
+                    <div>
+                        <h2 class="text-3xl font-bold text-white">Overview</h2>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-sm text-gray-400">Net Worth</span>
+                            <span class="text-xs px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-500 font-medium">+2.4% this month</span>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <h2 class="text-3xl font-bold text-white" id="dash-networth">$0.00</h2>
+                    </div>
+                </div>
+
+                <!-- Big Chart -->
+                <div class="glass-panel rounded-xl p-6">
+                    <h3 class="text-sm font-medium text-gray-400 mb-4">Net Worth Trend</h3>
+                    <div class="chart-wrapper">
+                        <canvas id="mainChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Three Columns Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Assets -->
+                    <div class="glass-panel rounded-xl p-5">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-400">Total Assets</span>
+                            <i class="fas fa-arrow-up text-emerald-500 text-xs"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white" id="dash-assets">$0.00</div>
+                    </div>
+                    <!-- Debts -->
+                    <div class="glass-panel rounded-xl p-5">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-400">Total Debts</span>
+                            <i class="fas fa-arrow-down text-rose-500 text-xs"></i>
+                        </div>
+                        <div class="text-2xl font-bold text-white" id="dash-debts">$0.00</div>
+                    </div>
+                    <!-- Cash Flow (Simulated) -->
+                    <div class="glass-panel rounded-xl p-5">
+                        <div class="flex justify-between mb-2">
+                            <span class="text-sm text-gray-400">Monthly Cash Flow</span>
+                            <span class="text-xs text-gray-500">Est.</span>
+                        </div>
+                        <div class="text-2xl font-bold text-emerald-400">+$2,450</div>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions (Mini) -->
+                <div class="glass-panel rounded-xl overflow-hidden">
+                    <div class="p-5 border-b border-white/5 flex justify-between items-center">
+                        <h3 class="font-medium text-white">Recent Activity</h3>
+                        <button onclick="router('transactions')" class="text-xs text-blue-400">View All</button>
+                    </div>
+                    <div id="dash-tx-list" class="divide-y divide-white/5">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: ACCOUNTS -->
+        <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-white">Accounts</h2>
+                    <button onclick="openModal('accountModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        + Add Account
+                    </button>
+                </div>
+
+                <!-- Account Categories -->
+                <div class="space-y-6" id="accounts-container">
+                    <!-- JS Injected Categories -->
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: TRANSACTIONS -->
+        <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-6xl mx-auto h-full flex flex-col">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-white">Transactions</h2>
+                    <button onclick="openModal('txModal')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors">
+                        + New
+                    </button>
+                </div>
+                
+                <div class="glass-panel rounded-xl flex-1 flex flex-col overflow-hidden">
+                    <!-- Toolbar -->
+                    <div class="p-4 border-b border-white/5 flex gap-2">
+                        <input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" 
+                               class="bg-gray-900 border border-white/10 rounded-lg px-3 py-2 text-sm text-white w-full md:w-64 focus:outline-none focus:border-blue-500">
+                    </div>
+                    <!-- Table Header -->
+                    <div class="grid grid-cols-12 bg-gray-800/50 p-3 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                        <div class="col-span-2">Date</div>
+                        <div class="col-span-6 md:col-span-7">Description</div>
+                        <div class="col-span-4 md:col-span-3 text-right">Amount</div>
+                    </div>
+                    <!-- Table Body -->
+                    <div id="full-tx-list" class="overflow-y-auto flex-1 divide-y divide-white/5">
+                        <!-- JS Injected -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW: SETTINGS -->
+        <div id="view-settings" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-2xl mx-auto">
+                <h2 class="text-2xl font-bold text-white mb-6">Settings</h2>
+                
+                <div class="glass-panel rounded-xl p-6 mb-6">
+                    <h3 class="text-lg font-medium text-white mb-4">Data Management</h3>
+                    <p class="text-sm text-gray-400 mb-6">Your data is stored locally on this device. Create a backup to transfer it or keep it safe.</p>
+                    
+                    <div class="flex flex-col gap-3">
+                        <button onclick="exportData()" class="flex items-center justify-center gap-2 w-full bg-gray-800 hover:bg-gray-700 border border-white/10 text-white py-3 rounded-lg transition">
+                            <i class="fas fa-download"></i> Export Data (JSON)
+                        </button>
+                        
+                        <div class="relative">
+                            <input type="file" id="importFile" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="importData(this)">
+                            <button class="flex items-center justify-center gap-2 w-full bg-gray-800 hover:bg-gray-700 border border-white/10 text-white py-3 rounded-lg transition">
+                                <i class="fas fa-upload"></i> Import Data
+                            </button>
+                        </div>
+
+                        <button onclick="resetData()" class="flex items-center justify-center gap-2 w-full bg-rose-900/20 hover:bg-rose-900/40 border border-rose-900/50 text-rose-500 py-3 rounded-lg transition mt-4">
+                            <i class="fas fa-trash"></i> Reset All Data
+                        </button>
+                    </div>
+                </div>
+
+                <div class="glass-panel rounded-xl p-6">
+                    <h3 class="text-lg font-medium text-white mb-4">Net Worth History</h3>
+                    <p class="text-sm text-gray-400 mb-2">Edit your chart history (12 months, comma separated).</p>
+                    <textarea id="historyInput" class="w-full bg-gray-900 border border-white/10 rounded-lg p-3 text-sm text-white font-mono mb-3" rows="3"></textarea>
+                    <button onclick="saveHistory()" class="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm">Update Chart</button>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: ADD ACCOUNT -->
+    <div id="accountModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal('accountModal')"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 rounded-xl border border-white/10 shadow-2xl p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Add Account</h3>
+            <form onsubmit="addAccount(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Account Name</label>
+                    <input type="text" id="accName" required class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none" placeholder="e.g. Chase Sapphire">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Balance</label>
+                    <input type="number" step="0.01" id="accBalance" required class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none" placeholder="0.00">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Type</label>
+                    <select id="accType" class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="cash">Cash / Checking</option>
+                        <option value="investment">Investment</option>
+                        <option value="property">Property / Asset</option>
+                        <option value="credit">Credit Card (Debt)</option>
+                        <option value="loan">Loan (Debt)</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition">Save Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL: ADD TRANSACTION -->
+    <div id="txModal" class="fixed inset-0 z-50 hidden">
+        <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" onclick="closeModal('txModal')"></div>
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-gray-800 rounded-xl border border-white/10 shadow-2xl p-6">
+            <h3 class="text-xl font-bold text-white mb-4">Add Transaction</h3>
+            <form onsubmit="addTransaction(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs text-gray-400 mb-1">Description</label>
+                    <input type="text" id="txDesc" required class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none" placeholder="e.g. Grocery Store">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Amount</label>
+                        <input type="number" step="0.01" id="txAmount" required class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-400 mb-1">Date</label>
+                        <input type="date" id="txDate" required class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none">
+                    </div>
+                </div>
+                 <div>
+                    <label class="block text-xs text-gray-400 mb-1">Type</label>
+                    <select id="txType" class="w-full bg-gray-900 border border-white/10 rounded-lg p-2.5 text-white focus:border-blue-500 focus:outline-none">
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                    </select>
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 rounded-lg transition">Save Transaction</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- LOGIC -->
+    <script>
+        // --- 1. DATA MODEL ---
+        const DEFAULT_STATE = {
+            accounts: [
+                { id: 1, name: 'Chase Checking', balance: 4500.50, type: 'cash' },
+                { id: 2, name: 'Vanguard 401k', balance: 142000.00, type: 'investment' },
+                { id: 3, name: 'Amex Gold', balance: 1240.00, type: 'credit' },
+                { id: 4, name: 'Home Equity', balance: 350000.00, type: 'property' },
+                { id: 5, name: 'Mortgage', balance: 280000.00, type: 'loan' }
+            ],
+            transactions: [
+                { id: 1, desc: 'Whole Foods Market', amount: 142.50, date: '2026-01-04', type: 'expense' },
+                { id: 2, desc: 'Shell Station', amount: 45.00, date: '2026-01-03', type: 'expense' },
+                { id: 3, desc: 'Tech Corp Payroll', amount: 4200.00, date: '2026-01-01', type: 'income' },
+                { id: 4, desc: 'Spotify Premium', amount: 12.99, date: '2025-12-28', type: 'expense' }
+            ],
+            history: [205000, 208000, 212000, 210000, 215000, 214000, 218000, 222000, 225000, 230000, 235000, 215260] // Will update dynamically
+        };
+
+        let state = JSON.parse(localStorage.getItem('sure_app_v2')) || DEFAULT_STATE;
+        let mainChartInstance = null;
+
+        // --- 2. ROUTING ---
+        function router(viewName) {
+            // Hide all views
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            // Show selected
+            document.getElementById(`view-${viewName}`).classList.add('active');
+            const navBtn = document.getElementById(`nav-${viewName}`);
+            if(navBtn) navBtn.classList.add('active');
+
+            // View specific Logic
+            if(viewName === 'dashboard') renderDashboard();
+            if(viewName === 'accounts') renderAccounts();
+            if(viewName === 'transactions') renderTransactions();
+            if(viewName === 'settings') {
+                document.getElementById('historyInput').value = state.history.join(', ');
+            }
+        }
+
+        // --- 3. RENDERING ---
+        const formatMoney = (num) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+
+        function renderDashboard() {
+            // Calculate Totals from Accounts
+            let assets = 0;
+            let debts = 0;
+
+            state.accounts.forEach(acc => {
+                if (['cash', 'investment', 'property'].includes(acc.type)) {
+                    assets += acc.balance;
+                } else {
+                    debts += acc.balance;
+                }
+            });
+
+            const netWorth = assets - debts;
+
+            // Update DOM
+            document.getElementById('dash-networth').innerText = formatMoney(netWorth);
+            document.getElementById('dash-assets').innerText = formatMoney(assets);
+            document.getElementById('dash-debts').innerText = formatMoney(debts);
+
+            // Update Chart History (Last point is current net worth)
+            state.history[state.history.length - 1] = netWorth; 
+            renderChart();
+
+            // Render Recent Tx
+            const txContainer = document.getElementById('dash-tx-list');
+            txContainer.innerHTML = '';
+            state.transactions.slice(0, 5).forEach(tx => {
+                const isInc = tx.type === 'income';
+                const color = isInc ? 'text-emerald-400' : 'text-white';
+                const sign = isInc ? '+' : '-';
+                txContainer.innerHTML += `
+                    <div class="p-4 flex justify-between items-center hover:bg-white/5 transition">
+                        <div>
+                            <div class="text-sm font-medium text-white">${tx.desc}</div>
+                            <div class="text-xs text-gray-500">${tx.date}</div>
+                        </div>
+                        <div class="text-sm font-medium ${color}">${sign}${formatMoney(tx.amount)}</div>
+                    </div>
+                `;
+            });
+        }
+
+        function renderAccounts() {
+            const container = document.getElementById('accounts-container');
+            container.innerHTML = '';
+
+            const groups = {
+                'Cash & Banking': state.accounts.filter(a => a.type === 'cash'),
+                'Investments': state.accounts.filter(a => a.type === 'investment'),
+                'Assets & Property': state.accounts.filter(a => a.type === 'property'),
+                'Credit Cards': state.accounts.filter(a => a.type === 'credit'),
+                'Loans': state.accounts.filter(a => a.type === 'loan')
+            };
+
+            for (const [groupName, accounts] of Object.entries(groups)) {
+                if (accounts.length === 0) continue;
+                
+                let groupTotal = accounts.reduce((sum, a) => sum + a.balance, 0);
+                
+                let html = `
+                    <div class="glass-panel rounded-xl overflow-hidden">
+                        <div class="bg-gray-800/50 p-4 border-b border-white/5 flex justify-between items-center">
+                            <h3 class="font-bold text-white text-sm uppercase tracking-wide">${groupName}</h3>
+                            <span class="text-sm font-medium text-gray-400">${formatMoney(groupTotal)}</span>
+                        </div>
+                        <div class="divide-y divide-white/5">
+                `;
+
+                accounts.forEach(acc => {
+                    html += `
+                        <div class="p-4 flex justify-between items-center hover:bg-white/5 group relative">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded bg-gray-700 flex items-center justify-center text-gray-400">
+                                    <i class="fas ${getIcon(acc.type)}"></i>
+                                </div>
+                                <div class="text-sm font-medium text-white">${acc.name}</div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <div class="text-sm font-medium text-white">${formatMoney(acc.balance)}</div>
+                                <button onclick="deleteAccount(${acc.id})" class="text-rose-500 opacity-0 group-hover:opacity-100 transition"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += `</div></div>`;
+                container.innerHTML += html;
+            }
+        }
+
+        function renderTransactions() {
+            const container = document.getElementById('full-tx-list');
+            const search = document.getElementById('tx-search').value.toLowerCase();
+            container.innerHTML = '';
+
+            const filtered = state.transactions
+                .filter(tx => tx.desc.toLowerCase().includes(search))
+                .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            filtered.forEach(tx => {
+                const isInc = tx.type === 'income';
+                container.innerHTML += `
+                    <div class="grid grid-cols-12 p-3 hover:bg-white/5 text-sm items-center group">
+                        <div class="col-span-2 text-gray-400 text-xs">${tx.date.substring(5)}</div>
+                        <div class="col-span-6 md:col-span-7 font-medium text-white truncate">${tx.desc}</div>
+                        <div class="col-span-4 md:col-span-3 text-right flex justify-end gap-3">
+                            <span class="${isInc ? 'text-emerald-400' : 'text-white'}">${isInc ? '+' : '-'}${formatMoney(tx.amount)}</span>
+                            <button onclick="deleteTx(${tx.id})" class="text-rose-500 opacity-0 group-hover:opacity-100"><i class="fas fa-times"></i></button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // --- 4. ACTIONS ---
+        function addAccount(e) {
+            e.preventDefault();
+            const name = document.getElementById('accName').value;
+            const balance = parseFloat(document.getElementById('accBalance').value);
+            const type = document.getElementById('accType').value;
+
+            state.accounts.push({ id: Date.now(), name, balance, type });
+            saveState();
+            closeModal('accountModal');
+            router('accounts'); // Refresh
+        }
+
+        function deleteAccount(id) {
+            if(confirm('Delete this account?')) {
+                state.accounts = state.accounts.filter(a => a.id !== id);
+                saveState();
+                renderAccounts();
+            }
+        }
+
+        function addTransaction(e) {
+            e.preventDefault();
+            const desc = document.getElementById('txDesc').value;
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const date = document.getElementById('txDate').value;
+            const type = document.getElementById('txType').value;
+
+            state.transactions.unshift({ id: Date.now(), desc, amount, date, type });
+            saveState();
+            closeModal('txModal');
+            router('transactions');
+        }
+
+        function deleteTx(id) {
+            if(confirm('Delete transaction?')) {
+                state.transactions = state.transactions.filter(t => t.id !== id);
+                saveState();
+                renderTransactions();
+            }
+        }
+
+        function saveHistory() {
+            const raw = document.getElementById('historyInput').value;
+            state.history = raw.split(',').map(n => parseFloat(n.trim()));
+            saveState();
+            alert('Chart updated');
+        }
+
+        // --- 5. UTILS ---
+        function getIcon(type) {
+            const map = { 'cash': 'fa-university', 'investment': 'fa-chart-line', 'credit': 'fa-credit-card', 'property': 'fa-home', 'loan': 'fa-file-invoice-dollar' };
+            return map[type] || 'fa-wallet';
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        function saveState() {
+            localStorage.setItem('sure_app_v2', JSON.stringify(state));
+        }
+
+        function exportData() {
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+            const dl = document.createElement('a');
+            dl.setAttribute("href", dataStr);
+            dl.setAttribute("download", "sure_backup.json");
+            document.body.appendChild(dl); dl.click(); dl.remove();
+        }
+
+        function importData(input) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                state = JSON.parse(e.target.result);
+                saveState();
+                location.reload();
+            };
+            reader.readAsText(file);
+        }
+
+        function resetData() {
+            if(confirm('Reset all data?')) {
+                localStorage.removeItem('sure_app_v2');
+                location.reload();
+            }
+        }
+
+        // --- 6. CHART LOGIC ---
+        function renderChart() {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (mainChartInstance) mainChartInstance.destroy();
+
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(59, 130, 246, 0.2)');
+            gradient.addColorStop(1, 'rgba(59, 130, 246, 0.0)');
+
+            mainChartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: Array(state.history.length).fill(''), // Blank labels for clean look
+                    datasets: [{
+                        data: state.history,
+                        borderColor: '#3B82F6',
+                        backgroundColor: gradient,
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 0,
+                        pointHoverRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false }, tooltip: { mode: 'index', intersect: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { display: false } // Minimal look
+                    }
+                }
+            });
+        }
+
+        // --- INIT ---
+        document.getElementById('txDate').valueAsDate = new Date();
+        router('dashboard');
+
+    </script>
+</body>
+</html>

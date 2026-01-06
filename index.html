@@ -208,7 +208,7 @@
             </div>
         </div>
 
-        <!-- NEW DEBTS VIEW -->
+        <!-- DEBTS VIEW -->
         <div id="view-debts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
@@ -216,13 +216,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Interest vs Principal Chart -->
                     <div class="neo-card p-6">
                         <h3 class="font-bold text-slate-900 text-lg mb-4">Total Obligation</h3>
-                        <p class="text-xs text-slate-500 mb-6">Remaining Principal vs Estimated Interest</p>
+                        <p class="text-xs text-slate-500 mb-6">Principal vs Future Interest</p>
                         <div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div>
                     </div>
-                    <!-- Breakdown Pie -->
                     <div class="neo-card p-6">
                         <h3 class="font-bold text-slate-900 text-lg mb-4">Debt Composition</h3>
                         <p class="text-xs text-slate-500 mb-6">Distribution by Loan</p>
@@ -230,9 +228,8 @@
                     </div>
                 </div>
 
-                <!-- Detail List -->
-                <div id="debt-list-container" class="space-y-4">
-                    <!-- Injected via JS -->
+                <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Cards Injected via JS -->
                 </div>
             </div>
         </div>
@@ -462,7 +459,7 @@
                     if(a.emi) {
                         totalScheduledEMI+=a.emi;
                         
-                        // Calc Remaining Interest
+                        // Remaining Interest Calc
                         let monthsElapsed = 0;
                         if(a.startDate) {
                             const start = new Date(a.startDate);
@@ -474,47 +471,53 @@
                         const interestComponent = Math.max(0, totalRemainingPayable - a.balance);
                         totalEstimatedInterest += interestComponent;
 
-                        // Build List HTML
+                        // Payoff Date
                         const payoffDate = new Date();
                         payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
                         
+                        // Percentage for Progress Bar
+                        const principalPercent = (a.balance / totalRemainingPayable) * 100;
+                        const interestPercent = 100 - principalPercent;
+
                         debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-rose-500">
+                            <div class="neo-card p-5 border-l-4 border-rose-500 mb-3">
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
-                                        <h4 class="font-bold text-slate-900">${a.name}</h4>
-                                        <p class="text-xs text-slate-500">Started: ${a.startDate ? formatDateIN(a.startDate) : 'N/A'}</p>
+                                        <h4 class="font-bold text-slate-900 text-lg">${a.name}</h4>
+                                        <span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span>
                                     </div>
                                     <div class="text-right">
-                                        <div class="font-bold text-slate-900">${money(a.balance)}</div>
-                                        <div class="text-xs text-rose-500 font-bold">EMI: ${money(a.emi)}</div>
+                                        <div class="text-xs text-slate-400 uppercase font-bold">Total Liability</div>
+                                        <div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div>
                                     </div>
                                 </div>
-                                <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-50 text-xs">
-                                    <div>
-                                        <span class="text-slate-400 block">Rate</span>
-                                        <span class="font-bold text-slate-700">${a.roi}%</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <span class="text-slate-400 block">Payoff Est.</span>
-                                        <span class="font-bold text-slate-700">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span>
-                                    </div>
+                                
+                                <div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden flex">
+                                    <div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div>
+                                    <div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div>
+                                </div>
+                                <div class="flex justify-between text-[10px] text-slate-500 mb-3">
+                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-indigo-500 rounded-full"></div> Principal: ${money(a.balance)}</span>
+                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span>
+                                </div>
+
+                                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-xs">
+                                    <div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700">${a.roi}%</span></div>
+                                    <div class="text-right"><span class="text-slate-400 block">Payoff Date</span><span class="font-bold text-slate-700">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div>
                                 </div>
                             </div>
                         `;
                     } else {
-                        // Credit card or untracked loan
                         debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-orange-400">
+                            <div class="neo-card p-5 border-l-4 border-orange-400 mb-3">
                                 <div class="flex justify-between items-center">
                                     <h4 class="font-bold text-slate-900">${a.name}</h4>
-                                    <div class="font-bold text-slate-900">${money(a.balance)}</div>
+                                    <div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div>
                                 </div>
+                                <div class="text-xs text-slate-400 mt-1">Revolving Credit / Untracked Loan</div>
                             </div>
                         `;
                     }
-
-                    // For Pie Chart
                     debtCompositionLabels.push(a.name);
                     debtCompositionData.push(a.balance);
                 } 
@@ -535,7 +538,6 @@
 
             // DEBT CHARTS
             if(document.getElementById('view-debts').classList.contains('active')) {
-                // 1. Split Chart
                 const debtSplitCtx = document.getElementById('debtSplitChart').getContext('2d');
                 if(debtSplitInst) debtSplitInst.destroy();
                 debtSplitInst = new Chart(debtSplitCtx, {
@@ -543,14 +545,13 @@
                     data: {
                         labels: ['Total Liability'],
                         datasets: [
-                            { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#94A3B8', borderRadius: 4 },
-                            { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 4 }
+                            { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 6 },
+                            { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 6 }
                         ]
                     },
                     options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } }
                 });
 
-                // 2. Composition Pie
                 const debtPieCtx = document.getElementById('debtPieChart').getContext('2d');
                 if(debtPieInst) debtPieInst.destroy();
                 debtPieInst = new Chart(debtPieCtx, {
@@ -562,14 +563,29 @@
                     options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } }
                 });
 
-                // 3. List
                 document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="text-center text-slate-400 py-10">No active debts found.</div>';
             }
 
             // ... (Existing Sankey/Bar Logic maintained below) ...
             const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
             const rangeMonths = analysisRange === '1Y' ? 11 : 5;
-            for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:totalScheduledEMI}); }
+            for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
+            
+            // 1. ADD EMI TO BUCKETS (Smart Date Logic)
+            state.accounts.forEach(a => {
+                if(a.emi && a.emi > 0) {
+                    buckets.forEach(b => {
+                        const bucketDate = new Date(b.year, b.month, 1);
+                        const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); // If no start, assume always active
+                        // Reset day to 1 to compare months easily
+                        loanStart.setDate(1);
+                        if (bucketDate >= loanStart) {
+                            b.expense += a.emi;
+                        }
+                    });
+                }
+            });
+
             const flows={}; const WALLET="Wallet"; let si=0, so=0;
             state.transactions.forEach(tx=>{
                 const txDate=new Date(tx.date); 
@@ -585,45 +601,44 @@
                     else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; }
                 }
             });
-            const emiMul = analysisRange==='1M'?1:(analysisRange==='6M'?6:12);
-            const emiFlow = totalScheduledEMI * emiMul;
-            if(emiFlow>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+emiFlow; so+=emiFlow; }
+            
+            // Add EMI to Sankey Flow
+            // Calculate total EMI for the selected range *accurately* by summing the buckets
+            let totalSankeyEMI = 0;
+            buckets.forEach(b => {
+                // Check if this bucket is inside the selected analysis range
+                let inRange = false;
+                if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true;
+                else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true;
+                else if(analysisRange === '1Y') inRange = true;
+
+                if(inRange) {
+                    // We need to know how much of b.expense was EMI.
+                    // Re-calculate EMI part for this bucket
+                    let monthEMI = 0;
+                    state.accounts.forEach(a => {
+                        if(a.emi && a.emi > 0) {
+                            const bDate = new Date(b.year, b.month, 1);
+                            const lStart = a.startDate ? new Date(a.startDate) : new Date(0);
+                            lStart.setDate(1);
+                            if(bDate >= lStart) monthEMI += a.emi;
+                        }
+                    });
+                    totalSankeyEMI += monthEMI;
+                }
+            });
+
+            if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
             const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
             
             const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
             const sankeyCtx=document.getElementById('sankeyChart').getContext('2d');
             if(sankeyInst) sankeyInst.destroy();
-            if (sankeyData.length > 0) {
-                const getColor = (name) => {
-                    if (!name) return '#ccc';
-                    if (name === WALLET) return '#2563EB'; 
-                    if (name === 'Surplus') return '#6366F1';
-                    if (name === 'Scheduled EMI') return '#F43F5E';
-                    if (sankeyData.some(d => d.from === name && d.to === WALLET)) return '#10B981'; 
-                    return '#F43F5E';
-                };
-                sankeyInst = new Chart(sankeyCtx, {
-                    type: 'sankey',
-                    data: {
-                        datasets: [{
-                            data: sankeyData,
-                            colorFrom: (c) => {
-                                const item = c.dataset.data[c.dataIndex];
-                                return item ? getColor(item.from) : '#ccc';
-                            },
-                            colorTo: (c) => {
-                                const item = c.dataset.data[c.dataIndex];
-                                return item ? getColor(item.to) : '#ccc';
-                            },
-                            colorMode: 'gradient',
-                            labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 },
-                            nodeWidth: 20, nodePadding: 20
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } }
-                });
+            if(sankeyData.length > 0) {
+                const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return '#2563EB'; if(name==='Surplus') return '#6366F1'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#10B981'; return '#F43F5E'; };
+                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].from):'#ccc', colorTo: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].to):'#ccc', colorMode: 'gradient', labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 }, nodeWidth: 20, nodePadding: 20 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } } });
             } else {
-                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } }); 
+                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } });
             }
 
             const barCtx = document.getElementById('monthlyBarChart').getContext('2d');

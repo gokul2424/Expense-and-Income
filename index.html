@@ -85,7 +85,7 @@
         /* Filter Buttons */
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .filter-btn.inactive { color: #94A3B8; hover:text: #64748B; }
+        .filter-btn.inactive { color: #94A3B8; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden bg-slate-50">
@@ -116,6 +116,7 @@
         <nav class="flex-1 px-6 space-y-1">
             <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-home w-5"></i> Home</button>
             <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
+            <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
             <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
         </nav>
@@ -207,6 +208,35 @@
             </div>
         </div>
 
+        <!-- NEW DEBTS VIEW -->
+        <div id="view-debts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <div class="flex justify-between items-center">
+                    <div><h2 class="text-3xl font-bold text-slate-900">Debt Intelligence</h2><p class="text-slate-500 font-medium">Liability Tracking</p></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Interest vs Principal Chart -->
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4">Total Obligation</h3>
+                        <p class="text-xs text-slate-500 mb-6">Remaining Principal vs Estimated Interest</p>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div>
+                    </div>
+                    <!-- Breakdown Pie -->
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4">Debt Composition</h3>
+                        <p class="text-xs text-slate-500 mb-6">Distribution by Loan</p>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- Detail List -->
+                <div id="debt-list-container" class="space-y-4">
+                    <!-- Injected via JS -->
+                </div>
+            </div>
+        </div>
+
         <!-- ACCOUNTS VIEW -->
         <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-4xl mx-auto">
@@ -246,8 +276,8 @@
             <div class="relative -top-8">
                 <button onclick="openModal('txModal')" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-indigo-300 hover:scale-110 transition-transform border-4 border-white"><i class="fas fa-plus"></i></button>
             </div>
+            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-receipt text-xl"></i></button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
-            <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-list text-xl"></i></button>
         </div>
     </nav>
 
@@ -266,6 +296,10 @@
                     <option value="loan">Loan (Debt)</option>
                 </select>
                 <div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div class="col-span-2">
+                        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Start Date</label>
+                        <input type="date" id="accStartDate" class="bg-white rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm text-slate-600">
+                    </div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="bg-white rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="8.5"></div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="bg-white rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="60"></div>
                     <div class="col-span-2 text-xs text-indigo-600 font-bold mt-1" id="emi-preview"></div>
@@ -317,9 +351,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ==========================================
-        // PASTE FIREBASE KEYS HERE
-        // ==========================================
+        // CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
             authDomain: "expense-and-income-faf13.firebaseapp.com",
@@ -328,7 +360,6 @@
             messagingSenderId: "1278622168",
             appId: "1:1278622168:web:b6e94a4d440d17d7b75aad"
         };
-        // ==========================================
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
@@ -337,7 +368,7 @@
         
         let currentUser = null;
         let state = { accounts: [], transactions: [], history: [0] };
-        let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, analysisRange='6M';
+        let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, analysisRange='6M';
 
         const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
@@ -365,12 +396,13 @@
         window.addAccount = (e) => {
             e.preventDefault();
             const type = document.getElementById('accType').value;
-            let emi = 0, roi = 0, tenure = 0;
+            let emi = 0, roi = 0, tenure = 0, startDate = '';
             if(['loan','credit'].includes(type)) {
                 const p = parseFloat(document.getElementById('accBalance').value)||0; roi = parseFloat(document.getElementById('accRoi').value)||0; tenure = parseFloat(document.getElementById('accTenure').value)||0;
                 emi = calculateEMI(p, roi, tenure);
+                startDate = document.getElementById('accStartDate').value;
             }
-            state.accounts.push({ id: Date.now(), name: document.getElementById('accName').value, balance: parseFloat(document.getElementById('accBalance').value), type, roi, tenure, emi });
+            state.accounts.push({ id: Date.now(), name: document.getElementById('accName').value, balance: parseFloat(document.getElementById('accBalance').value), type, roi, tenure, emi, startDate });
             save(); closeModal('accountModal'); e.target.reset(); document.getElementById('debt-fields').classList.add('hidden');
         };
 
@@ -404,80 +436,200 @@
 
         function render() {
             updateAccountSelect();
-            
-            // Toggle Button Styling
-            ['1M','6M','1Y'].forEach(r => {
-                const btn = document.getElementById(`btn-range-${r.toLowerCase()}`);
-                if(r === analysisRange) btn.className = "filter-btn active";
-                else btn.className = "filter-btn inactive";
-            });
+            ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(r===analysisRange) btn.className="filter-btn active"; else btn.className="filter-btn inactive"; });
 
-            // 1. Stats
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
+            
+            // Debt Intelligence vars
+            let totalDebtPrincipal = 0;
+            let totalEstimatedInterest = 0;
+            let debtCompositionLabels = [];
+            let debtCompositionData = [];
+            let debtListHTML = "";
+
             state.accounts.forEach(a => { 
-                if(['cash','investment','property'].includes(a.type)) { assets+=a.balance; if(a.type==='cash') assetMap['Cash']+=a.balance; if(a.type==='investment') assetMap['Investments']+=a.balance; if(a.type==='property') assetMap['Property']+=a.balance; } 
-                else { debts+=a.balance; if(a.emi) totalScheduledEMI+=a.emi; } 
+                if(['cash','investment','property'].includes(a.type)) { 
+                    assets+=a.balance; 
+                    if(a.type==='cash') assetMap['Cash']+=a.balance; 
+                    if(a.type==='investment') assetMap['Investments']+=a.balance; 
+                    if(a.type==='property') assetMap['Property']+=a.balance; 
+                } 
+                else { 
+                    debts+=a.balance; 
+                    totalDebtPrincipal += a.balance;
+                    
+                    if(a.emi) {
+                        totalScheduledEMI+=a.emi;
+                        
+                        // Calc Remaining Interest
+                        let monthsElapsed = 0;
+                        if(a.startDate) {
+                            const start = new Date(a.startDate);
+                            const now = new Date();
+                            monthsElapsed = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
+                        }
+                        const remainingTenure = Math.max(0, (a.tenure || 0) - monthsElapsed);
+                        const totalRemainingPayable = a.emi * remainingTenure;
+                        const interestComponent = Math.max(0, totalRemainingPayable - a.balance);
+                        totalEstimatedInterest += interestComponent;
+
+                        // Build List HTML
+                        const payoffDate = new Date();
+                        payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
+                        
+                        debtListHTML += `
+                            <div class="neo-card p-5 border-l-4 border-rose-500">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <h4 class="font-bold text-slate-900">${a.name}</h4>
+                                        <p class="text-xs text-slate-500">Started: ${a.startDate ? formatDateIN(a.startDate) : 'N/A'}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <div class="font-bold text-slate-900">${money(a.balance)}</div>
+                                        <div class="text-xs text-rose-500 font-bold">EMI: ${money(a.emi)}</div>
+                                    </div>
+                                </div>
+                                <div class="grid grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-50 text-xs">
+                                    <div>
+                                        <span class="text-slate-400 block">Rate</span>
+                                        <span class="font-bold text-slate-700">${a.roi}%</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-slate-400 block">Payoff Est.</span>
+                                        <span class="font-bold text-slate-700">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // Credit card or untracked loan
+                        debtListHTML += `
+                            <div class="neo-card p-5 border-l-4 border-orange-400">
+                                <div class="flex justify-between items-center">
+                                    <h4 class="font-bold text-slate-900">${a.name}</h4>
+                                    <div class="font-bold text-slate-900">${money(a.balance)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    // For Pie Chart
+                    debtCompositionLabels.push(a.name);
+                    debtCompositionData.push(a.balance);
+                } 
             });
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
-            // 2. Main Chart
+            // Chart Renderers (existing + new debt ones)
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
             chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
 
-            // 3. Asset Pie
             const pieCtx = document.getElementById('assetPieChart').getContext('2d');
             if(assetPieInst) assetPieInst.destroy();
             assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } });
             const totalAssets=assets||1; document.getElementById('asset-legend').innerHTML=`<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`;
 
-            // 4. Sankey & Bar Logic
+            // DEBT CHARTS
+            if(document.getElementById('view-debts').classList.contains('active')) {
+                // 1. Split Chart
+                const debtSplitCtx = document.getElementById('debtSplitChart').getContext('2d');
+                if(debtSplitInst) debtSplitInst.destroy();
+                debtSplitInst = new Chart(debtSplitCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Total Liability'],
+                        datasets: [
+                            { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#94A3B8', borderRadius: 4 },
+                            { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } }
+                });
+
+                // 2. Composition Pie
+                const debtPieCtx = document.getElementById('debtPieChart').getContext('2d');
+                if(debtPieInst) debtPieInst.destroy();
+                debtPieInst = new Chart(debtPieCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: debtCompositionLabels,
+                        datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } }
+                });
+
+                // 3. List
+                document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="text-center text-slate-400 py-10">No active debts found.</div>';
+            }
+
+            // ... (Existing Sankey/Bar Logic maintained below) ...
             const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
-            
-            // Determine Bar Chart Range (Max range needed)
-            const rangeMonths = analysisRange === '1Y' ? 11 : 5; // 0-11 (12 months) or 0-5 (6 months)
+            const rangeMonths = analysisRange === '1Y' ? 11 : 5;
             for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:totalScheduledEMI}); }
-            
             const flows={}; const WALLET="Wallet"; let si=0, so=0;
             state.transactions.forEach(tx=>{
                 const txDate=new Date(tx.date); 
-                // Populate Bar Data
                 const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear());
                 if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; }
-                
-                // Populate Sankey
                 let inc=false;
                 if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } 
-                else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } // Last 6 of 6/12 buckets
-                else { if(bi !== -1) inc=true; } // All 12 buckets
-
+                else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; }
+                else { if(bi !== -1) inc=true; }
                 if(inc){
                     const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount;
                     if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; }
                     else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; }
                 }
             });
-
-            // Add EMI to Sankey
             const emiMul = analysisRange==='1M'?1:(analysisRange==='6M'?6:12);
             const emiFlow = totalScheduledEMI * emiMul;
             if(emiFlow>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+emiFlow; so+=emiFlow; }
-            
             const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
-            const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
             
+            const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
             const sankeyCtx=document.getElementById('sankeyChart').getContext('2d');
             if(sankeyInst) sankeyInst.destroy();
-            sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c) => c.raw.from === WALLET ? '#4F46E5' : '#10B981', colorTo: (c) => c.raw.to === 'Savings' ? '#6366F1' : (c.raw.to === WALLET ? '#4F46E5' : '#F43F5E'), colorMode: 'gradient', labels: { color: '#334155', font: { weight: 'bold', size: 11 }, padding: 8 } }] }, options: { responsive: true, maintainAspectRatio: false } });
+            if (sankeyData.length > 0) {
+                const getColor = (name) => {
+                    if (!name) return '#ccc';
+                    if (name === WALLET) return '#2563EB'; 
+                    if (name === 'Surplus') return '#6366F1';
+                    if (name === 'Scheduled EMI') return '#F43F5E';
+                    if (sankeyData.some(d => d.from === name && d.to === WALLET)) return '#10B981'; 
+                    return '#F43F5E';
+                };
+                sankeyInst = new Chart(sankeyCtx, {
+                    type: 'sankey',
+                    data: {
+                        datasets: [{
+                            data: sankeyData,
+                            colorFrom: (c) => {
+                                const item = c.dataset.data[c.dataIndex];
+                                return item ? getColor(item.from) : '#ccc';
+                            },
+                            colorTo: (c) => {
+                                const item = c.dataset.data[c.dataIndex];
+                                return item ? getColor(item.to) : '#ccc';
+                            },
+                            colorMode: 'gradient',
+                            labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 },
+                            nodeWidth: 20, nodePadding: 20
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } }
+                });
+            } else {
+                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } }); 
+            }
 
             const barCtx = document.getElementById('monthlyBarChart').getContext('2d');
             if(barChartInst) barChartInst.destroy();
-            barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { display: false } } } });
+            barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } } });
 
-            // 5. Lists
             const ac=document.getElementById('accounts-container'); ac.innerHTML='';
             const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] };
             for(const[name,types] of Object.entries(groups)){
@@ -486,6 +638,7 @@
                     let h=`<div class="neo-card p-5 mb-4"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">${name}</h4><div class="space-y-4">`;
                     items.forEach(i=>{
                         let sub=i.emi?`<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-full inline-block mt-1">EMI: ${money(i.emi)}</div>`:'';
+                        if(i.startDate) sub += ` <span class="text-[10px] text-slate-400 ml-1">Since: ${formatDateIN(i.startDate)}</span>`;
                         h+=`<div class="flex justify-between items-center group"><div><div class="font-bold text-slate-800">${i.name}</div>${sub}</div><div class="flex items-center gap-3"><span class="font-bold text-slate-900">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="text-slate-300 hover:text-rose-500 transition"><i class="fas fa-trash"></i></button></div></div>`;
                     });
                     ac.innerHTML+=h+`</div></div>`;
@@ -500,7 +653,7 @@
             });
         }
 
-        window.router=(v)=>{document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e=>e.classList.remove('active'));if(document.getElementById('d-nav-'+v))document.getElementById('d-nav-'+v).classList.add('active');if(document.getElementById('m-nav-'+v))document.getElementById('m-nav-'+v).classList.add('active');};
+        window.router=(v)=>{document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e=>e.classList.remove('active'));if(document.getElementById('d-nav-'+v))document.getElementById('d-nav-'+v).classList.add('active');if(document.getElementById('m-nav-'+v))document.getElementById('m-nav-'+v).classList.add('active');render();};
         window.openModal=(id)=>document.getElementById(id).classList.remove('hidden');window.closeModal=(id)=>document.getElementById(id).classList.add('hidden');
         document.getElementById('txDate').valueAsDate=new Date(); router('dashboard');
     </script>

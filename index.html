@@ -287,7 +287,7 @@
         </div>
     </div>
 
-    <!-- MODAL: ADD TRANSACTION -->
+    <!-- MODAL: ADD TRANSACTION (UPDATED WITH ACCOUNT LINK) -->
     <div id="txModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
         <div class="bg-white rounded-t-2xl md:rounded-2xl border border-gray-100 p-6 w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out]">
             <h3 class="text-xl font-bold text-gray-900 mb-4">Log Transaction</h3>
@@ -306,6 +306,13 @@
                         <optgroup label="Expenses">
                             <option value="Food & Dining">Food & Dining</option><option value="Housing">Housing/Rent</option><option value="Transportation">Transportation</option><option value="Shopping">Shopping</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="EMI/Debt">EMI/Debt</option><option value="Misc">Misc</option>
                         </optgroup>
+                    </select>
+                </div>
+                <!-- ACCOUNT SELECTION -->
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Via Account</label>
+                    <select id="txAccount" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
+                        <!-- Populated by JS -->
                     </select>
                 </div>
                 <div class="flex gap-3 pt-2">
@@ -400,15 +407,53 @@
 
         window.addTransaction = (e) => {
             e.preventDefault();
-            state.transactions.unshift({
-                id: Date.now(),
-                desc: document.getElementById('txDesc').value,
-                amount: parseFloat(document.getElementById('txAmount').value),
-                date: document.getElementById('txDate').value,
-                type: document.getElementById('txType').value,
-                cat: document.getElementById('txCat').value // New Category
-            });
-            save(); closeModal('txModal'); e.target.reset();
+            const amount = parseFloat(document.getElementById('txAmount').value);
+            const type = document.getElementById('txType').value;
+            const accId = parseFloat(document.getElementById('txAccount').value); // ID from Select
+            
+            // Find Account
+            const accIndex = state.accounts.findIndex(a => a.id === accId);
+            if(accIndex !== -1) {
+                const acc = state.accounts[accIndex];
+                const accName = acc.name;
+
+                // Update Balance Logic
+                if (type === 'income') {
+                    // Income: Always Increases Balance (Asset goes up, or Debt refund goes "up" towards 0)
+                    // For Credit Cards: "Income" usually means Payment/Refund -> Debt decreases.
+                    // But in this simple app, Debt is stored as a positive number.
+                    // So Income to Credit Card should DECREASE the balance.
+                    if(['credit', 'loan'].includes(acc.type)) {
+                        acc.balance -= amount; 
+                    } else {
+                        acc.balance += amount; 
+                    }
+                } else {
+                    // Expense: 
+                    // From Asset: Balance Decreases.
+                    // From Credit: Debt Increases.
+                    if(['credit', 'loan'].includes(acc.type)) {
+                        acc.balance += amount;
+                    } else {
+                        acc.balance -= amount;
+                    }
+                }
+
+                // Add Transaction
+                state.transactions.unshift({
+                    id: Date.now(),
+                    desc: document.getElementById('txDesc').value,
+                    amount: amount,
+                    date: document.getElementById('txDate').value,
+                    type: type,
+                    cat: document.getElementById('txCat').value,
+                    accName: accName // Store Account Name for display
+                });
+                
+                save(); 
+                closeModal('txModal'); 
+                e.target.reset();
+            }
         };
 
         window.deleteItem = (list, id) => { if(confirm('Delete?')) { state[list] = state[list].filter(i=>i.id!==id); save(); } };
@@ -429,7 +474,44 @@
             render(); 
         };
 
+        // Render Account Options for Modal
+        function updateAccountSelect() {
+            const select = document.getElementById('txAccount');
+            select.innerHTML = '';
+            
+            // Assets Group
+            const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type));
+            if(assets.length) {
+                const grp = document.createElement('optgroup');
+                grp.label = "Liquidity / Assets";
+                assets.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.innerText = `${a.name} (${money(a.balance)})`;
+                    grp.appendChild(opt);
+                });
+                select.appendChild(grp);
+            }
+
+            // Debts Group
+            const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type));
+            if(debts.length) {
+                const grp = document.createElement('optgroup');
+                grp.label = "Credit Cards / Loans";
+                debts.forEach(a => {
+                    const opt = document.createElement('option');
+                    opt.value = a.id;
+                    opt.innerText = `${a.name} (Due: ${money(a.balance)})`;
+                    grp.appendChild(opt);
+                });
+                select.appendChild(grp);
+            }
+        }
+
         function render() {
+            // Update Select Dropdown
+            updateAccountSelect();
+
             // 1. Stats & Calculations
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
@@ -480,7 +562,6 @@
                     plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ` ${money(c.parsed)} (${((c.parsed/assets)*100).toFixed(1)}%)` } } }
                 }
             });
-            // Custom Legend
             const legendDiv = document.getElementById('asset-legend');
             const totalAssets = assets || 1;
             legendDiv.innerHTML = `
@@ -497,7 +578,7 @@
             
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(currentYear, currentMonth - i, 1);
-                buckets.push({ label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, month: d.getMonth(), year: d.getFullYear(), income: 0, expense: totalScheduledEMI }); // Auto-Add EMI
+                buckets.push({ label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, month: d.getMonth(), year: d.getFullYear(), income: 0, expense: totalScheduledEMI }); 
             }
 
             const flows = {};
@@ -617,7 +698,7 @@
             const term = document.getElementById('tx-search').value.toLowerCase();
             state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t => {
                 const isInc = t.type === 'income';
-                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${formatDateIN(t.date)} • ${t.cat||'Uncategorized'}</span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
+                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${formatDateIN(t.date)} • ${t.cat||'Uncategorized'} • <span class="text-blue-500">${t.accName || 'Account'}</span></span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
             });
         }
 

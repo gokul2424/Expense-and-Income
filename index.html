@@ -147,13 +147,13 @@
             </div>
         </div>
 
-        <!-- ANALYSIS VIEW (NEW) -->
+        <!-- ANALYSIS VIEW -->
         <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-6xl mx-auto space-y-6">
                 <div class="flex justify-between items-center">
                     <div>
                         <h2 class="text-3xl font-bold text-gray-900">Analysis</h2>
-                        <p class="text-gray-500 text-sm mt-1">Flows & Trends (Last 6 Months)</p>
+                        <p class="text-gray-500 text-sm mt-1">Flows, Trends & Asset Allocation</p>
                     </div>
                 </div>
 
@@ -161,23 +161,48 @@
                 <div class="glass-panel rounded-2xl p-6 bg-white">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="font-semibold text-gray-900 text-lg">Money Flow</h3>
+                        
+                        <div class="flex bg-gray-100 rounded-lg p-1">
+                            <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors">1 Month</button>
+                            <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all">6 Months</button>
+                        </div>
                     </div>
-                    <div class="chart-wrapper" style="height: 400px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
+                    
+                    <div class="chart-wrapper" style="height: 350px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
                         <canvas id="sankeyChart"></canvas>
                     </div>
                     <div class="mt-4 text-center text-xs text-gray-500 font-medium">
                         <span class="text-emerald-600">● Income</span> &rarr; <span class="text-blue-600">● Wallet</span> &rarr; <span class="text-rose-500">● Expenses</span> & <span class="text-indigo-600">● Surplus</span>
+                        <div class="mt-1 text-gray-400 font-normal">Includes Auto-Scheduled EMIs</div>
                     </div>
                 </div>
 
-                <!-- MONTHLY BREAKDOWN (BAR) -->
-                <div class="glass-panel rounded-2xl p-6 bg-white">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-gray-900 text-lg">Monthly Breakdown</h3>
-                        <p class="text-xs text-gray-500">Income vs Expense</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- MONTHLY BREAKDOWN (BAR) -->
+                    <div class="glass-panel rounded-2xl p-6 bg-white">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-gray-900 text-lg">Monthly Trend</h3>
+                            <p class="text-xs text-gray-500">Includes EMI</p>
+                        </div>
+                        <div class="chart-wrapper" style="height: 250px;">
+                            <canvas id="monthlyBarChart"></canvas>
+                        </div>
                     </div>
-                    <div class="chart-wrapper" style="height: 250px;">
-                        <canvas id="monthlyBarChart"></canvas>
+
+                    <!-- ASSET ALLOCATION (PIE) -->
+                    <div class="glass-panel rounded-2xl p-6 bg-white">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="font-semibold text-gray-900 text-lg">Asset Allocation</h3>
+                            <p class="text-xs text-gray-500">Portfolio Weightage</p>
+                        </div>
+                        <div class="flex items-center justify-center">
+                            <div class="chart-wrapper" style="height: 200px; width: 200px;">
+                                <canvas id="assetPieChart"></canvas>
+                            </div>
+                            <div id="asset-legend" class="ml-6 space-y-2 text-sm">
+                                <!-- Legend Injected by JS -->
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -320,6 +345,8 @@
         let chartInst = null;
         let sankeyInst = null;
         let barChartInst = null;
+        let assetPieInst = null;
+        let analysisRange = '6M';
 
         const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
@@ -389,10 +416,35 @@
         const money = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
         const formatDateIN = (d) => { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
 
+        // Toggle Analysis Range
+        window.setAnalysisRange = (range) => {
+            analysisRange = range;
+            if(range === '1M') {
+                document.getElementById('btn-range-1m').className = "px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all";
+                document.getElementById('btn-range-6m').className = "px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors";
+            } else {
+                document.getElementById('btn-range-1m').className = "px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors";
+                document.getElementById('btn-range-6m').className = "px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all";
+            }
+            render(); 
+        };
+
         function render() {
-            // 1. Stats
-            let assets=0, debts=0, totalEMI=0;
-            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) assets+=a.balance; else { debts+=a.balance; if(a.emi) totalEMI+=a.emi; } });
+            // 1. Stats & Calculations
+            let assets=0, debts=0, totalScheduledEMI=0;
+            let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
+            
+            state.accounts.forEach(a => { 
+                if(['cash','investment','property'].includes(a.type)) {
+                    assets += a.balance;
+                    if(a.type === 'cash') assetMap['Cash'] += a.balance;
+                    if(a.type === 'investment') assetMap['Investments'] += a.balance;
+                    if(a.type === 'property') assetMap['Property'] += a.balance;
+                } else { 
+                    debts += a.balance; 
+                    if(a.emi) totalScheduledEMI += a.emi; 
+                } 
+            });
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
@@ -404,60 +456,76 @@
                 type: 'line', 
                 data: { 
                     labels: Array(state.history.length).fill(''), 
-                    datasets: [{ 
-                        data: state.history, 
-                        borderColor: '#2563EB', 
-                        backgroundColor: 'rgba(37, 99, 235, 0.1)', 
-                        borderWidth: 3, 
-                        fill: true, 
-                        tension: 0.4, 
-                        pointRadius: 0 
-                    }] 
+                    datasets: [{ data: state.history, borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] 
                 }, 
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } }, 
-                    scales: { 
-                        x: { display: false }, 
-                        y: { display: false } 
-                    } 
-                } 
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } 
             });
 
-            // 3. 6-MONTH LOGIC (For Sankey & Bar)
+            // 3. ASSET ALLOCATION PIE CHART
+            const pieCtx = document.getElementById('assetPieChart').getContext('2d');
+            if(assetPieInst) assetPieInst.destroy();
+            assetPieInst = new Chart(pieCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cash', 'Investments', 'Property'],
+                    datasets: [{
+                        data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']],
+                        backgroundColor: ['#10B981', '#2563EB', '#6366F1'],
+                        borderWidth: 0,
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ` ${money(c.parsed)} (${((c.parsed/assets)*100).toFixed(1)}%)` } } }
+                }
+            });
+            // Custom Legend
+            const legendDiv = document.getElementById('asset-legend');
+            const totalAssets = assets || 1;
+            legendDiv.innerHTML = `
+                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10B981]"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets*100)||0).toFixed(0)}%</span></div>
+                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#2563EB]"></span><span>Investments</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets*100)||0).toFixed(0)}%</span></div>
+                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#6366F1]"></span><span>Property</span></div><span class="font-bold">${((assetMap['Property']/totalAssets*100)||0).toFixed(0)}%</span></div>
+            `;
+
+            // 4. SANKEY & ANALYSIS
+            const buckets = [];
             const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
             const currentMonth = new Date().getMonth();
             const currentYear = new Date().getFullYear();
             
-            const buckets = [];
             for (let i = 5; i >= 0; i--) {
                 const d = new Date(currentYear, currentMonth - i, 1);
-                buckets.push({ 
-                    label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, 
-                    month: d.getMonth(), 
-                    year: d.getFullYear(), 
-                    income: 0, 
-                    expense: 0 
-                });
+                buckets.push({ label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, month: d.getMonth(), year: d.getFullYear(), income: 0, expense: totalScheduledEMI }); // Auto-Add EMI
             }
 
-            // --- SANKEY DATA (Last 6 Months Aggregate) ---
             const flows = {};
             const WALLET = "Wallet";
             let sankeyTotalIn = 0, sankeyTotalOut = 0;
 
             state.transactions.forEach(tx => {
                 const txDate = new Date(tx.date);
-                const cutoffDate = new Date(buckets[0].year, buckets[0].month, 1);
+                const cutoff6M = new Date(buckets[0].year, buckets[0].month, 1);
                 
-                if (txDate >= cutoffDate) {
+                // Populate Bar Data
+                if (txDate >= cutoff6M) {
                     const bIndex = buckets.findIndex(b => b.month === txDate.getMonth() && b.year === txDate.getFullYear());
                     if (bIndex !== -1) {
                         if (tx.type === 'income') buckets[bIndex].income += tx.amount;
                         else buckets[bIndex].expense += tx.amount;
                     }
+                }
 
+                // Populate Sankey
+                let includeInSankey = false;
+                if (analysisRange === '1M') {
+                    if (txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear) includeInSankey = true;
+                } else {
+                    if (txDate >= cutoff6M) includeInSankey = true;
+                }
+
+                if (includeInSankey) {
                     const cat = tx.cat || (tx.type === 'income' ? 'Uncategorized Income' : 'Misc');
                     const amt = tx.amount;
                     if (tx.type === 'income') {
@@ -471,6 +539,14 @@
                     }
                 }
             });
+
+            // ADD EMI FLOW TO SANKEY
+            const emiFlow = analysisRange === '1M' ? totalScheduledEMI : (totalScheduledEMI * 6);
+            if (emiFlow > 0) {
+                const emiKey = `${WALLET}|Scheduled EMI`;
+                flows[emiKey] = (flows[emiKey] || 0) + emiFlow;
+                sankeyTotalOut += emiFlow;
+            }
 
             const surplus = sankeyTotalIn - sankeyTotalOut;
             if (surplus > 0) flows[`${WALLET}|Surplus`] = surplus;
@@ -486,6 +562,7 @@
                 const getColor = (name) => {
                     if (name === WALLET) return '#2563EB'; 
                     if (name === 'Surplus') return '#6366F1';
+                    if (name === 'Scheduled EMI') return '#F43F5E';
                     if (sankeyData.some(d => d.from === name && d.to === WALLET)) return '#10B981'; 
                     return '#F43F5E';
                 };
@@ -501,11 +578,10 @@
                             nodeWidth: 20, nodePadding: 20
                         }]
                     },
-                    options: { 
-                        responsive: true, maintainAspectRatio: false,
-                        plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } }
-                    }
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } }
                 });
+            } else {
+                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } }); 
             }
 
             const barCtx = document.getElementById('monthlyBarChart').getContext('2d');
@@ -516,20 +592,13 @@
                     labels: buckets.map(b => b.label),
                     datasets: [
                         { label: 'Income', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 },
-                        { label: 'Expense', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }
+                        { label: 'Expense (Inc. EMI)', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }
                     ]
                 },
-                options: {
-                    responsive: true, maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#6B7280' } }, 
-                        y: { display: false } 
-                    }
-                }
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } }
             });
 
-            // 4. Accounts List
+            // 5. Lists
             const ac = document.getElementById('accounts-container'); ac.innerHTML = '';
             const groups = { 'Liquidity': 'cash', 'Investments': 'investment', 'Properties': 'property', 'Loans & Credit': ['credit','loan'] };
             for(const [name, types] of Object.entries(groups)) {
@@ -544,7 +613,6 @@
                 }
             }
 
-            // 5. Tx List
             const tc = document.getElementById('full-tx-list'); tc.innerHTML = '';
             const term = document.getElementById('tx-search').value.toLowerCase();
             state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t => {

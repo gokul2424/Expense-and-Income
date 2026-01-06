@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Modern</title>
+    <title>Cash Flow | AI</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -15,6 +15,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts: Plus Jakarta Sans -->
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Markdown Parser -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
         :root { 
@@ -86,6 +88,10 @@
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .filter-btn.inactive { color: #94A3B8; }
+
+        /* AI Sparkle */
+        @keyframes sparkle { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.7; transform: scale(1.1); } }
+        .ai-glow { animation: sparkle 2s infinite ease-in-out; color: #8B5CF6; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden bg-slate-50">
@@ -97,7 +103,7 @@
                 <i class="fas fa-wave-square text-white text-4xl"></i>
             </div>
             <h1 class="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-10 font-medium">Master your financial life.</p>
+            <p class="text-slate-500 mb-10 font-medium">AI-Powered Finance OS</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -119,6 +125,12 @@
             <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
             <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
+            
+            <div class="mt-6 pt-6 border-t border-slate-100">
+                <button onclick="openModal('aiModal')" class="w-full bg-gradient-to-r from-violet-500 to-indigo-600 text-white rounded-xl py-3 px-4 flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 hover:scale-[1.02] transition-transform font-bold">
+                    <i class="fas fa-sparkles"></i> Ask AI
+                </button>
+            </div>
         </nav>
         <div class="p-6 border-t border-slate-50">
             <div class="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-2xl">
@@ -141,6 +153,7 @@
                 <p class="text-slate-500 text-sm font-medium">Financial Overview</p>
             </div>
             <div class="flex gap-2">
+                <button onclick="openModal('aiModal')" class="w-10 h-10 bg-violet-100 text-violet-600 border border-violet-200 rounded-full flex items-center justify-center shadow-sm"><i class="fas fa-sparkles"></i></button>
                 <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100"><div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div></div>
                 <button id="mob-btn-logout" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-rose-500"><i class="fas fa-power-off text-sm"></i></button>
             </div>
@@ -211,57 +224,21 @@
         <!-- DEBTS VIEW -->
         <div id="view-debts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
-                <div class="flex justify-between items-center">
-                    <div><h2 class="text-3xl font-bold text-slate-900">Debt Intelligence</h2><p class="text-slate-500 font-medium">Liability Tracking</p></div>
-                </div>
-
+                <div class="flex justify-between items-center"><div><h2 class="text-3xl font-bold text-slate-900">Debt Intelligence</h2><p class="text-slate-500 font-medium">Liability Tracking</p></div></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="neo-card p-6">
-                        <h3 class="font-bold text-slate-900 text-lg mb-4">Total Obligation</h3>
-                        <p class="text-xs text-slate-500 mb-6">Principal vs Future Interest</p>
-                        <div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div>
-                    </div>
-                    <div class="neo-card p-6">
-                        <h3 class="font-bold text-slate-900 text-lg mb-4">Debt Composition</h3>
-                        <p class="text-xs text-slate-500 mb-6">Distribution by Loan</p>
-                        <div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div>
-                    </div>
+                    <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-4">Total Obligation</h3><p class="text-xs text-slate-500 mb-6">Principal vs Future Interest</p><div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div></div>
+                    <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-4">Debt Composition</h3><p class="text-xs text-slate-500 mb-6">Distribution by Loan</p><div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div></div>
                 </div>
-
-                <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Cards Injected via JS -->
-                </div>
+                <div id="debt-list-container" class="space-y-4"></div>
             </div>
         </div>
 
-        <!-- ACCOUNTS VIEW -->
+        <!-- ACCOUNTS & TRANSACTIONS VIEWS -->
         <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
-            <div class="max-w-4xl mx-auto">
-                <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur z-10 py-2">
-                    <h2 class="text-3xl font-bold text-slate-900">Accounts</h2>
-                    <button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
-                </div>
-                <div id="accounts-container" class="space-y-6"></div>
-            </div>
+            <div class="max-w-4xl mx-auto"><div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur z-10 py-2"><h2 class="text-3xl font-bold text-slate-900">Accounts</h2><button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button></div><div id="accounts-container" class="space-y-6"></div></div>
         </div>
-
-        <!-- TRANSACTIONS VIEW -->
         <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
-            <div class="max-w-4xl mx-auto h-full flex flex-col">
-                <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-3xl font-bold text-slate-900">Activity</h2>
-                    <button onclick="openModal('txModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
-                </div>
-                <div class="neo-card flex-1 flex flex-col overflow-hidden">
-                    <div class="p-4 border-b border-slate-100">
-                        <div class="relative">
-                            <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
-                            <input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11 bg-slate-50">
-                        </div>
-                    </div>
-                    <div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div>
-                </div>
-            </div>
+            <div class="max-w-4xl mx-auto h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-bold text-slate-900">Activity</h2><button onclick="openModal('txModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button></div><div class="neo-card flex-1 flex flex-col overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11 bg-slate-50"></div></div><div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div></div></div>
         </div>
     </main>
 
@@ -270,13 +247,40 @@
         <div class="nav-dock flex justify-between items-center px-6 py-4">
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
             <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
-            <div class="relative -top-8">
-                <button onclick="openModal('txModal')" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-indigo-300 hover:scale-110 transition-transform border-4 border-white"><i class="fas fa-plus"></i></button>
-            </div>
+            <div class="relative -top-8"><button onclick="openModal('txModal')" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-indigo-300 hover:scale-110 transition-transform border-4 border-white"><i class="fas fa-plus"></i></button></div>
             <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-receipt text-xl"></i></button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
         </div>
     </nav>
+
+    <!-- AI MODAL -->
+    <div id="aiModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-center justify-center sm:p-4 transition-all">
+        <div class="bg-white rounded-[32px] w-full max-w-lg shadow-2xl flex flex-col h-[80vh] md:h-[600px] animate-[slideUp_0.3s_ease-out]">
+            <div class="p-6 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-t-[32px]">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold flex items-center gap-2"><i class="fas fa-sparkles text-yellow-300"></i> AI Assistant</h3>
+                    <button onclick="closeModal('aiModal')" class="text-white/80 hover:text-white"><i class="fas fa-times text-xl"></i></button>
+                </div>
+            </div>
+            <div class="flex-1 overflow-y-auto p-6 bg-slate-50" id="ai-chat-area">
+                <div class="text-center text-slate-400 mt-10">
+                    <i class="fas fa-robot text-4xl mb-4 text-slate-300"></i>
+                    <p class="text-sm">Powered by Gemini 2.0 Flash</p>
+                    <div class="grid grid-cols-1 gap-2 mt-6">
+                        <button onclick="fillPrompt('Spent 2500 on Dinner using HDFC')" class="bg-white border border-slate-200 p-3 rounded-xl text-sm text-left hover:bg-indigo-50 transition shadow-sm">"Spent 2500 on Dinner using HDFC"</button>
+                        <button onclick="fillPrompt('Got 80000 salary in SBI')" class="bg-white border border-slate-200 p-3 rounded-xl text-sm text-left hover:bg-indigo-50 transition shadow-sm">"Got 80000 salary in SBI"</button>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 bg-white border-t border-slate-100 rounded-b-[32px]">
+                <div class="flex gap-2">
+                    <button onclick="generateInsights()" class="bg-purple-100 text-purple-700 w-12 h-12 rounded-xl hover:bg-purple-200 transition flex items-center justify-center" title="Analyze"><i class="fas fa-chart-line"></i></button>
+                    <input type="text" id="ai-input" class="flex-1 bg-slate-100 border-none rounded-xl px-4 focus:ring-2 focus:ring-indigo-500 outline-none" placeholder="Ask Gemini...">
+                    <button onclick="handleAIInput()" id="ai-send-btn" class="bg-indigo-600 text-white w-12 h-12 rounded-xl hover:bg-indigo-700 transition flex items-center justify-center"><i class="fas fa-paper-plane"></i></button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL: ADD ACCOUNT -->
     <div id="accountModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
@@ -348,7 +352,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // CONFIG
+        // FIREBASE CONFIG
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
             authDomain: "expense-and-income-faf13.firebaseapp.com",
@@ -358,6 +362,77 @@
             appId: "1:1278622168:web:b6e94a4d440d17d7b75aad"
         };
 
+        // GEMINI KEY
+        const GEMINI_KEY = "AIzaSyAl2PEfI_ncH51F8tMYTurYgZuyoOQNT7w";
+
+        // AI LOGIC
+        window.fillPrompt = (t) => { document.getElementById('ai-input').value = t; };
+        
+        window.callGemini = async (prompt) => {
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+                });
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (e) {
+                console.error(e);
+                return "Error connecting to AI. Please try again.";
+            }
+        };
+
+        window.handleAIInput = async () => {
+            const input = document.getElementById('ai-input').value;
+            if(!input) return;
+            const btn = document.getElementById('ai-send-btn');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            const accountsList = state.accounts.map(a => a.name).join(", ");
+            const prompt = `
+                I have these accounts: [${accountsList}].
+                Parse transaction: "${input}".
+                Return ONLY a JSON object:
+                { "desc": "string", "amount": number, "type": "income" or "expense", "date": "YYYY-MM-DD" (use today if missing), "category": "category", "accountName": "exact matching account or null" }
+            `;
+
+            const res = await callGemini(prompt);
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i>';
+            document.getElementById('ai-input').value = '';
+
+            try {
+                const json = JSON.parse(res.replace(/```json|```/g, '').trim());
+                const acc = state.accounts.find(a => a.name === json.accountName);
+                if(acc) {
+                    if(json.type==='income') { if(['credit','loan'].includes(acc.type)) acc.balance -= json.amount; else acc.balance += json.amount; }
+                    else { if(['credit','loan'].includes(acc.type)) acc.balance += json.amount; else acc.balance -= json.amount; }
+                    state.transactions.unshift({ id: Date.now(), desc: json.desc, amount: json.amount, date: json.date, type: json.type, cat: json.category, accName: acc.name });
+                    save();
+                    document.getElementById('ai-chat-area').innerHTML = `<div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100 mb-4"><div class="font-bold text-emerald-700">Success!</div><div class="text-sm text-emerald-600">${json.desc} - ${json.amount}</div></div>` + document.getElementById('ai-chat-area').innerHTML;
+                } else {
+                    document.getElementById('ai-chat-area').innerHTML = `<div class="bg-rose-50 p-4 rounded-xl border border-rose-100 mb-4"><div class="font-bold text-rose-700">Error</div><div class="text-sm text-rose-600">Could not find account '${json.accountName}'</div></div>` + document.getElementById('ai-chat-area').innerHTML;
+                }
+            } catch(e) {
+                document.getElementById('ai-chat-area').innerHTML = `<div class="bg-rose-50 p-4 rounded-xl border border-rose-100 mb-4"><div class="font-bold text-rose-700">Error</div><div class="text-sm text-rose-600">AI failed to understand. Try again.</div></div>` + document.getElementById('ai-chat-area').innerHTML;
+            }
+        };
+
+        window.generateInsights = async () => {
+            const area = document.getElementById('ai-chat-area');
+            area.innerHTML = '<div class="text-center py-10"><i class="fas fa-spinner fa-spin text-indigo-500 text-2xl"></i></div>';
+            
+            let assetTotal = 0, debtTotal = 0;
+            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) assetTotal+=a.balance; else debtTotal+=a.balance; });
+            const recent = state.transactions.slice(0, 10).map(t => `${t.date}: ${t.desc} (${t.amount})`).join("\n");
+            
+            const prompt = `Act as a financial advisor. Assets: ${assetTotal}, Debts: ${debtTotal}. Recent Tx: \n${recent}\n. Give me a 3-point health check and 1 specific advice. Format in Markdown.`;
+            const res = await callGemini(prompt);
+            area.innerHTML = `<div class="prose prose-sm prose-indigo bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">${marked.parse(res)}</div>`;
+        };
+
+        // --- APP LOGIC ---
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
@@ -459,7 +534,6 @@
                     if(a.emi) {
                         totalScheduledEMI+=a.emi;
                         
-                        // Remaining Interest Calc
                         let monthsElapsed = 0;
                         if(a.startDate) {
                             const start = new Date(a.startDate);
@@ -471,52 +545,15 @@
                         const interestComponent = Math.max(0, totalRemainingPayable - a.balance);
                         totalEstimatedInterest += interestComponent;
 
-                        // Payoff Date
                         const payoffDate = new Date();
                         payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
                         
-                        // Percentage for Progress Bar
-                        const principalPercent = (a.balance / totalRemainingPayable) * 100;
+                        const principalPercent = totalRemainingPayable > 0 ? (a.balance / totalRemainingPayable) * 100 : 0;
                         const interestPercent = 100 - principalPercent;
 
-                        debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-rose-500 mb-3">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div>
-                                        <h4 class="font-bold text-slate-900 text-lg">${a.name}</h4>
-                                        <span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span>
-                                    </div>
-                                    <div class="text-right">
-                                        <div class="text-xs text-slate-400 uppercase font-bold">Total Liability</div>
-                                        <div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div>
-                                    </div>
-                                </div>
-                                
-                                <div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden flex">
-                                    <div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div>
-                                    <div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div>
-                                </div>
-                                <div class="flex justify-between text-[10px] text-slate-500 mb-3">
-                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-indigo-500 rounded-full"></div> Principal: ${money(a.balance)}</span>
-                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span>
-                                </div>
-
-                                <div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-xs">
-                                    <div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700">${a.roi}%</span></div>
-                                    <div class="text-right"><span class="text-slate-400 block">Payoff Date</span><span class="font-bold text-slate-700">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div>
-                                </div>
-                            </div>
-                        `;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Total Liability</div><div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 mb-3"><span class="flex items-center gap-1"><div class="w-2 h-2 bg-indigo-500 rounded-full"></div> Principal: ${money(a.balance)}</span><span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-xs"><div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700">${a.roi}%</span></div><div class="text-right"><span class="text-slate-400 block">Payoff Est.</span><span class="font-bold text-slate-700">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div></div></div>`;
                     } else {
-                        debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-orange-400 mb-3">
-                                <div class="flex justify-between items-center">
-                                    <h4 class="font-bold text-slate-900">${a.name}</h4>
-                                    <div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div>
-                                </div>
-                                <div class="text-xs text-slate-400 mt-1">Revolving Credit / Untracked Loan</div>
-                            </div>
-                        `;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-orange-400 mb-3"><div class="flex justify-between items-center"><h4 class="font-bold text-slate-900">${a.name}</h4><div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div></div><div class="text-xs text-slate-400 mt-1">Revolving Credit / Untracked Loan</div></div>`;
                     }
                     debtCompositionLabels.push(a.name);
                     debtCompositionData.push(a.balance);
@@ -525,7 +562,6 @@
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
-            // Chart Renderers (existing + new debt ones)
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
@@ -536,52 +572,27 @@
             assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } });
             const totalAssets=assets||1; document.getElementById('asset-legend').innerHTML=`<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`;
 
-            // DEBT CHARTS
             if(document.getElementById('view-debts').classList.contains('active')) {
                 const debtSplitCtx = document.getElementById('debtSplitChart').getContext('2d');
                 if(debtSplitInst) debtSplitInst.destroy();
-                debtSplitInst = new Chart(debtSplitCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Total Liability'],
-                        datasets: [
-                            { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 6 },
-                            { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 6 }
-                        ]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } }
-                });
-
+                debtSplitInst = new Chart(debtSplitCtx, { type: 'bar', data: { labels: ['Liability'], datasets: [{ label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 6 }, { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } } });
                 const debtPieCtx = document.getElementById('debtPieChart').getContext('2d');
                 if(debtPieInst) debtPieInst.destroy();
-                debtPieInst = new Chart(debtPieCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: debtCompositionLabels,
-                        datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } }
-                });
-
+                debtPieInst = new Chart(debtPieCtx, { type: 'doughnut', data: { labels: debtCompositionLabels, datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } } });
                 document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="text-center text-slate-400 py-10">No active debts found.</div>';
             }
 
-            // ... (Existing Sankey/Bar Logic maintained below) ...
             const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
             const rangeMonths = analysisRange === '1Y' ? 11 : 5;
             for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
             
-            // 1. ADD EMI TO BUCKETS (Smart Date Logic)
             state.accounts.forEach(a => {
                 if(a.emi && a.emi > 0) {
                     buckets.forEach(b => {
                         const bucketDate = new Date(b.year, b.month, 1);
-                        const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); // If no start, assume always active
-                        // Reset day to 1 to compare months easily
+                        const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); 
                         loanStart.setDate(1);
-                        if (bucketDate >= loanStart) {
-                            b.expense += a.emi;
-                        }
+                        if (bucketDate >= loanStart) { b.expense += a.emi; }
                     });
                 }
             });
@@ -601,34 +612,9 @@
                     else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; }
                 }
             });
-            
-            // Add EMI to Sankey Flow
-            // Calculate total EMI for the selected range *accurately* by summing the buckets
-            let totalSankeyEMI = 0;
-            buckets.forEach(b => {
-                // Check if this bucket is inside the selected analysis range
-                let inRange = false;
-                if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true;
-                else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true;
-                else if(analysisRange === '1Y') inRange = true;
-
-                if(inRange) {
-                    // We need to know how much of b.expense was EMI.
-                    // Re-calculate EMI part for this bucket
-                    let monthEMI = 0;
-                    state.accounts.forEach(a => {
-                        if(a.emi && a.emi > 0) {
-                            const bDate = new Date(b.year, b.month, 1);
-                            const lStart = a.startDate ? new Date(a.startDate) : new Date(0);
-                            lStart.setDate(1);
-                            if(bDate >= lStart) monthEMI += a.emi;
-                        }
-                    });
-                    totalSankeyEMI += monthEMI;
-                }
-            });
-
-            if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
+            const emiMul = analysisRange==='1M'?1:(analysisRange==='6M'?6:12);
+            const emiFlow = totalScheduledEMI * emiMul;
+            if(emiFlow>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+emiFlow; so+=emiFlow; }
             const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
             
             const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});

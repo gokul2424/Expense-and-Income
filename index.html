@@ -3,205 +3,204 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#F3F4F6">
-    <title>Cash Flow | Financial Dashboard</title>
+    <meta name="theme-color" content="#F8FAFC">
+    <title>Cash Flow | Modern</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js Base -->
+    <!-- Chart.js & Plugins -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- Chart.js Sankey Plugin -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts: Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
         :root { 
-            --bg-body: #F3F4F6;       /* Gray 100 */
-            --bg-card: #FFFFFF;       /* White */
-            --text-main: #111827;     /* Gray 900 */
-            --text-muted: #6B7280;    /* Gray 500 */
-            --accent: #2563EB;        /* Blue 600 */
+            --bg-body: #F8FAFC;       /* Slate 50 */
+            --primary: #4F46E5;       /* Indigo 600 */
+            --primary-soft: #EEF2FF;  /* Indigo 50 */
+            --surface: #FFFFFF;
         }
 
         body { 
-            font-family: 'Inter', sans-serif; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
             background-color: var(--bg-body); 
-            color: var(--text-main); 
+            color: #1E293B; 
             -webkit-tap-highlight-color: transparent; 
         }
         
-        /* Glass UI - Light Mode */
-        .glass-panel { 
-            background: rgba(255, 255, 255, 0.9); 
-            border: 1px solid rgba(229, 231, 235, 0.8); 
-            backdrop-filter: blur(12px); 
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        /* Modern Cards */
+        .neo-card { 
+            background: white; 
+            border-radius: 24px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02), 0 10px 25px rgba(0,0,0,0.03);
+            border: 1px solid #F1F5F9;
+        }
+
+        /* Inputs */
+        .neo-input {
+            background: #F1F5F9;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 500;
+            color: #0F172A;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .neo-input:focus {
+            background: white;
+            box-shadow: 0 0 0 2px var(--primary);
+            outline: none;
+        }
+
+        /* View Transitions */
+        .view-section { display: none; padding-bottom: 120px; }
+        .view-section.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Mobile Nav Dock */
+        .nav-dock {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.5);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            border-radius: 24px;
+            margin: 0 16px 16px 16px;
         }
         
-        /* Transitions */
-        .view-section { display: none; padding-bottom: 90px; }
-        .view-section.active { display: block; animation: fadeIn 0.3s ease-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-item.active { color: var(--primary); transform: scale(1.1); }
+        .nav-item { transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-        /* Nav Active States */
-        .nav-item.active { color: #2563EB; }
-        .desktop-nav-item.active { background: #EFF6FF; color: #2563EB; border-right: 3px solid #2563EB; font-weight: 600; }
+        /* Desktop Nav */
+        .desktop-nav-item { border-radius: 12px; margin-bottom: 4px; color: #64748B; font-weight: 600; }
+        .desktop-nav-item:hover { background: #F8FAFC; color: #334155; }
+        .desktop-nav-item.active { background: var(--primary-soft); color: var(--primary); }
 
-        .chart-wrapper { position: relative; height: 300px; width: 100%; }
-        
         /* Scrollbar */
-        ::-webkit-scrollbar { width: 6px; } 
-        ::-webkit-scrollbar-track { background: #F3F4F6; } 
-        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* Filter Buttons */
+        .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
+        .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-btn.inactive { color: #94A3B8; hover:text: #64748B; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-blue-100 selection:text-blue-900">
+<body class="flex h-screen overflow-hidden bg-slate-50">
 
     <!-- AUTH OVERLAY -->
-    <div id="auth-overlay" class="fixed inset-0 z-50 bg-gray-50 flex flex-col items-center justify-center p-6">
-        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-xl border border-gray-100">
-            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
-                <i class="fas fa-wave-square text-white text-3xl"></i>
+    <div id="auth-overlay" class="fixed inset-0 z-50 bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-10 rounded-[32px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
+            <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-200 rotate-3">
+                <i class="fas fa-wave-square text-white text-4xl"></i>
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 mb-2">Cash Flow.</h1>
-            <p class="text-gray-500 mb-8 text-sm">Personal Finance OS</p>
-            <button id="btn-login" class="w-full bg-white border border-gray-300 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-3 shadow-sm">
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
-                Continue with Google
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
+            <p class="text-slate-500 mb-10 font-medium">Master your financial life.</p>
+            <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
+                <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
-            <p id="auth-status" class="text-xs text-rose-500 mt-4 min-h-[1rem]"></p>
+            <p id="auth-status" class="text-xs text-rose-500 mt-6 min-h-[1rem] font-medium"></p>
         </div>
     </div>
 
-    <!-- SIDEBAR (Desktop) -->
-    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 z-20 shadow-sm">
-        <div class="p-6 text-xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-blue-200"><i class="fas fa-wave-square"></i></div> Cash Flow
+    <!-- SIDEBAR -->
+    <aside class="hidden md:flex flex-col w-72 bg-white border-r border-slate-100 z-20">
+        <div class="p-8">
+            <div class="flex items-center gap-3 text-2xl font-bold text-slate-900">
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg"><i class="fas fa-wave-square"></i></div>
+                Cash Flow
+            </div>
         </div>
-        <nav class="flex-1 px-4 space-y-2 mt-4">
-            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-chart-pie w-5"></i> Dashboard</button>
-            <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-project-diagram w-5"></i> Analysis</button>
-            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-wallet w-5"></i> Accounts</button>
-            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-list w-5"></i> Transactions</button>
+        <nav class="flex-1 px-6 space-y-1">
+            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-home w-5"></i> Home</button>
+            <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
+            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
+            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
         </nav>
-        <div class="p-4 border-t border-gray-100 bg-gray-50/50">
-            <div class="flex items-center gap-3 mb-3">
-                <img id="user-avatar" src="" class="w-9 h-9 rounded-full bg-gray-200 hidden border border-white shadow-sm">
+        <div class="p-6 border-t border-slate-50">
+            <div class="flex items-center gap-3 mb-4 p-3 bg-slate-50 rounded-2xl">
+                <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden">
                 <div class="overflow-hidden">
-                    <div id="user-name" class="text-sm font-semibold text-gray-900 truncate">User</div>
-                    <div class="text-[10px] text-emerald-600 flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sync Active</div>
+                    <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
+                    <div class="text-xs text-emerald-600 font-medium">● Pro Active</div>
                 </div>
             </div>
-            <button id="btn-logout" class="w-full py-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded border border-rose-100 transition">Sign Out</button>
+            <button id="btn-logout" class="w-full py-3 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition">Sign Out</button>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 relative flex flex-col h-full overflow-hidden bg-[#F9FAFB]">
+    <main class="flex-1 relative flex flex-col h-full overflow-hidden bg-[#F8FAFC]">
         <!-- Mobile Header -->
-        <header class="md:hidden flex items-center justify-between p-4 bg-white/80 backdrop-blur-md border-b border-gray-200 z-30 sticky top-0 shadow-sm">
-            <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs shadow-sm"><i class="fas fa-wave-square"></i></div>
-                <span class="font-bold text-lg text-gray-900">Cash Flow.</span>
+        <header class="md:hidden flex items-center justify-between p-6 pb-2 bg-[#F8FAFC] z-30">
+            <div>
+                <h1 class="text-2xl font-extrabold text-slate-900">Hello!</h1>
+                <p class="text-slate-500 text-sm font-medium">Financial Overview</p>
             </div>
-            <div id="mob-sync-status" class="w-2 h-2 rounded-full bg-emerald-500"></div>
+            <div class="flex gap-2">
+                <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100"><div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></div></div>
+                <button id="mob-btn-logout" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-rose-500"><i class="fas fa-power-off text-sm"></i></button>
+            </div>
         </header>
 
         <!-- DASHBOARD VIEW -->
-        <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-6xl mx-auto space-y-6">
-                <!-- NET WORTH HEADER -->
-                <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Overview</h2>
-                        <p class="text-gray-500 text-sm mt-1">Real-time financial health</p>
-                    </div>
-                    <div class="glass-panel px-5 py-3 rounded-xl border-l-4 border-blue-600 bg-white">
-                        <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Net Worth</div>
-                        <div class="text-3xl font-bold text-gray-900" id="dash-networth">...</div>
+        <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <!-- Net Worth -->
+                <div class="relative overflow-hidden rounded-[32px] bg-indigo-600 text-white shadow-xl shadow-indigo-200 p-8">
+                    <div class="absolute -top-20 -right-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-purple-500 opacity-20 rounded-full blur-3xl"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                        <div><div class="text-indigo-100 text-sm font-medium mb-1 uppercase tracking-wider opacity-80">Total Net Worth</div><div class="text-4xl md:text-5xl font-bold tracking-tight" id="dash-networth">...</div></div>
+                        <div class="flex gap-3"><button onclick="openModal('txModal')" class="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-50 transition shadow-lg"><i class="fas fa-plus mr-2"></i> Add Tx</button></div>
                     </div>
                 </div>
-
-                <!-- MAIN HISTORY CHART (Line) -->
-                <div class="glass-panel rounded-2xl p-1 bg-white">
-                    <div class="p-5 pb-0 flex justify-between items-center"><h3 class="font-semibold text-gray-800">Net Worth Trend</h3></div>
-                    <div class="chart-wrapper p-4" style="height: 200px;"><canvas id="mainChart"></canvas></div>
-                </div>
-
-                <!-- ASSETS / DEBTS GRID -->
+                <!-- Stats -->
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-panel p-5 rounded-2xl bg-white">
-                        <div class="text-xs text-gray-500 font-semibold uppercase">Total Assets</div>
-                        <div class="text-xl md:text-2xl font-bold text-gray-900 mt-1" id="dash-assets">...</div>
-                    </div>
-                    <div class="glass-panel p-5 rounded-2xl bg-white">
-                        <div class="text-xs text-gray-500 font-semibold uppercase">Total Debts</div>
-                        <div class="text-xl md:text-2xl font-bold text-gray-900 mt-1" id="dash-debts">...</div>
-                    </div>
+                    <div class="neo-card p-6 flex flex-col justify-center"><div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mb-3 text-lg"><i class="fas fa-arrow-up"></i></div><div class="text-slate-500 text-xs font-semibold uppercase tracking-wide">Assets</div><div class="text-2xl font-bold text-slate-900 mt-1" id="dash-assets">...</div></div>
+                    <div class="neo-card p-6 flex flex-col justify-center"><div class="w-10 h-10 bg-rose-100 text-rose-600 rounded-full flex items-center justify-center mb-3 text-lg"><i class="fas fa-arrow-down"></i></div><div class="text-slate-500 text-xs font-semibold uppercase tracking-wide">Liabilities</div><div class="text-2xl font-bold text-slate-900 mt-1" id="dash-debts">...</div></div>
+                </div>
+                <!-- Main Chart -->
+                <div class="neo-card p-6">
+                    <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-slate-900 text-lg">Growth Trend</h3><span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full text-xs font-bold">1 Year</span></div>
+                    <div class="chart-wrapper p-2" style="height: 220px;"><canvas id="mainChart"></canvas></div>
                 </div>
             </div>
         </div>
 
         <!-- ANALYSIS VIEW -->
-        <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-6xl mx-auto space-y-6">
+        <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-6xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-3xl font-bold text-gray-900">Analysis</h2>
-                        <p class="text-gray-500 text-sm mt-1">Flows, Trends & Asset Allocation</p>
-                    </div>
+                    <div><h2 class="text-3xl font-bold text-slate-900">Analysis</h2><p class="text-slate-500 font-medium">Flows & Allocation</p></div>
                 </div>
 
-                <!-- SANKEY CHART SECTION -->
-                <div class="glass-panel rounded-2xl p-6 bg-white">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="font-semibold text-gray-900 text-lg">Money Flow</h3>
-                        
-                        <div class="flex bg-gray-100 rounded-lg p-1">
-                            <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors">1 Month</button>
-                            <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all">6 Months</button>
+                <!-- SANKEY -->
+                <div class="neo-card p-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="font-bold text-slate-900 text-lg">Money Flow</h3>
+                        <div class="flex bg-slate-100 rounded-xl p-1 gap-1">
+                            <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button>
+                            <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button>
+                            <button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button>
                         </div>
                     </div>
-                    
-                    <div class="chart-wrapper" style="height: 350px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
-                        <canvas id="sankeyChart"></canvas>
-                    </div>
-                    <div class="mt-4 text-center text-xs text-gray-500 font-medium">
-                        <span class="text-emerald-600">● Income</span> &rarr; <span class="text-blue-600">● Wallet</span> &rarr; <span class="text-rose-500">● Expenses</span> & <span class="text-indigo-600">● Surplus</span>
-                        <div class="mt-1 text-gray-400 font-normal">Includes Auto-Scheduled EMIs</div>
-                    </div>
+                    <div class="chart-wrapper" style="height: 350px;"><canvas id="sankeyChart"></canvas></div>
+                    <div class="mt-4 text-center text-xs text-slate-400 font-medium">Shows aggregated flows for the selected period</div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- MONTHLY BREAKDOWN (BAR) -->
-                    <div class="glass-panel rounded-2xl p-6 bg-white">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-gray-900 text-lg">Monthly Trend</h3>
-                            <p class="text-xs text-gray-500">Includes EMI</p>
-                        </div>
-                        <div class="chart-wrapper" style="height: 250px;">
-                            <canvas id="monthlyBarChart"></canvas>
-                        </div>
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-6">Monthly Trend</h3>
+                        <div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div>
                     </div>
-
-                    <!-- ASSET ALLOCATION (PIE) -->
-                    <div class="glass-panel rounded-2xl p-6 bg-white">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-semibold text-gray-900 text-lg">Asset Allocation</h3>
-                            <p class="text-xs text-gray-500">Portfolio Weightage</p>
-                        </div>
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-6">Allocation</h3>
                         <div class="flex items-center justify-center">
-                            <div class="chart-wrapper" style="height: 200px; width: 200px;">
-                                <canvas id="assetPieChart"></canvas>
-                            </div>
-                            <div id="asset-legend" class="ml-6 space-y-2 text-sm">
-                                <!-- Legend Injected by JS -->
-                            </div>
+                            <div style="height: 200px; width: 200px;"><canvas id="assetPieChart"></canvas></div>
+                            <div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div>
                         </div>
                     </div>
                 </div>
@@ -209,128 +208,117 @@
         </div>
 
         <!-- ACCOUNTS VIEW -->
-        <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-3xl mx-auto">
-                <div class="flex justify-between items-center mb-6 sticky top-0 md:static z-10 py-2 bg-[#F9FAFB]/90 backdrop-blur-sm">
-                    <h2 class="text-2xl font-bold text-gray-900">Accounts</h2>
-                    <button onclick="openModal('accountModal')" class="bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"><i class="fas fa-plus"></i></button>
+        <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur z-10 py-2">
+                    <h2 class="text-3xl font-bold text-slate-900">Accounts</h2>
+                    <button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
                 </div>
-                <div id="accounts-container" class="space-y-6 pb-20"></div>
+                <div id="accounts-container" class="space-y-6"></div>
             </div>
         </div>
 
         <!-- TRANSACTIONS VIEW -->
-        <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+        <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-4xl mx-auto h-full flex flex-col">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-gray-900">Activity</h2>
-                    <button onclick="openModal('txModal')" class="bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"><i class="fas fa-plus"></i></button>
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-bold text-slate-900">Activity</h2>
+                    <button onclick="openModal('txModal')" class="bg-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
                 </div>
-                <div class="glass-panel rounded-2xl flex-1 flex flex-col overflow-hidden bg-white shadow-sm">
-                    <div class="p-3 border-b border-gray-100">
+                <div class="neo-card flex-1 flex flex-col overflow-hidden">
+                    <div class="p-4 border-b border-slate-100">
                         <div class="relative">
-                            <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-xs"></i>
-                            <input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-gray-800 w-full focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                            <i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i>
+                            <input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11 bg-slate-50">
                         </div>
                     </div>
-                    <div id="full-tx-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 pb-20"></div>
+                    <div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- MOBILE NAV -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-safe z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-        <div class="flex justify-around items-center h-16">
-            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Home</span></button>
-            <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-project-diagram text-lg"></i><span class="text-[10px] font-medium">Analysis</span></button>
-            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-wallet text-lg"></i><span class="text-[10px] font-medium">Accounts</span></button>
-            <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-medium">Activity</span></button>
-            <button id="mob-btn-logout" class="flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-rose-500"><i class="fas fa-sign-out-alt text-lg"></i><span class="text-[10px] font-medium">Logout</span></button>
+    <!-- MOBILE FLOATING DOCK -->
+    <nav class="md:hidden fixed bottom-6 left-4 right-4 z-40">
+        <div class="nav-dock flex justify-between items-center px-6 py-4">
+            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
+            <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
+            <div class="relative -top-8">
+                <button onclick="openModal('txModal')" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-indigo-300 hover:scale-110 transition-transform border-4 border-white"><i class="fas fa-plus"></i></button>
+            </div>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
+            <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-list text-xl"></i></button>
         </div>
     </nav>
 
     <!-- MODAL: ADD ACCOUNT -->
-    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
-        <div class="bg-white rounded-t-2xl md:rounded-2xl border border-gray-100 p-6 w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out]">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Add Account</h3>
-            <form onsubmit="addAccount(event)" class="space-y-4">
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Name</label>
-                    <input type="text" id="accName" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors" placeholder="e.g. HDFC Bank">
+    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
+        <div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Add Account</h3>
+            <form onsubmit="addAccount(event)" class="space-y-5">
+                <input type="text" id="accName" required class="neo-input" placeholder="Account Name (e.g. HDFC)">
+                <input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Current Balance">
+                <select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none">
+                    <option value="cash">Cash / Bank</option>
+                    <option value="investment">Investment</option>
+                    <option value="property">Property</option>
+                    <option value="credit">Credit Card (Debt)</option>
+                    <option value="loan">Loan (Debt)</option>
+                </select>
+                <div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="bg-white rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="8.5"></div>
+                    <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="bg-white rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="60"></div>
+                    <div class="col-span-2 text-xs text-indigo-600 font-bold mt-1" id="emi-preview"></div>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Balance / Limit</label>
-                    <input type="number" step="1" id="accBalance" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors" placeholder="0">
-                </div>
-                <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Type</label>
-                    <select id="accType" onchange="toggleDebtFields()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors">
-                        <option value="cash">Cash/Bank</option>
-                        <option value="investment">Investment</option>
-                        <option value="property">Property</option>
-                        <option value="credit">Credit Card (Debt)</option>
-                        <option value="loan">Loan (Debt)</option>
-                    </select>
-                </div>
-                <!-- Debt Fields -->
-                <div id="debt-fields" class="hidden grid grid-cols-2 gap-3 p-4 bg-rose-50 rounded-xl border border-rose-100">
-                    <div><label class="text-[10px] text-rose-600 font-bold uppercase">Rate (%)</label><input type="number" step="0.1" id="accRoi" class="w-full bg-white border border-rose-200 rounded p-2 text-gray-900 text-sm mt-1" placeholder="8.5"></div>
-                    <div><label class="text-[10px] text-rose-600 font-bold uppercase">Months</label><input type="number" id="accTenure" class="w-full bg-white border border-rose-200 rounded p-2 text-gray-900 text-sm mt-1" placeholder="60"></div>
-                    <div class="col-span-2 text-xs text-rose-600 font-medium mt-1" id="emi-preview"></div>
-                </div>
-                <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeModal('accountModal')" class="w-1/3 py-3 text-gray-500 hover:bg-gray-100 rounded-xl font-medium transition">Cancel</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3 shadow-lg shadow-blue-600/30 transition">Save</button>
+                <div class="flex gap-4 pt-2">
+                    <button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl hover:bg-slate-200 transition">Cancel</button>
+                    <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- MODAL: ADD TRANSACTION (UPDATED WITH ACCOUNT LINK) -->
-    <div id="txModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
-        <div class="bg-white rounded-t-2xl md:rounded-2xl border border-gray-100 p-6 w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out]">
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Log Transaction</h3>
-            <form onsubmit="addTransaction(event)" class="space-y-4">
-                <input type="text" id="txDesc" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none" placeholder="Description (e.g. Lunch)">
-                <div class="grid grid-cols-2 gap-3">
-                    <input type="number" step="1" id="txAmount" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none" placeholder="Amount">
-                    <input type="date" id="txDate" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
+    <!-- MODAL: ADD TRANSACTION -->
+    <div id="txModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
+        <div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Log Transaction</h3>
+            <form onsubmit="addTransaction(event)" class="space-y-5">
+                <input type="text" id="txDesc" required class="neo-input" placeholder="What is this for?">
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="number" step="1" id="txAmount" required class="neo-input" placeholder="Amount">
+                    <input type="date" id="txDate" required class="neo-input text-slate-500">
                 </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <select id="txType" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none"><option value="expense">Expense</option><option value="income">Income</option></select>
-                    <select id="txCat" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="txType" class="neo-input appearance-none"><option value="expense">Expense</option><option value="income">Income</option></select>
+                    <select id="txCat" class="neo-input appearance-none">
                         <optgroup label="Income">
                             <option value="Salary">Salary</option><option value="Freelance">Freelance</option><option value="Business">Business</option><option value="Other Income">Other Income</option>
                         </optgroup>
                         <optgroup label="Expenses">
-                            <option value="Food & Dining">Food & Dining</option><option value="Housing">Housing/Rent</option><option value="Transportation">Transportation</option><option value="Shopping">Shopping</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="EMI/Debt">EMI/Debt</option><option value="Misc">Misc</option>
+                            <option value="Food & Dining">Food & Dining</option><option value="Housing">Housing</option><option value="Transportation">Transportation</option><option value="Shopping">Shopping</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="EMI/Debt">EMI/Debt</option><option value="Misc">Misc</option>
                         </optgroup>
                     </select>
                 </div>
-                <!-- ACCOUNT SELECTION -->
                 <div>
-                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Via Account</label>
-                    <select id="txAccount" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
-                        <!-- Populated by JS -->
-                    </select>
+                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block">Account</label>
+                    <select id="txAccount" required class="neo-input appearance-none"></select>
                 </div>
-                <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="closeModal('txModal')" class="w-1/3 py-3 text-gray-500 hover:bg-gray-100 rounded-xl font-medium transition">Cancel</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3 shadow-lg shadow-blue-600/30 transition">Save</button>
+                <div class="flex gap-4 pt-2">
+                    <button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl hover:bg-slate-200 transition">Cancel</button>
+                    <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- FIREBASE LOGIC -->
+    <!-- LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
-        // YOUR KEYS (INJECTED)
+        // PASTE FIREBASE KEYS HERE
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
@@ -349,18 +337,14 @@
         
         let currentUser = null;
         let state = { accounts: [], transactions: [], history: [0] };
-        let chartInst = null;
-        let sankeyInst = null;
-        let barChartInst = null;
-        let assetPieInst = null;
-        let analysisRange = '6M';
+        let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, analysisRange='6M';
 
         const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
         document.getElementById('btn-login').onclick = async () => { els.status.innerText = "Connecting..."; try { await signInWithPopup(auth, provider); } catch(e) { els.status.innerText = e.message; } };
-        const logout = () => signOut(auth);
-        document.getElementById('btn-logout').onclick = logout;
-        document.getElementById('mob-btn-logout').onclick = logout;
+        document.getElementById('btn-logout').onclick = () => signOut(auth);
+        
+        if(document.getElementById('mob-btn-logout')) document.getElementById('mob-btn-logout').onclick = () => signOut(auth);
 
         onAuthStateChanged(auth, (user) => {
             if(user) { currentUser = user; els.overlay.classList.add('hidden'); els.name.innerText = user.displayName; els.avatar.src = user.photoURL; els.avatar.classList.remove('hidden'); initSync(); } 
@@ -369,29 +353,14 @@
 
         function initSync() {
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
-                if(doc.exists()) {
-                    state = doc.data();
-                    render();
-                    document.getElementById('mob-sync-status').classList.add('animate-ping');
-                    setTimeout(()=>document.getElementById('mob-sync-status').classList.remove('animate-ping'), 1000);
-                } else { save(); }
+                if(doc.exists()) { state = doc.data(); render(); document.getElementById('mob-sync-status').classList.add('animate-ping'); setTimeout(()=>document.getElementById('mob-sync-status').classList.remove('animate-ping'),1000); } else { save(); }
             });
         }
         async function save() { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), state); }
 
-        window.toggleDebtFields = () => {
-            const type = document.getElementById('accType').value;
-            const fields = document.getElementById('debt-fields');
-            if(['loan','credit'].includes(type)) fields.classList.remove('hidden'); else fields.classList.add('hidden');
-        };
-
+        window.toggleDebtFields = () => { const t=document.getElementById('accType').value; const f=document.getElementById('debt-fields'); if(['loan','credit'].includes(t)) f.classList.remove('hidden'); else f.classList.add('hidden'); };
         function calculateEMI(p, r, n) { if(!p||!r||!n) return 0; const rm = r/12/100; return Math.round(p * rm * (Math.pow(1+rm, n) / (Math.pow(1+rm, n)-1))); }
-        ['accBalance','accRoi','accTenure'].forEach(id => {
-            document.getElementById(id).addEventListener('input', () => {
-                const p = parseFloat(document.getElementById('accBalance').value)||0, r = parseFloat(document.getElementById('accRoi').value)||0, n = parseFloat(document.getElementById('accTenure').value)||0;
-                if(p&&r&&n) document.getElementById('emi-preview').innerText = `Estimated EMI: ${money(calculateEMI(p,r,n))}/mo`;
-            });
-        });
+        ['accBalance','accRoi','accTenure'].forEach(id => { document.getElementById(id).addEventListener('input', () => { const p = parseFloat(document.getElementById('accBalance').value)||0, r = parseFloat(document.getElementById('accRoi').value)||0, n = parseFloat(document.getElementById('accTenure').value)||0; if(p&&r&&n) document.getElementById('emi-preview').innerText = `Estimated EMI: ${money(calculateEMI(p,r,n))}/mo`; }); });
 
         window.addAccount = (e) => {
             e.preventDefault();
@@ -409,123 +378,46 @@
             e.preventDefault();
             const amount = parseFloat(document.getElementById('txAmount').value);
             const type = document.getElementById('txType').value;
-            const accId = parseFloat(document.getElementById('txAccount').value); // ID from Select
-            
-            // Find Account
+            const accId = parseFloat(document.getElementById('txAccount').value);
             const accIndex = state.accounts.findIndex(a => a.id === accId);
             if(accIndex !== -1) {
                 const acc = state.accounts[accIndex];
-                const accName = acc.name;
-
-                // Update Balance Logic
-                if (type === 'income') {
-                    // Income: Always Increases Balance (Asset goes up, or Debt refund goes "up" towards 0)
-                    // For Credit Cards: "Income" usually means Payment/Refund -> Debt decreases.
-                    // But in this simple app, Debt is stored as a positive number.
-                    // So Income to Credit Card should DECREASE the balance.
-                    if(['credit', 'loan'].includes(acc.type)) {
-                        acc.balance -= amount; 
-                    } else {
-                        acc.balance += amount; 
-                    }
-                } else {
-                    // Expense: 
-                    // From Asset: Balance Decreases.
-                    // From Credit: Debt Increases.
-                    if(['credit', 'loan'].includes(acc.type)) {
-                        acc.balance += amount;
-                    } else {
-                        acc.balance -= amount;
-                    }
-                }
-
-                // Add Transaction
-                state.transactions.unshift({
-                    id: Date.now(),
-                    desc: document.getElementById('txDesc').value,
-                    amount: amount,
-                    date: document.getElementById('txDate').value,
-                    type: type,
-                    cat: document.getElementById('txCat').value,
-                    accName: accName // Store Account Name for display
-                });
-                
-                save(); 
-                closeModal('txModal'); 
-                e.target.reset();
+                if (type === 'income') { if(['credit', 'loan'].includes(acc.type)) acc.balance -= amount; else acc.balance += amount; }
+                else { if(['credit', 'loan'].includes(acc.type)) acc.balance += amount; else acc.balance -= amount; }
+                state.transactions.unshift({ id: Date.now(), desc: document.getElementById('txDesc').value, amount: amount, date: document.getElementById('txDate').value, type: type, cat: document.getElementById('txCat').value, accName: acc.name });
+                save(); closeModal('txModal'); e.target.reset();
             }
         };
 
         window.deleteItem = (list, id) => { if(confirm('Delete?')) { state[list] = state[list].filter(i=>i.id!==id); save(); } };
-
         const money = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
         const formatDateIN = (d) => { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
+        window.setAnalysisRange = (range) => { analysisRange = range; render(); };
 
-        // Toggle Analysis Range
-        window.setAnalysisRange = (range) => {
-            analysisRange = range;
-            if(range === '1M') {
-                document.getElementById('btn-range-1m').className = "px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all";
-                document.getElementById('btn-range-6m').className = "px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors";
-            } else {
-                document.getElementById('btn-range-1m').className = "px-3 py-1 text-xs font-medium rounded-md text-gray-500 hover:text-blue-600 transition-colors";
-                document.getElementById('btn-range-6m').className = "px-3 py-1 text-xs font-medium rounded-md bg-white text-blue-600 shadow-sm transition-all";
-            }
-            render(); 
-        };
-
-        // Render Account Options for Modal
         function updateAccountSelect() {
-            const select = document.getElementById('txAccount');
-            select.innerHTML = '';
-            
-            // Assets Group
+            const select = document.getElementById('txAccount'); select.innerHTML = '';
             const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type));
-            if(assets.length) {
-                const grp = document.createElement('optgroup');
-                grp.label = "Liquidity / Assets";
-                assets.forEach(a => {
-                    const opt = document.createElement('option');
-                    opt.value = a.id;
-                    opt.innerText = `${a.name} (${money(a.balance)})`;
-                    grp.appendChild(opt);
-                });
-                select.appendChild(grp);
-            }
-
-            // Debts Group
             const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type));
-            if(debts.length) {
-                const grp = document.createElement('optgroup');
-                grp.label = "Credit Cards / Loans";
-                debts.forEach(a => {
-                    const opt = document.createElement('option');
-                    opt.value = a.id;
-                    opt.innerText = `${a.name} (Due: ${money(a.balance)})`;
-                    grp.appendChild(opt);
-                });
-                select.appendChild(grp);
-            }
+            if(assets.length) { const g=document.createElement('optgroup'); g.label="Assets"; assets.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.innerText=`${a.name} (${money(a.balance)})`;g.appendChild(o);}); select.appendChild(g); }
+            if(debts.length) { const g=document.createElement('optgroup'); g.label="Credit"; debts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.innerText=`${a.name} (Due: ${money(a.balance)})`;g.appendChild(o);}); select.appendChild(g); }
         }
 
         function render() {
-            // Update Select Dropdown
             updateAccountSelect();
+            
+            // Toggle Button Styling
+            ['1M','6M','1Y'].forEach(r => {
+                const btn = document.getElementById(`btn-range-${r.toLowerCase()}`);
+                if(r === analysisRange) btn.className = "filter-btn active";
+                else btn.className = "filter-btn inactive";
+            });
 
-            // 1. Stats & Calculations
+            // 1. Stats
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
-            
             state.accounts.forEach(a => { 
-                if(['cash','investment','property'].includes(a.type)) {
-                    assets += a.balance;
-                    if(a.type === 'cash') assetMap['Cash'] += a.balance;
-                    if(a.type === 'investment') assetMap['Investments'] += a.balance;
-                    if(a.type === 'property') assetMap['Property'] += a.balance;
-                } else { 
-                    debts += a.balance; 
-                    if(a.emi) totalScheduledEMI += a.emi; 
-                } 
+                if(['cash','investment','property'].includes(a.type)) { assets+=a.balance; if(a.type==='cash') assetMap['Cash']+=a.balance; if(a.type==='investment') assetMap['Investments']+=a.balance; if(a.type==='property') assetMap['Property']+=a.balance; } 
+                else { debts+=a.balance; if(a.emi) totalScheduledEMI+=a.emi; } 
             });
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
@@ -534,186 +426,83 @@
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
-            chartInst = new Chart(ctx, { 
-                type: 'line', 
-                data: { 
-                    labels: Array(state.history.length).fill(''), 
-                    datasets: [{ data: state.history, borderColor: '#2563EB', backgroundColor: 'rgba(37, 99, 235, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] 
-                }, 
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } 
-            });
+            chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
 
-            // 3. ASSET ALLOCATION PIE CHART
+            // 3. Asset Pie
             const pieCtx = document.getElementById('assetPieChart').getContext('2d');
             if(assetPieInst) assetPieInst.destroy();
-            assetPieInst = new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Cash', 'Investments', 'Property'],
-                    datasets: [{
-                        data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']],
-                        backgroundColor: ['#10B981', '#2563EB', '#6366F1'],
-                        borderWidth: 0,
-                        hoverOffset: 4
-                    }]
-                },
-                options: {
-                    responsive: true, maintainAspectRatio: false, cutout: '70%',
-                    plugins: { legend: { display: false }, tooltip: { callbacks: { label: (c) => ` ${money(c.parsed)} (${((c.parsed/assets)*100).toFixed(1)}%)` } } }
-                }
-            });
-            const legendDiv = document.getElementById('asset-legend');
-            const totalAssets = assets || 1;
-            legendDiv.innerHTML = `
-                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#10B981]"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets*100)||0).toFixed(0)}%</span></div>
-                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#2563EB]"></span><span>Investments</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets*100)||0).toFixed(0)}%</span></div>
-                <div class="flex items-center justify-between gap-4"><div class="flex items-center gap-2"><span class="w-3 h-3 rounded-full bg-[#6366F1]"></span><span>Property</span></div><span class="font-bold">${((assetMap['Property']/totalAssets*100)||0).toFixed(0)}%</span></div>
-            `;
+            assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } });
+            const totalAssets=assets||1; document.getElementById('asset-legend').innerHTML=`<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`;
 
-            // 4. SANKEY & ANALYSIS
-            const buckets = [];
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const currentMonth = new Date().getMonth();
-            const currentYear = new Date().getFullYear();
+            // 4. Sankey & Bar Logic
+            const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
             
-            for (let i = 5; i >= 0; i--) {
-                const d = new Date(currentYear, currentMonth - i, 1);
-                buckets.push({ label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, month: d.getMonth(), year: d.getFullYear(), income: 0, expense: totalScheduledEMI }); 
-            }
-
-            const flows = {};
-            const WALLET = "Wallet";
-            let sankeyTotalIn = 0, sankeyTotalOut = 0;
-
-            state.transactions.forEach(tx => {
-                const txDate = new Date(tx.date);
-                const cutoff6M = new Date(buckets[0].year, buckets[0].month, 1);
-                
+            // Determine Bar Chart Range (Max range needed)
+            const rangeMonths = analysisRange === '1Y' ? 11 : 5; // 0-11 (12 months) or 0-5 (6 months)
+            for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:totalScheduledEMI}); }
+            
+            const flows={}; const WALLET="Wallet"; let si=0, so=0;
+            state.transactions.forEach(tx=>{
+                const txDate=new Date(tx.date); 
                 // Populate Bar Data
-                if (txDate >= cutoff6M) {
-                    const bIndex = buckets.findIndex(b => b.month === txDate.getMonth() && b.year === txDate.getFullYear());
-                    if (bIndex !== -1) {
-                        if (tx.type === 'income') buckets[bIndex].income += tx.amount;
-                        else buckets[bIndex].expense += tx.amount;
-                    }
-                }
-
+                const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear());
+                if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; }
+                
                 // Populate Sankey
-                let includeInSankey = false;
-                if (analysisRange === '1M') {
-                    if (txDate.getMonth() === currentMonth && txDate.getFullYear() === currentYear) includeInSankey = true;
-                } else {
-                    if (txDate >= cutoff6M) includeInSankey = true;
-                }
+                let inc=false;
+                if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } 
+                else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } // Last 6 of 6/12 buckets
+                else { if(bi !== -1) inc=true; } // All 12 buckets
 
-                if (includeInSankey) {
-                    const cat = tx.cat || (tx.type === 'income' ? 'Uncategorized Income' : 'Misc');
-                    const amt = tx.amount;
-                    if (tx.type === 'income') {
-                        const key = `${cat}|${WALLET}`;
-                        flows[key] = (flows[key] || 0) + amt;
-                        sankeyTotalIn += amt;
-                    } else {
-                        const key = `${WALLET}|${cat}`;
-                        flows[key] = (flows[key] || 0) + amt;
-                        sankeyTotalOut += amt;
-                    }
+                if(inc){
+                    const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount;
+                    if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; }
+                    else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; }
                 }
             });
 
-            // ADD EMI FLOW TO SANKEY
-            const emiFlow = analysisRange === '1M' ? totalScheduledEMI : (totalScheduledEMI * 6);
-            if (emiFlow > 0) {
-                const emiKey = `${WALLET}|Scheduled EMI`;
-                flows[emiKey] = (flows[emiKey] || 0) + emiFlow;
-                sankeyTotalOut += emiFlow;
-            }
-
-            const surplus = sankeyTotalIn - sankeyTotalOut;
-            if (surplus > 0) flows[`${WALLET}|Surplus`] = surplus;
-
-            const sankeyData = Object.keys(flows).map(key => {
-                const [from, to] = key.split('|');
-                return { from, to, flow: flows[key] };
-            });
-
-            const sankeyCtx = document.getElementById('sankeyChart').getContext('2d');
+            // Add EMI to Sankey
+            const emiMul = analysisRange==='1M'?1:(analysisRange==='6M'?6:12);
+            const emiFlow = totalScheduledEMI * emiMul;
+            if(emiFlow>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+emiFlow; so+=emiFlow; }
+            
+            const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
+            const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
+            
+            const sankeyCtx=document.getElementById('sankeyChart').getContext('2d');
             if(sankeyInst) sankeyInst.destroy();
-            if (sankeyData.length > 0) {
-                const getColor = (name) => {
-                    if (name === WALLET) return '#2563EB'; 
-                    if (name === 'Surplus') return '#6366F1';
-                    if (name === 'Scheduled EMI') return '#F43F5E';
-                    if (sankeyData.some(d => d.from === name && d.to === WALLET)) return '#10B981'; 
-                    return '#F43F5E';
-                };
-                sankeyInst = new Chart(sankeyCtx, {
-                    type: 'sankey',
-                    data: {
-                        datasets: [{
-                            data: sankeyData,
-                            colorFrom: (c) => getColor(c.raw.from),
-                            colorTo: (c) => getColor(c.raw.to),
-                            colorMode: 'gradient',
-                            labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 },
-                            nodeWidth: 20, nodePadding: 20
-                        }]
-                    },
-                    options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } }
-                });
-            } else {
-                sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } }); 
-            }
+            sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c) => c.raw.from === WALLET ? '#4F46E5' : '#10B981', colorTo: (c) => c.raw.to === 'Savings' ? '#6366F1' : (c.raw.to === WALLET ? '#4F46E5' : '#F43F5E'), colorMode: 'gradient', labels: { color: '#334155', font: { weight: 'bold', size: 11 }, padding: 8 } }] }, options: { responsive: true, maintainAspectRatio: false } });
 
             const barCtx = document.getElementById('monthlyBarChart').getContext('2d');
             if(barChartInst) barChartInst.destroy();
-            barChartInst = new Chart(barCtx, {
-                type: 'bar',
-                data: {
-                    labels: buckets.map(b => b.label),
-                    datasets: [
-                        { label: 'Income', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 },
-                        { label: 'Expense (Inc. EMI)', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }
-                    ]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } }
-            });
+            barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { display: false } } } });
 
             // 5. Lists
-            const ac = document.getElementById('accounts-container'); ac.innerHTML = '';
-            const groups = { 'Liquidity': 'cash', 'Investments': 'investment', 'Properties': 'property', 'Loans & Credit': ['credit','loan'] };
-            for(const [name, types] of Object.entries(groups)) {
-                const items = state.accounts.filter(a => Array.isArray(types) ? types.includes(a.type) : a.type === types);
-                if(items.length) {
-                    let h = `<div class="glass-panel rounded-2xl overflow-hidden mb-4 bg-white shadow-sm"><div class="bg-gray-50 p-3 text-xs font-bold text-gray-500 uppercase pl-5 border-b border-gray-100">${name}</div><div class="divide-y divide-gray-100">`;
-                    items.forEach(i => {
-                        let sub = i.emi ? `<div class="text-[10px] text-rose-500 font-medium">EMI: ${money(i.emi)} @ ${i.roi}%</div>` : '';
-                        h += `<div class="p-4 flex justify-between items-center hover:bg-gray-50 group"><div><div class="text-gray-900 font-medium text-sm">${i.name}</div>${sub}</div><div class="flex gap-3"><span class="text-gray-900 font-bold">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`;
+            const ac=document.getElementById('accounts-container'); ac.innerHTML='';
+            const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] };
+            for(const[name,types] of Object.entries(groups)){
+                const items=state.accounts.filter(a=>Array.isArray(types)?types.includes(a.type):a.type===types);
+                if(items.length){
+                    let h=`<div class="neo-card p-5 mb-4"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">${name}</h4><div class="space-y-4">`;
+                    items.forEach(i=>{
+                        let sub=i.emi?`<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-full inline-block mt-1">EMI: ${money(i.emi)}</div>`:'';
+                        h+=`<div class="flex justify-between items-center group"><div><div class="font-bold text-slate-800">${i.name}</div>${sub}</div><div class="flex items-center gap-3"><span class="font-bold text-slate-900">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="text-slate-300 hover:text-rose-500 transition"><i class="fas fa-trash"></i></button></div></div>`;
                     });
-                    ac.innerHTML += h + `</div></div>`;
+                    ac.innerHTML+=h+`</div></div>`;
                 }
             }
 
-            const tc = document.getElementById('full-tx-list'); tc.innerHTML = '';
-            const term = document.getElementById('tx-search').value.toLowerCase();
-            state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t => {
-                const isInc = t.type === 'income';
-                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${formatDateIN(t.date)} • ${t.cat||'Uncategorized'} • <span class="text-blue-500">${t.accName || 'Account'}</span></span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
+            const tc=document.getElementById('full-tx-list'); tc.innerHTML='';
+            const term=document.getElementById('tx-search').value.toLowerCase();
+            state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t=>{
+                const isInc=t.type==='income';
+                tc.innerHTML+=`<div class="flex justify-between items-center p-3 mb-2 bg-white rounded-xl border border-slate-50 hover:shadow-md transition"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${isInc?'bg-emerald-50 text-emerald-600':'bg-rose-50 text-rose-600'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'}"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="text-[10px] text-slate-400 font-medium">${formatDateIN(t.date)} • ${t.accName}</div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`;
             });
         }
 
-        window.router = (v) => {
-            document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
-            document.getElementById('view-'+v).classList.add('active');
-            document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e => e.classList.remove('active'));
-            if(document.getElementById('d-nav-'+v)) document.getElementById('d-nav-'+v).classList.add('active');
-            if(document.getElementById('m-nav-'+v)) document.getElementById('m-nav-'+v).classList.add('active');
-        };
-        window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
-        window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-        
-        document.getElementById('txDate').valueAsDate = new Date();
-        router('dashboard');
+        window.router=(v)=>{document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active'));document.getElementById('view-'+v).classList.add('active');document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e=>e.classList.remove('active'));if(document.getElementById('d-nav-'+v))document.getElementById('d-nav-'+v).classList.add('active');if(document.getElementById('m-nav-'+v))document.getElementById('m-nav-'+v).classList.add('active');};
+        window.openModal=(id)=>document.getElementById(id).classList.remove('hidden');window.closeModal=(id)=>document.getElementById(id).classList.add('hidden');
+        document.getElementById('txDate').valueAsDate=new Date(); router('dashboard');
     </script>
 </body>
 </html>

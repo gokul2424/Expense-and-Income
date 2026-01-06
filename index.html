@@ -35,8 +35,8 @@
         
         /* Glass UI - Light Mode */
         .glass-panel { 
-            background: rgba(255, 255, 255, 0.85); 
-            border: 1px solid rgba(229, 231, 235, 0.8); /* Gray 200 */
+            background: rgba(255, 255, 255, 0.9); 
+            border: 1px solid rgba(229, 231, 235, 0.8); 
             backdrop-filter: blur(12px); 
             -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
@@ -47,7 +47,7 @@
         .view-section.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Nav Active States - Light Mode */
+        /* Nav Active States */
         .nav-item.active { color: #2563EB; }
         .desktop-nav-item.active { background: #EFF6FF; color: #2563EB; border-right: 3px solid #2563EB; font-weight: 600; }
 
@@ -85,6 +85,7 @@
         </div>
         <nav class="flex-1 px-4 space-y-2 mt-4">
             <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-chart-pie w-5"></i> Dashboard</button>
+            <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-project-diagram w-5"></i> Analysis</button>
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-wallet w-5"></i> Accounts</button>
             <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-list w-5"></i> Transactions</button>
         </nav>
@@ -132,26 +133,6 @@
                     <div class="chart-wrapper p-4" style="height: 200px;"><canvas id="mainChart"></canvas></div>
                 </div>
 
-                <!-- SANKEY CASH FLOW SECTION -->
-                <div class="glass-panel rounded-2xl p-6 bg-white">
-                    <div class="flex justify-between items-center mb-4">
-                        <div>
-                            <h3 class="font-semibold text-gray-900 text-lg">Money Flows</h3>
-                            <p class="text-xs text-gray-500">Source to Expense Visualization</p>
-                        </div>
-                        <div class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded font-medium">All Time</div>
-                    </div>
-
-                    <!-- Sankey Chart Container -->
-                    <div class="chart-wrapper" style="height: 400px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
-                        <canvas id="sankeyChart"></canvas>
-                    </div>
-                    
-                    <div class="mt-4 text-center text-xs text-gray-500 font-medium">
-                        <span class="text-emerald-600">Income</span> &rarr; <span class="text-gray-800">Wallet</span> &rarr; <span class="text-rose-500">Expenses</span> & <span class="text-blue-600">Surplus</span>
-                    </div>
-                </div>
-
                 <!-- ASSETS / DEBTS GRID -->
                 <div class="grid grid-cols-2 gap-4">
                     <div class="glass-panel p-5 rounded-2xl bg-white">
@@ -161,6 +142,42 @@
                     <div class="glass-panel p-5 rounded-2xl bg-white">
                         <div class="text-xs text-gray-500 font-semibold uppercase">Total Debts</div>
                         <div class="text-xl md:text-2xl font-bold text-gray-900 mt-1" id="dash-debts">...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYSIS VIEW (NEW) -->
+        <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
+            <div class="max-w-6xl mx-auto space-y-6">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-3xl font-bold text-gray-900">Analysis</h2>
+                        <p class="text-gray-500 text-sm mt-1">Flows & Trends (Last 6 Months)</p>
+                    </div>
+                </div>
+
+                <!-- SANKEY CHART SECTION -->
+                <div class="glass-panel rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-gray-900 text-lg">Money Flow</h3>
+                    </div>
+                    <div class="chart-wrapper" style="height: 400px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
+                        <canvas id="sankeyChart"></canvas>
+                    </div>
+                    <div class="mt-4 text-center text-xs text-gray-500 font-medium">
+                        <span class="text-emerald-600">● Income</span> &rarr; <span class="text-blue-600">● Wallet</span> &rarr; <span class="text-rose-500">● Expenses</span> & <span class="text-indigo-600">● Surplus</span>
+                    </div>
+                </div>
+
+                <!-- MONTHLY BREAKDOWN (BAR) -->
+                <div class="glass-panel rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="font-semibold text-gray-900 text-lg">Monthly Breakdown</h3>
+                        <p class="text-xs text-gray-500">Income vs Expense</p>
+                    </div>
+                    <div class="chart-wrapper" style="height: 250px;">
+                        <canvas id="monthlyBarChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -200,7 +217,8 @@
     <!-- MOBILE NAV -->
     <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-safe z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div class="flex justify-around items-center h-16">
-            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Overview</span></button>
+            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Home</span></button>
+            <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-project-diagram text-lg"></i><span class="text-[10px] font-medium">Analysis</span></button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-wallet text-lg"></i><span class="text-[10px] font-medium">Accounts</span></button>
             <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-medium">Activity</span></button>
             <button id="mob-btn-logout" class="flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-rose-500"><i class="fas fa-sign-out-alt text-lg"></i><span class="text-[10px] font-medium">Logout</span></button>
@@ -301,6 +319,7 @@
         let state = { accounts: [], transactions: [], history: [0] };
         let chartInst = null;
         let sankeyInst = null;
+        let barChartInst = null;
 
         const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
@@ -368,6 +387,7 @@
         window.deleteItem = (list, id) => { if(confirm('Delete?')) { state[list] = state[list].filter(i=>i.id!==id); save(); } };
 
         const money = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
+        const formatDateIN = (d) => { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
 
         function render() {
             // 1. Stats
@@ -376,7 +396,7 @@
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
-            // 2. Main Chart (Updated Colors for Light Mode)
+            // 2. Main Chart
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
@@ -405,29 +425,55 @@
                 } 
             });
 
-            // 3. SANKEY DIAGRAM LOGIC
+            // 3. 6-MONTH LOGIC (For Sankey & Bar)
+            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+            const currentMonth = new Date().getMonth();
+            const currentYear = new Date().getFullYear();
+            
+            const buckets = [];
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(currentYear, currentMonth - i, 1);
+                buckets.push({ 
+                    label: `${monthNames[d.getMonth()]} ${d.getFullYear().toString().substr(-2)}`, 
+                    month: d.getMonth(), 
+                    year: d.getFullYear(), 
+                    income: 0, 
+                    expense: 0 
+                });
+            }
+
+            // --- SANKEY DATA (Last 6 Months Aggregate) ---
             const flows = {};
-            let totalIncome = 0;
-            let totalExpense = 0;
             const WALLET = "Wallet";
+            let sankeyTotalIn = 0, sankeyTotalOut = 0;
 
             state.transactions.forEach(tx => {
-                const cat = tx.cat || (tx.type === 'income' ? 'Uncategorized Income' : 'Misc');
-                const amt = tx.amount;
+                const txDate = new Date(tx.date);
+                const cutoffDate = new Date(buckets[0].year, buckets[0].month, 1);
+                
+                if (txDate >= cutoffDate) {
+                    const bIndex = buckets.findIndex(b => b.month === txDate.getMonth() && b.year === txDate.getFullYear());
+                    if (bIndex !== -1) {
+                        if (tx.type === 'income') buckets[bIndex].income += tx.amount;
+                        else buckets[bIndex].expense += tx.amount;
+                    }
 
-                if (tx.type === 'income') {
-                    const key = `${cat}|${WALLET}`;
-                    flows[key] = (flows[key] || 0) + amt;
-                    totalIncome += amt;
-                } else {
-                    const key = `${WALLET}|${cat}`;
-                    flows[key] = (flows[key] || 0) + amt;
-                    totalExpense += amt;
+                    const cat = tx.cat || (tx.type === 'income' ? 'Uncategorized Income' : 'Misc');
+                    const amt = tx.amount;
+                    if (tx.type === 'income') {
+                        const key = `${cat}|${WALLET}`;
+                        flows[key] = (flows[key] || 0) + amt;
+                        sankeyTotalIn += amt;
+                    } else {
+                        const key = `${WALLET}|${cat}`;
+                        flows[key] = (flows[key] || 0) + amt;
+                        sankeyTotalOut += amt;
+                    }
                 }
             });
 
-            const surplus = totalIncome - totalExpense;
-            if (surplus > 0) { flows[`${WALLET}|Surplus`] = surplus; }
+            const surplus = sankeyTotalIn - sankeyTotalOut;
+            if (surplus > 0) flows[`${WALLET}|Surplus`] = surplus;
 
             const sankeyData = Object.keys(flows).map(key => {
                 const [from, to] = key.split('|');
@@ -436,22 +482,52 @@
 
             const sankeyCtx = document.getElementById('sankeyChart').getContext('2d');
             if(sankeyInst) sankeyInst.destroy();
-            
             if (sankeyData.length > 0) {
+                const getColor = (name) => {
+                    if (name === WALLET) return '#2563EB'; 
+                    if (name === 'Surplus') return '#6366F1';
+                    if (sankeyData.some(d => d.from === name && d.to === WALLET)) return '#10B981'; 
+                    return '#F43F5E';
+                };
                 sankeyInst = new Chart(sankeyCtx, {
                     type: 'sankey',
                     data: {
                         datasets: [{
                             data: sankeyData,
-                            colorFrom: (c) => c.dataset.data[c.dataIndex].from === WALLET ? '#2563EB' : '#10B981', // Blue outgoing, Green incoming
-                            colorTo: (c) => c.dataset.data[c.dataIndex].to === 'Surplus' ? '#2563EB' : (c.dataset.data[c.dataIndex].to === WALLET ? '#2563EB' : '#F43F5E'), // Blue surplus, Red exp
+                            colorFrom: (c) => getColor(c.raw.from),
+                            colorTo: (c) => getColor(c.raw.to),
                             colorMode: 'gradient',
-                            labels: { color: 'black', font: { size: 10 } } // Dark labels for Light mode
+                            labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 },
+                            nodeWidth: 20, nodePadding: 20
                         }]
                     },
-                    options: { responsive: true, maintainAspectRatio: false }
+                    options: { 
+                        responsive: true, maintainAspectRatio: false,
+                        plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } }
+                    }
                 });
             }
+
+            const barCtx = document.getElementById('monthlyBarChart').getContext('2d');
+            if(barChartInst) barChartInst.destroy();
+            barChartInst = new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: buckets.map(b => b.label),
+                    datasets: [
+                        { label: 'Income', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 },
+                        { label: 'Expense', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { 
+                        x: { grid: { display: false }, ticks: { color: '#6B7280' } }, 
+                        y: { display: false } 
+                    }
+                }
+            });
 
             // 4. Accounts List
             const ac = document.getElementById('accounts-container'); ac.innerHTML = '';
@@ -473,7 +549,7 @@
             const term = document.getElementById('tx-search').value.toLowerCase();
             state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t => {
                 const isInc = t.type === 'income';
-                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${t.date} • ${t.cat||'Uncategorized'}</span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
+                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${formatDateIN(t.date)} • ${t.cat||'Uncategorized'}</span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
             });
         }
 

@@ -3,146 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#111827">
-    <title>Sure | Financial Dashboard (India)</title>
+    <meta name="theme-color" content="#F3F4F6">
+    <title>Cash Flow | Financial Dashboard</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Chart.js -->
+    <!-- Chart.js Base -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Chart.js Sankey Plugin -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-sankey"></script>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        :root { --bg-body: #111827; --text-main: #F9FAFB; --text-muted: #9CA3AF; --accent: #3B82F6; }
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-body); color: var(--text-main); -webkit-tap-highlight-color: transparent; }
+        :root { 
+            --bg-body: #F3F4F6;       /* Gray 100 */
+            --bg-card: #FFFFFF;       /* White */
+            --text-main: #111827;     /* Gray 900 */
+            --text-muted: #6B7280;    /* Gray 500 */
+            --accent: #2563EB;        /* Blue 600 */
+        }
+
+        body { 
+            font-family: 'Inter', sans-serif; 
+            background-color: var(--bg-body); 
+            color: var(--text-main); 
+            -webkit-tap-highlight-color: transparent; 
+        }
         
-        /* Glass UI */
-        .glass-panel { background: rgba(31, 41, 55, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        /* Glass UI - Light Mode */
+        .glass-panel { 
+            background: rgba(255, 255, 255, 0.85); 
+            border: 1px solid rgba(229, 231, 235, 0.8); /* Gray 200 */
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        }
         
         /* Transitions */
         .view-section { display: none; padding-bottom: 90px; }
         .view-section.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Nav Active States */
-        .nav-item.active { color: #3B82F6; }
-        .desktop-nav-item.active { background: rgba(255,255,255,0.05); color: white; border-right: 3px solid #3B82F6; }
+        /* Nav Active States - Light Mode */
+        .nav-item.active { color: #2563EB; }
+        .desktop-nav-item.active { background: #EFF6FF; color: #2563EB; border-right: 3px solid #2563EB; font-weight: 600; }
 
-        .chart-wrapper { position: relative; height: 250px; width: 100%; }
+        .chart-wrapper { position: relative; height: 300px; width: 100%; }
+        
+        /* Scrollbar */
         ::-webkit-scrollbar { width: 6px; } 
-        ::-webkit-scrollbar-track { background: #111827; } 
-        ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
+        ::-webkit-scrollbar-track { background: #F3F4F6; } 
+        ::-webkit-scrollbar-thumb { background: #D1D5DB; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #9CA3AF; }
     </style>
 </head>
-<body class="flex h-screen overflow-hidden selection:bg-blue-500 selection:text-white">
+<body class="flex h-screen overflow-hidden selection:bg-blue-100 selection:text-blue-900">
 
     <!-- AUTH OVERLAY -->
-    <div id="auth-overlay" class="fixed inset-0 z-50 bg-[#111827] flex flex-col items-center justify-center p-6">
-        <div class="glass-panel p-8 rounded-2xl max-w-sm w-full text-center shadow-2xl">
-            <h1 class="text-4xl font-bold text-white mb-2">Sure.</h1>
-            <p class="text-gray-400 mb-8 text-sm">Cloud Finance Dashboard</p>
-            <button id="btn-login" class="w-full bg-white text-gray-900 font-bold py-3.5 rounded-xl hover:bg-gray-100 transition flex items-center justify-center gap-3 shadow-lg">
-                <i class="fab fa-google text-lg"></i> Continue with Google
+    <div id="auth-overlay" class="fixed inset-0 z-50 bg-gray-50 flex flex-col items-center justify-center p-6">
+        <div class="bg-white p-8 rounded-2xl max-w-sm w-full text-center shadow-xl border border-gray-100">
+            <div class="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-200">
+                <i class="fas fa-wave-square text-white text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold text-gray-900 mb-2">Cash Flow.</h1>
+            <p class="text-gray-500 mb-8 text-sm">Personal Finance OS</p>
+            <button id="btn-login" class="w-full bg-white border border-gray-300 text-gray-700 font-bold py-3.5 rounded-xl hover:bg-gray-50 transition flex items-center justify-center gap-3 shadow-sm">
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-5 h-5">
+                Continue with Google
             </button>
-            <p id="auth-status" class="text-xs text-rose-400 mt-4 min-h-[1rem]"></p>
+            <p id="auth-status" class="text-xs text-rose-500 mt-4 min-h-[1rem]"></p>
         </div>
     </div>
 
     <!-- SIDEBAR (Desktop) -->
-    <aside class="hidden md:flex flex-col w-64 bg-gray-900 border-r border-white/5 z-20">
-        <div class="p-6 text-xl font-bold tracking-tight text-white flex items-center gap-2">
-            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white"><i class="fas fa-bolt"></i></div> Sure.
+    <aside class="hidden md:flex flex-col w-64 bg-white border-r border-gray-200 z-20 shadow-sm">
+        <div class="p-6 text-xl font-bold tracking-tight text-gray-900 flex items-center gap-2">
+            <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center text-white shadow-md shadow-blue-200"><i class="fas fa-wave-square"></i></div> Cash Flow
         </div>
         <nav class="flex-1 px-4 space-y-2 mt-4">
-            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-r-lg text-left gap-3"><i class="fas fa-chart-pie w-5"></i> Dashboard</button>
-            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-r-lg text-left gap-3"><i class="fas fa-wallet w-5"></i> Accounts</button>
-            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-400 rounded-r-lg text-left gap-3"><i class="fas fa-list w-5"></i> Transactions</button>
+            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-chart-pie w-5"></i> Dashboard</button>
+            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-wallet w-5"></i> Accounts</button>
+            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm font-medium text-gray-500 rounded-r-lg text-left gap-3 hover:bg-gray-50 transition-all"><i class="fas fa-list w-5"></i> Transactions</button>
         </nav>
-        <div class="p-4 border-t border-white/5">
+        <div class="p-4 border-t border-gray-100 bg-gray-50/50">
             <div class="flex items-center gap-3 mb-3">
-                <img id="user-avatar" src="" class="w-9 h-9 rounded-full bg-gray-700 hidden border border-white/10">
+                <img id="user-avatar" src="" class="w-9 h-9 rounded-full bg-gray-200 hidden border border-white shadow-sm">
                 <div class="overflow-hidden">
-                    <div id="user-name" class="text-sm font-medium text-white truncate">User</div>
-                    <div class="text-[10px] text-emerald-500 flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sync Active</div>
+                    <div id="user-name" class="text-sm font-semibold text-gray-900 truncate">User</div>
+                    <div class="text-[10px] text-emerald-600 flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Sync Active</div>
                 </div>
             </div>
-            <button id="btn-logout" class="w-full py-2 text-xs text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 rounded border border-rose-500/20 transition">Sign Out</button>
+            <button id="btn-logout" class="w-full py-2 text-xs font-medium text-rose-600 bg-rose-50 hover:bg-rose-100 rounded border border-rose-100 transition">Sign Out</button>
         </div>
     </aside>
 
     <!-- MAIN CONTENT -->
-    <main class="flex-1 relative flex flex-col h-full overflow-hidden bg-[#0B1120]">
+    <main class="flex-1 relative flex flex-col h-full overflow-hidden bg-[#F9FAFB]">
         <!-- Mobile Header -->
-        <header class="md:hidden flex items-center justify-between p-4 bg-gray-900/80 backdrop-blur-md border-b border-white/5 z-30 sticky top-0">
+        <header class="md:hidden flex items-center justify-between p-4 bg-white/80 backdrop-blur-md border-b border-gray-200 z-30 sticky top-0 shadow-sm">
             <div class="flex items-center gap-2">
-                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs"><i class="fas fa-bolt"></i></div>
-                <span class="font-bold text-lg text-white">Sure.</span>
+                <div class="w-6 h-6 bg-blue-600 rounded flex items-center justify-center text-white text-xs shadow-sm"><i class="fas fa-wave-square"></i></div>
+                <span class="font-bold text-lg text-gray-900">Cash Flow.</span>
             </div>
             <div id="mob-sync-status" class="w-2 h-2 rounded-full bg-emerald-500"></div>
         </header>
 
         <!-- DASHBOARD VIEW -->
         <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
-            <div class="max-w-5xl mx-auto space-y-6">
+            <div class="max-w-6xl mx-auto space-y-6">
                 <!-- NET WORTH HEADER -->
                 <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
                     <div>
-                        <h2 class="text-3xl font-bold text-white">Overview</h2>
-                        <p class="text-gray-400 text-sm mt-1">Real-time cloud sync</p>
+                        <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Overview</h2>
+                        <p class="text-gray-500 text-sm mt-1">Real-time financial health</p>
                     </div>
-                    <div class="glass-panel px-5 py-3 rounded-xl border-l-4 border-blue-500">
-                        <div class="text-xs text-gray-400 uppercase tracking-wider">Net Worth</div>
-                        <div class="text-3xl font-bold text-white" id="dash-networth">...</div>
+                    <div class="glass-panel px-5 py-3 rounded-xl border-l-4 border-blue-600 bg-white">
+                        <div class="text-xs text-gray-500 uppercase tracking-wider font-semibold">Net Worth</div>
+                        <div class="text-3xl font-bold text-gray-900" id="dash-networth">...</div>
                     </div>
                 </div>
 
-                <!-- MAIN NET WORTH CHART -->
-                <div class="glass-panel rounded-2xl p-1">
-                    <div class="p-5 pb-0 flex justify-between items-center"><h3 class="font-medium text-gray-200">History</h3></div>
-                    <div class="chart-wrapper p-4"><canvas id="mainChart"></canvas></div>
+                <!-- MAIN HISTORY CHART (Line) -->
+                <div class="glass-panel rounded-2xl p-1 bg-white">
+                    <div class="p-5 pb-0 flex justify-between items-center"><h3 class="font-semibold text-gray-800">Net Worth Trend</h3></div>
+                    <div class="chart-wrapper p-4" style="height: 200px;"><canvas id="mainChart"></canvas></div>
                 </div>
 
-                <!-- NEW CASH FLOW SECTION -->
-                <div class="glass-panel rounded-2xl p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="font-medium text-white text-lg">Cash Flow</h3>
-                        <span class="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded">Last 6 Months</span>
+                <!-- SANKEY CASH FLOW SECTION -->
+                <div class="glass-panel rounded-2xl p-6 bg-white">
+                    <div class="flex justify-between items-center mb-4">
+                        <div>
+                            <h3 class="font-semibold text-gray-900 text-lg">Money Flows</h3>
+                            <p class="text-xs text-gray-500">Source to Expense Visualization</p>
+                        </div>
+                        <div class="text-xs text-gray-600 bg-gray-100 px-2 py-1 rounded font-medium">All Time</div>
                     </div>
 
-                    <!-- Cash Flow Summary Stats -->
-                    <div class="grid grid-cols-3 gap-4 mb-6 pb-6 border-b border-white/5">
-                        <div class="text-center">
-                            <div class="text-xs text-gray-400 mb-1">Total Income</div>
-                            <div class="text-lg font-bold text-emerald-400" id="cf-in">₹0</div>
-                        </div>
-                        <div class="text-center border-l border-white/5">
-                            <div class="text-xs text-gray-400 mb-1">Total Expenses</div>
-                            <div class="text-lg font-bold text-rose-400" id="cf-out">₹0</div>
-                        </div>
-                        <div class="text-center border-l border-white/5">
-                            <div class="text-xs text-gray-400 mb-1">Net Savings</div>
-                            <div class="text-lg font-bold text-blue-400" id="cf-net">₹0</div>
-                        </div>
+                    <!-- Sankey Chart Container -->
+                    <div class="chart-wrapper" style="height: 400px; background: #FAFAFA; border-radius: 12px; padding: 10px; border: 1px solid #F3F4F6;">
+                        <canvas id="sankeyChart"></canvas>
                     </div>
-
-                    <!-- Cash Flow Bar Chart -->
-                    <div class="chart-wrapper" style="height: 200px;">
-                        <canvas id="cashFlowChart"></canvas>
+                    
+                    <div class="mt-4 text-center text-xs text-gray-500 font-medium">
+                        <span class="text-emerald-600">Income</span> &rarr; <span class="text-gray-800">Wallet</span> &rarr; <span class="text-rose-500">Expenses</span> & <span class="text-blue-600">Surplus</span>
                     </div>
                 </div>
 
                 <!-- ASSETS / DEBTS GRID -->
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="glass-panel p-5 rounded-2xl">
-                        <div class="text-xs text-gray-400">Total Assets</div>
-                        <div class="text-xl md:text-2xl font-bold text-white mt-1" id="dash-assets">...</div>
+                    <div class="glass-panel p-5 rounded-2xl bg-white">
+                        <div class="text-xs text-gray-500 font-semibold uppercase">Total Assets</div>
+                        <div class="text-xl md:text-2xl font-bold text-gray-900 mt-1" id="dash-assets">...</div>
                     </div>
-                    <div class="glass-panel p-5 rounded-2xl">
-                        <div class="text-xs text-gray-400">Total Debts</div>
-                        <div class="text-xl md:text-2xl font-bold text-white mt-1" id="dash-debts">...</div>
+                    <div class="glass-panel p-5 rounded-2xl bg-white">
+                        <div class="text-xs text-gray-500 font-semibold uppercase">Total Debts</div>
+                        <div class="text-xl md:text-2xl font-bold text-gray-900 mt-1" id="dash-debts">...</div>
                     </div>
                 </div>
             </div>
@@ -151,9 +169,9 @@
         <!-- ACCOUNTS VIEW -->
         <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-3xl mx-auto">
-                <div class="flex justify-between items-center mb-6 sticky top-0 md:static z-10 py-2">
-                    <h2 class="text-2xl font-bold text-white">Accounts</h2>
-                    <button onclick="openModal('accountModal')" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+                <div class="flex justify-between items-center mb-6 sticky top-0 md:static z-10 py-2 bg-[#F9FAFB]/90 backdrop-blur-sm">
+                    <h2 class="text-2xl font-bold text-gray-900">Accounts</h2>
+                    <button onclick="openModal('accountModal')" class="bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"><i class="fas fa-plus"></i></button>
                 </div>
                 <div id="accounts-container" class="space-y-6 pb-20"></div>
             </div>
@@ -163,57 +181,93 @@
         <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-4 md:p-8">
             <div class="max-w-4xl mx-auto h-full flex flex-col">
                 <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-2xl font-bold text-white">Activity</h2>
-                    <button onclick="openModal('txModal')" class="bg-blue-600 hover:bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+                    <h2 class="text-2xl font-bold text-gray-900">Activity</h2>
+                    <button onclick="openModal('txModal')" class="bg-blue-600 hover:bg-blue-700 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg shadow-blue-600/30 transition-all hover:scale-105 active:scale-95"><i class="fas fa-plus"></i></button>
                 </div>
-                <div class="glass-panel rounded-2xl flex-1 flex flex-col overflow-hidden">
-                    <div class="p-3 border-b border-white/5">
-                        <input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="bg-gray-900/50 border border-white/10 rounded-xl px-4 py-2 text-sm text-white w-full focus:outline-none focus:border-blue-500">
+                <div class="glass-panel rounded-2xl flex-1 flex flex-col overflow-hidden bg-white shadow-sm">
+                    <div class="p-3 border-b border-gray-100">
+                        <div class="relative">
+                            <i class="fas fa-search absolute left-3 top-3 text-gray-400 text-xs"></i>
+                            <input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="bg-gray-50 border border-gray-200 rounded-xl pl-9 pr-4 py-2.5 text-sm text-gray-800 w-full focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+                        </div>
                     </div>
-                    <div id="full-tx-list" class="overflow-y-auto flex-1 divide-y divide-white/5 pb-20"></div>
+                    <div id="full-tx-list" class="overflow-y-auto flex-1 divide-y divide-gray-100 pb-20"></div>
                 </div>
             </div>
         </div>
     </main>
 
     <!-- MOBILE NAV -->
-    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/90 backdrop-blur-xl border-t border-white/10 pb-safe z-40">
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-xl border-t border-gray-200 pb-safe z-40 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
         <div class="flex justify-around items-center h-16">
-            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-500 w-full h-full justify-center"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px]">Overview</span></button>
-            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-gray-500 w-full h-full justify-center"><i class="fas fa-wallet text-lg"></i><span class="text-[10px]">Accounts</span></button>
-            <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-gray-500 w-full h-full justify-center"><i class="fas fa-list text-lg"></i><span class="text-[10px]">Activity</span></button>
-            <button id="mob-btn-logout" class="flex flex-col items-center gap-1 text-gray-500 w-full h-full justify-center"><i class="fas fa-sign-out-alt text-lg"></i><span class="text-[10px]">Logout</span></button>
+            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-chart-pie text-lg"></i><span class="text-[10px] font-medium">Overview</span></button>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-wallet text-lg"></i><span class="text-[10px] font-medium">Accounts</span></button>
+            <button onclick="router('transactions')" id="m-nav-transactions" class="nav-item flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-blue-600"><i class="fas fa-list text-lg"></i><span class="text-[10px] font-medium">Activity</span></button>
+            <button id="mob-btn-logout" class="flex flex-col items-center gap-1 text-gray-400 w-full h-full justify-center hover:text-rose-500"><i class="fas fa-sign-out-alt text-lg"></i><span class="text-[10px] font-medium">Logout</span></button>
         </div>
     </nav>
 
-    <!-- MODALS -->
-    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4">
-        <div class="bg-gray-800 rounded-t-2xl md:rounded-2xl border border-white/10 p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold text-white mb-4">Add Account</h3>
+    <!-- MODAL: ADD ACCOUNT -->
+    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
+        <div class="bg-white rounded-t-2xl md:rounded-2xl border border-gray-100 p-6 w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out]">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Add Account</h3>
             <form onsubmit="addAccount(event)" class="space-y-4">
-                <input type="text" id="accName" required class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white" placeholder="Account Name">
-                <input type="number" step="1" id="accBalance" required class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white" placeholder="0">
-                <select id="accType" class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white">
-                    <option value="cash">Cash/Bank</option><option value="investment">Investment</option><option value="property">Property</option><option value="credit">Debt/Credit</option>
-                </select>
-                <div class="flex gap-2">
-                    <button type="button" onclick="closeModal('accountModal')" class="w-1/3 text-gray-400">Cancel</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-bold rounded-xl py-3">Save</button>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Name</label>
+                    <input type="text" id="accName" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors" placeholder="e.g. HDFC Bank">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Balance / Limit</label>
+                    <input type="number" step="1" id="accBalance" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors" placeholder="0">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-500 uppercase mb-1">Type</label>
+                    <select id="accType" onchange="toggleDebtFields()" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none transition-colors">
+                        <option value="cash">Cash/Bank</option>
+                        <option value="investment">Investment</option>
+                        <option value="property">Property</option>
+                        <option value="credit">Credit Card (Debt)</option>
+                        <option value="loan">Loan (Debt)</option>
+                    </select>
+                </div>
+                <!-- Debt Fields -->
+                <div id="debt-fields" class="hidden grid grid-cols-2 gap-3 p-4 bg-rose-50 rounded-xl border border-rose-100">
+                    <div><label class="text-[10px] text-rose-600 font-bold uppercase">Rate (%)</label><input type="number" step="0.1" id="accRoi" class="w-full bg-white border border-rose-200 rounded p-2 text-gray-900 text-sm mt-1" placeholder="8.5"></div>
+                    <div><label class="text-[10px] text-rose-600 font-bold uppercase">Months</label><input type="number" id="accTenure" class="w-full bg-white border border-rose-200 rounded p-2 text-gray-900 text-sm mt-1" placeholder="60"></div>
+                    <div class="col-span-2 text-xs text-rose-600 font-medium mt-1" id="emi-preview"></div>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('accountModal')" class="w-1/3 py-3 text-gray-500 hover:bg-gray-100 rounded-xl font-medium transition">Cancel</button>
+                    <button type="submit" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3 shadow-lg shadow-blue-600/30 transition">Save</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <div id="txModal" class="fixed inset-0 z-50 hidden bg-black/90 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4">
-        <div class="bg-gray-800 rounded-t-2xl md:rounded-2xl border border-white/10 p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold text-white mb-4">Log Transaction</h3>
+    <!-- MODAL: ADD TRANSACTION -->
+    <div id="txModal" class="fixed inset-0 z-50 hidden bg-black/50 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
+        <div class="bg-white rounded-t-2xl md:rounded-2xl border border-gray-100 p-6 w-full max-w-md shadow-2xl animate-[slideUp_0.2s_ease-out]">
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Log Transaction</h3>
             <form onsubmit="addTransaction(event)" class="space-y-4">
-                <input type="text" id="txDesc" required class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white" placeholder="Description">
-                <div class="grid grid-cols-2 gap-3"><input type="number" step="1" id="txAmount" required class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white" placeholder="0"><input type="date" id="txDate" required class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white"></div>
-                <select id="txType" class="w-full bg-gray-900 border border-white/10 rounded-xl p-3 text-white"><option value="expense">Expense</option><option value="income">Income</option></select>
-                <div class="flex gap-2">
-                    <button type="button" onclick="closeModal('txModal')" class="w-1/3 text-gray-400">Cancel</button>
-                    <button type="submit" class="w-2/3 bg-blue-600 text-white font-bold rounded-xl py-3">Save</button>
+                <input type="text" id="txDesc" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none" placeholder="Description (e.g. Lunch)">
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="number" step="1" id="txAmount" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none" placeholder="Amount">
+                    <input type="date" id="txDate" required class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <select id="txType" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none"><option value="expense">Expense</option><option value="income">Income</option></select>
+                    <select id="txCat" class="w-full bg-gray-50 border border-gray-200 rounded-xl p-3 text-gray-900 focus:border-blue-500 outline-none">
+                        <optgroup label="Income">
+                            <option value="Salary">Salary</option><option value="Freelance">Freelance</option><option value="Business">Business</option><option value="Other Income">Other Income</option>
+                        </optgroup>
+                        <optgroup label="Expenses">
+                            <option value="Food & Dining">Food & Dining</option><option value="Housing">Housing/Rent</option><option value="Transportation">Transportation</option><option value="Shopping">Shopping</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="EMI/Debt">EMI/Debt</option><option value="Misc">Misc</option>
+                        </optgroup>
+                    </select>
+                </div>
+                <div class="flex gap-3 pt-2">
+                    <button type="button" onclick="closeModal('txModal')" class="w-1/3 py-3 text-gray-500 hover:bg-gray-100 rounded-xl font-medium transition">Cancel</button>
+                    <button type="submit" class="w-2/3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl py-3 shadow-lg shadow-blue-600/30 transition">Save</button>
                 </div>
             </form>
         </div>
@@ -226,7 +280,7 @@
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ==========================================
-        // CONFIGURATION (EMBEDDED)
+        // YOUR KEYS (INJECTED)
         // ==========================================
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
@@ -246,44 +300,20 @@
         let currentUser = null;
         let state = { accounts: [], transactions: [], history: [0] };
         let chartInst = null;
-        let cfChartInst = null; // Cash Flow Chart
+        let sankeyInst = null;
 
-        // UI Refs
-        const els = {
-            overlay: document.getElementById('auth-overlay'),
-            status: document.getElementById('auth-status'),
-            name: document.getElementById('user-name'),
-            avatar: document.getElementById('user-avatar'),
-            nw: document.getElementById('dash-networth'),
-            as: document.getElementById('dash-assets'),
-            db: document.getElementById('dash-debts')
-        };
+        const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
-        // Auth
-        document.getElementById('btn-login').onclick = async () => {
-            els.status.innerText = "Connecting...";
-            try { await signInWithPopup(auth, provider); } catch(e) { els.status.innerText = e.message; }
-        };
+        document.getElementById('btn-login').onclick = async () => { els.status.innerText = "Connecting..."; try { await signInWithPopup(auth, provider); } catch(e) { els.status.innerText = e.message; } };
         const logout = () => signOut(auth);
         document.getElementById('btn-logout').onclick = logout;
         document.getElementById('mob-btn-logout').onclick = logout;
 
         onAuthStateChanged(auth, (user) => {
-            if(user) {
-                currentUser = user;
-                els.overlay.classList.add('hidden');
-                els.name.innerText = user.displayName;
-                els.avatar.src = user.photoURL;
-                els.avatar.classList.remove('hidden');
-                initSync();
-            } else {
-                currentUser = null;
-                els.overlay.classList.remove('hidden');
-                els.status.innerText = "";
-            }
+            if(user) { currentUser = user; els.overlay.classList.add('hidden'); els.name.innerText = user.displayName; els.avatar.src = user.photoURL; els.avatar.classList.remove('hidden'); initSync(); } 
+            else { currentUser = null; els.overlay.classList.remove('hidden'); els.status.innerText = ""; }
         });
 
-        // Sync
         function initSync() {
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 if(doc.exists()) {
@@ -291,23 +321,35 @@
                     render();
                     document.getElementById('mob-sync-status').classList.add('animate-ping');
                     setTimeout(()=>document.getElementById('mob-sync-status').classList.remove('animate-ping'), 1000);
-                } else {
-                    save(); // Init
-                }
+                } else { save(); }
             });
         }
         async function save() { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), state); }
 
-        // Logic
+        window.toggleDebtFields = () => {
+            const type = document.getElementById('accType').value;
+            const fields = document.getElementById('debt-fields');
+            if(['loan','credit'].includes(type)) fields.classList.remove('hidden'); else fields.classList.add('hidden');
+        };
+
+        function calculateEMI(p, r, n) { if(!p||!r||!n) return 0; const rm = r/12/100; return Math.round(p * rm * (Math.pow(1+rm, n) / (Math.pow(1+rm, n)-1))); }
+        ['accBalance','accRoi','accTenure'].forEach(id => {
+            document.getElementById(id).addEventListener('input', () => {
+                const p = parseFloat(document.getElementById('accBalance').value)||0, r = parseFloat(document.getElementById('accRoi').value)||0, n = parseFloat(document.getElementById('accTenure').value)||0;
+                if(p&&r&&n) document.getElementById('emi-preview').innerText = `Estimated EMI: ${money(calculateEMI(p,r,n))}/mo`;
+            });
+        });
+
         window.addAccount = (e) => {
             e.preventDefault();
-            state.accounts.push({
-                id: Date.now(),
-                name: document.getElementById('accName').value,
-                balance: parseFloat(document.getElementById('accBalance').value),
-                type: document.getElementById('accType').value
-            });
-            save(); closeModal('accountModal'); e.target.reset();
+            const type = document.getElementById('accType').value;
+            let emi = 0, roi = 0, tenure = 0;
+            if(['loan','credit'].includes(type)) {
+                const p = parseFloat(document.getElementById('accBalance').value)||0; roi = parseFloat(document.getElementById('accRoi').value)||0; tenure = parseFloat(document.getElementById('accTenure').value)||0;
+                emi = calculateEMI(p, roi, tenure);
+            }
+            state.accounts.push({ id: Date.now(), name: document.getElementById('accName').value, balance: parseFloat(document.getElementById('accBalance').value), type, roi, tenure, emi });
+            save(); closeModal('accountModal'); e.target.reset(); document.getElementById('debt-fields').classList.add('hidden');
         };
 
         window.addTransaction = (e) => {
@@ -317,115 +359,110 @@
                 desc: document.getElementById('txDesc').value,
                 amount: parseFloat(document.getElementById('txAmount').value),
                 date: document.getElementById('txDate').value,
-                type: document.getElementById('txType').value
+                type: document.getElementById('txType').value,
+                cat: document.getElementById('txCat').value // New Category
             });
             save(); closeModal('txModal'); e.target.reset();
         };
 
-        window.deleteItem = (list, id) => {
-            if(confirm('Delete item?')) { state[list] = state[list].filter(i=>i.id!==id); save(); }
-        };
+        window.deleteItem = (list, id) => { if(confirm('Delete?')) { state[list] = state[list].filter(i=>i.id!==id); save(); } };
 
-        // Render with INDIAN RUPEE FORMATTING
-        const money = (n) => new Intl.NumberFormat('en-IN', { 
-            style: 'currency', 
-            currency: 'INR', 
-            maximumFractionDigits: 0 
-        }).format(n);
+        const money = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
 
         function render() {
-            // 1. Net Worth Calcs
-            let assets = 0, debts = 0;
-            state.accounts.forEach(a => {
-                if(['cash','investment','property'].includes(a.type)) assets += a.balance;
-                else debts += a.balance;
-            });
+            // 1. Stats
+            let assets=0, debts=0, totalEMI=0;
+            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) assets+=a.balance; else { debts+=a.balance; if(a.emi) totalEMI+=a.emi; } });
             const nw = assets - debts;
+            els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
-            els.nw.innerText = money(nw);
-            els.as.innerText = money(assets);
-            els.db.innerText = money(debts);
-
-            // 2. Main History Chart
-            if(state.history[state.history.length-1] !== nw) {
-                state.history.push(nw);
-                if(state.history.length > 12) state.history.shift();
-            }
+            // 2. Main Chart (Updated Colors for Light Mode)
+            if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
-            chartInst = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: Array(state.history.length).fill(''),
-                    datasets: [{ data: state.history, borderColor: '#3B82F6', backgroundColor: 'rgba(59, 130, 246, 0.1)', borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }]
-                },
-                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } }
+            chartInst = new Chart(ctx, { 
+                type: 'line', 
+                data: { 
+                    labels: Array(state.history.length).fill(''), 
+                    datasets: [{ 
+                        data: state.history, 
+                        borderColor: '#2563EB', 
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)', 
+                        borderWidth: 3, 
+                        fill: true, 
+                        tension: 0.4, 
+                        pointRadius: 0 
+                    }] 
+                }, 
+                options: { 
+                    responsive: true, 
+                    maintainAspectRatio: false, 
+                    plugins: { legend: { display: false } }, 
+                    scales: { 
+                        x: { display: false }, 
+                        y: { display: false } 
+                    } 
+                } 
             });
 
-            // 3. CASH FLOW CALCULATIONS
-            const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-            const currentMonth = new Date().getMonth();
-            const monthlyStats = Array(6).fill(0).map((_, i) => {
-                const d = new Date();
-                d.setMonth(currentMonth - 5 + i);
-                return { month: monthNames[d.getMonth()], income: 0, expense: 0 };
-            });
-
-            let totalIn = 0, totalOut = 0;
+            // 3. SANKEY DIAGRAM LOGIC
+            const flows = {};
+            let totalIncome = 0;
+            let totalExpense = 0;
+            const WALLET = "Wallet";
 
             state.transactions.forEach(tx => {
-                const txDate = new Date(tx.date);
-                // Check if in last 6 months
-                const diff = (new Date().getFullYear() - txDate.getFullYear()) * 12 + (new Date().getMonth() - txDate.getMonth());
-                if(diff >= 0 && diff < 6) {
-                    const idx = 5 - diff; // 5 is current month
-                    if(tx.type === 'income') {
-                        monthlyStats[idx].income += tx.amount;
-                        totalIn += tx.amount;
-                    } else {
-                        monthlyStats[idx].expense += tx.amount;
-                        totalOut += tx.amount;
-                    }
+                const cat = tx.cat || (tx.type === 'income' ? 'Uncategorized Income' : 'Misc');
+                const amt = tx.amount;
+
+                if (tx.type === 'income') {
+                    const key = `${cat}|${WALLET}`;
+                    flows[key] = (flows[key] || 0) + amt;
+                    totalIncome += amt;
+                } else {
+                    const key = `${WALLET}|${cat}`;
+                    flows[key] = (flows[key] || 0) + amt;
+                    totalExpense += amt;
                 }
             });
 
-            // Update Cash Flow UI
-            document.getElementById('cf-in').innerText = money(totalIn);
-            document.getElementById('cf-out').innerText = money(totalOut);
-            document.getElementById('cf-net').innerText = money(totalIn - totalOut);
+            const surplus = totalIncome - totalExpense;
+            if (surplus > 0) { flows[`${WALLET}|Surplus`] = surplus; }
 
-            // Render Cash Flow Chart
-            const cfCtx = document.getElementById('cashFlowChart').getContext('2d');
-            if(cfChartInst) cfChartInst.destroy();
-            cfChartInst = new Chart(cfCtx, {
-                type: 'bar',
-                data: {
-                    labels: monthlyStats.map(m => m.month),
-                    datasets: [
-                        { label: 'Income', data: monthlyStats.map(m => m.income), backgroundColor: '#10B981', borderRadius: 4 },
-                        { label: 'Expense', data: monthlyStats.map(m => m.expense), backgroundColor: '#E11D48', borderRadius: 4 }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: { 
-                        x: { grid: { display: false }, ticks: { color: '#9CA3AF' } }, 
-                        y: { display: false } 
-                    }
-                }
+            const sankeyData = Object.keys(flows).map(key => {
+                const [from, to] = key.split('|');
+                return { from, to, flow: flows[key] };
             });
+
+            const sankeyCtx = document.getElementById('sankeyChart').getContext('2d');
+            if(sankeyInst) sankeyInst.destroy();
+            
+            if (sankeyData.length > 0) {
+                sankeyInst = new Chart(sankeyCtx, {
+                    type: 'sankey',
+                    data: {
+                        datasets: [{
+                            data: sankeyData,
+                            colorFrom: (c) => c.dataset.data[c.dataIndex].from === WALLET ? '#2563EB' : '#10B981', // Blue outgoing, Green incoming
+                            colorTo: (c) => c.dataset.data[c.dataIndex].to === 'Surplus' ? '#2563EB' : (c.dataset.data[c.dataIndex].to === WALLET ? '#2563EB' : '#F43F5E'), // Blue surplus, Red exp
+                            colorMode: 'gradient',
+                            labels: { color: 'black', font: { size: 10 } } // Dark labels for Light mode
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
 
             // 4. Accounts List
             const ac = document.getElementById('accounts-container'); ac.innerHTML = '';
-            const groups = { 'Liquidity': 'cash', 'Investments': 'investment', 'Properties': 'property', 'Debts': ['credit','loan'] };
+            const groups = { 'Liquidity': 'cash', 'Investments': 'investment', 'Properties': 'property', 'Loans & Credit': ['credit','loan'] };
             for(const [name, types] of Object.entries(groups)) {
                 const items = state.accounts.filter(a => Array.isArray(types) ? types.includes(a.type) : a.type === types);
                 if(items.length) {
-                    let h = `<div class="glass-panel rounded-2xl overflow-hidden mb-4"><div class="bg-gray-800/30 p-3 text-xs font-bold text-gray-400 uppercase pl-5">${name}</div><div class="divide-y divide-white/5">`;
+                    let h = `<div class="glass-panel rounded-2xl overflow-hidden mb-4 bg-white shadow-sm"><div class="bg-gray-50 p-3 text-xs font-bold text-gray-500 uppercase pl-5 border-b border-gray-100">${name}</div><div class="divide-y divide-gray-100">`;
                     items.forEach(i => {
-                        h += `<div class="p-4 flex justify-between items-center hover:bg-white/5 group"><span class="text-white font-medium text-sm">${i.name}</span><div class="flex gap-3"><span class="text-white">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="text-rose-500 opacity-50 hover:opacity-100"><i class="fas fa-trash"></i></button></div></div>`;
+                        let sub = i.emi ? `<div class="text-[10px] text-rose-500 font-medium">EMI: ${money(i.emi)} @ ${i.roi}%</div>` : '';
+                        h += `<div class="p-4 flex justify-between items-center hover:bg-gray-50 group"><div><div class="text-gray-900 font-medium text-sm">${i.name}</div>${sub}</div><div class="flex gap-3"><span class="text-gray-900 font-bold">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`;
                     });
                     ac.innerHTML += h + `</div></div>`;
                 }
@@ -436,11 +473,10 @@
             const term = document.getElementById('tx-search').value.toLowerCase();
             state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t => {
                 const isInc = t.type === 'income';
-                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-white/5"><div class="flex gap-3"><div class="flex flex-col"><span class="text-white text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${t.date}</span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-400':'text-white'} font-medium text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-600 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
+                tc.innerHTML += `<div class="flex justify-between items-center p-4 hover:bg-gray-50 transition"><div class="flex gap-3"><div class="flex flex-col"><span class="text-gray-900 text-sm font-medium">${t.desc}</span><span class="text-xs text-gray-500">${t.date} • ${t.cat||'Uncategorized'}</span></div></div><div class="flex gap-3"><span class="${isInc?'text-emerald-600':'text-gray-900'} font-bold text-sm">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="deleteItem('transactions', ${t.id})" class="text-gray-400 hover:text-rose-500"><i class="fas fa-times"></i></button></div></div>`;
             });
         }
 
-        // Nav
         window.router = (v) => {
             document.querySelectorAll('.view-section').forEach(e => e.classList.remove('active'));
             document.getElementById('view-'+v).classList.add('active');

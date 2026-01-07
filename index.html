@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Vibranium</title>
+    <title>Cash Flow | Unobtainium</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -16,8 +16,8 @@
         :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
         
-        /* Layout Engine for Any Interface */
-        .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; } /* 100dvh handles mobile address bars */
+        /* Layout Engine */
+        .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; }
         .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
         
         /* UI Elements */
@@ -48,15 +48,19 @@
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
-        .dot { width: 4px; height: 4px; border-radius: 50%; }
         
-        /* Responsive adjustments */
+        /* Responsive */
         @media (min-width: 768px) {
             .app-container { flex-direction: row; }
             .nav-dock { display: none; }
             .main-scroll { padding: 40px; padding-bottom: 40px; }
             .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; }
         }
+        
+        /* Filter Buttons */
+        .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
+        .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .filter-btn.inactive { color: #94A3B8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -66,7 +70,7 @@
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200 rotate-3">
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Vibranium.</h1>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Unobtainium.</h1>
             <p class="text-slate-500 mb-8 font-medium">Financial Intelligence.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
@@ -84,12 +88,11 @@
                 </div>
             </div>
             <nav class="flex-1 px-6 space-y-1 overflow-y-auto">
-                <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Home</button>
+                <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Dashboard</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
                 <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
                 <button onclick="router('planning')" id="d-nav-planning" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-compass w-5"></i> Planning</button>
-                <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
                 <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
                 <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
                 <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
@@ -99,7 +102,7 @@
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Vibranium</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Unobtainium</div>
                     </div>
                 </div>
                 <div class="flex gap-2 mb-2">
@@ -114,7 +117,7 @@
             <header class="md:hidden flex items-center justify-between p-6 bg-[#F8FAFC]/90 backdrop-blur-md sticky top-0 z-40">
                 <div>
                     <h1 class="text-2xl font-extrabold text-slate-900" id="greeting">Hello!</h1>
-                    <p class="text-slate-500 text-sm font-medium">Financial Overview</p>
+                    <p class="text-slate-500 text-sm font-medium">Financial Command Center</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="togglePrivacy()" id="mob-btn-privacy" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-eye"></i></button>
@@ -129,7 +132,7 @@
             <div class="p-4 md:p-0 max-w-6xl mx-auto">
                 
                 <div id="view-dashboard" class="view-section space-y-6">
-                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100">
+                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]">
                         <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div>
                         <div>
                             <h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4>
@@ -162,26 +165,56 @@
                             <span class="money-val" id="burn-income">Inc: 0</span>
                         </div>
                     </div>
-                    
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="neo-card p-6 flex flex-col justify-center">
-                            <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div>
-                            <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div>
-                        </div>
-                        <div class="neo-card p-6 flex flex-col justify-center">
-                            <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div>
-                            <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div>
-                            <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div>
-                        </div>
+
+                    <div id="recurring-section" class="hidden">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4">Active Subscriptions</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="recurring-list"></div>
                     </div>
 
-                    <div class="neo-card p-6 md:p-8">
-                        <div class="flex justify-between items-center mb-6">
-                            <div><h3 class="font-bold text-slate-900 text-xl">Growth Trend</h3></div>
-                            <span class="bg-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-xs font-bold">1 Year</span>
+                    <div class="neo-card p-8 border-indigo-100 border-2">
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+                            <div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div>
+                            <div class="flex bg-slate-100 rounded-xl p-1 gap-1">
+                                <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button>
+                                <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button>
+                                <button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button>
+                            </div>
                         </div>
-                        <div class="chart-wrapper p-2" style="height: 250px;"><canvas id="mainChart"></canvas></div>
+                        <div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-6">
+                            <div class="neo-card p-6">
+                                <h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3>
+                                <div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div>
+                            </div>
+                            <div class="neo-card p-6">
+                                <h3 class="font-bold text-slate-900 text-lg mb-6">Monthly Income/Expense</h3>
+                                <div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div>
+                            </div>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="neo-card p-6 flex flex-col justify-center">
+                                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div>
+                                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div>
+                                    <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div>
+                                </div>
+                                <div class="neo-card p-6 flex flex-col justify-center">
+                                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div>
+                                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div>
+                                    <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div>
+                                </div>
+                            </div>
+                            <div class="neo-card p-6 h-full flex flex-col">
+                                <h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3>
+                                <div class="flex-1 flex items-center justify-center">
+                                    <div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div>
+                                    <div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -190,20 +223,12 @@
                         <div><h2 class="text-3xl font-extrabold text-slate-900">Calendar</h2><p class="text-slate-500 font-medium">Financial Heatmap</p></div>
                         <div class="text-xl font-bold text-slate-700 bg-white px-4 py-2 rounded-xl shadow-sm" id="cal-month-name">...</div>
                     </div>
-                    
                     <div class="neo-card p-4 md:p-6">
                         <div class="grid grid-cols-7 gap-2 mb-4 text-center">
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">SUN</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">MON</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">TUE</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">WED</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">THU</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">FRI</div>
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">SAT</div>
+                            <div class="text-[10px] md:text-xs font-bold text-slate-400">SUN</div><div class="text-[10px] md:text-xs font-bold text-slate-400">MON</div><div class="text-[10px] md:text-xs font-bold text-slate-400">TUE</div><div class="text-[10px] md:text-xs font-bold text-slate-400">WED</div><div class="text-[10px] md:text-xs font-bold text-slate-400">THU</div><div class="text-[10px] md:text-xs font-bold text-slate-400">FRI</div><div class="text-[10px] md:text-xs font-bold text-slate-400">SAT</div>
                         </div>
                         <div id="calendar-grid" class="calendar-grid"></div>
                     </div>
-
                     <div id="cal-day-detail" class="hidden neo-card p-6 animate-[fadeIn_0.2s_ease-out]">
                         <div class="flex justify-between items-center mb-4">
                             <h3 class="font-bold text-slate-900" id="cal-sel-date">Selected Date</h3>
@@ -219,15 +244,8 @@
                         <div class="absolute -top-10 -right-10 w-48 h-48 bg-purple-600 opacity-20 rounded-full blur-3xl"></div>
                         <h3 class="font-bold text-xl mb-6 relative z-10"><i class="fas fa-fire text-orange-500 mr-2"></i> FIRE Calculator</h3>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                            <div>
-                                <label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label>
-                                <input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()">
-                            </div>
-                            <div class="flex flex-col justify-center">
-                                <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div>
-                                <div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div>
-                                <div class="text-sm text-slate-400 mt-2" id="fire-progress">Rule of 25</div>
-                            </div>
+                            <div><label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label><input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()"></div>
+                            <div class="flex flex-col justify-center"><div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div><div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div><div class="text-sm text-slate-400 mt-2" id="fire-progress">Rule of 25</div></div>
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -266,13 +284,6 @@
                     <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Budgets</h3><button onclick="addBudget()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="budget-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
                 </div>
 
-                <div id="view-analysis" class="view-section space-y-6">
-                    <div class="flex justify-between items-center"><div><h2 class="text-3xl font-extrabold text-slate-900">Analysis</h2><p class="text-slate-500 font-medium">Flows</p></div></div>
-                    <div id="recurring-section" class="hidden"><h3 class="font-bold text-slate-900 text-lg mb-4">Subscriptions</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="recurring-list"></div></div>
-                    <div class="neo-card p-8 border-indigo-100 border-2"><div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"><div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div><div class="flex bg-slate-100 rounded-xl p-1 gap-1"><button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button><button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button></div></div><div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Trend</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div></div><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Allocation</h3><div class="flex items-center justify-center"><div style="height: 200px; width: 200px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div></div>
-                </div>
-
                 <div id="view-debts" class="view-section space-y-6">
                     <div><h2 class="text-3xl font-extrabold text-slate-900">Debts</h2><p class="text-slate-500 font-medium">Tracking</p></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">True Cost</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div></div><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">Composition</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div></div></div>
@@ -292,7 +303,7 @@
             <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-calendar-alt text-xl"></i></button>
             <div class="relative -top-10"><button onclick="openTxModal()" class="w-16 h-16 bg-indigo-600 rounded-[22px] flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button></div>
             <button onclick="router('planning')" id="m-nav-planning" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-compass text-xl"></i></button>
-            <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
         </div>
     </nav>
 
@@ -307,7 +318,7 @@
 
         const config = { currency: 'INR', locale: 'en-IN' };
 
-        // --- RESTORE YOUR KEYS HERE ---
+        // --- PASTE YOUR FIREBASE CONFIG HERE ---
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
             authDomain: "expense-and-income-faf13.firebaseapp.com",
@@ -434,25 +445,31 @@
             if(document.getElementById('view-future').classList.contains('active')) calcFuture();
             if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
 
-            if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
-            const mainCtxEl = document.getElementById('mainChart'); if(mainCtxEl) { const ctx = mainCtxEl.getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } }); }
-            const pieCtxEl = document.getElementById('assetPieChart'); if(pieCtxEl) { const pieCtx = pieCtxEl.getContext('2d'); if(assetPieInst) assetPieInst.destroy(); assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } }); const totalAssets=assets||1; setHtml('asset-legend', `<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`); }
+            // RENDER DASHBOARD CHARTS (MERGED ANALYSIS)
+            if(document.getElementById('view-dashboard').classList.contains('active')) {
+                // Sankey
+                const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); const rangeMonths = analysisRange === '1Y' ? 11 : 5; for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
+                state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });
+                const flows={}; const WALLET="Wallet"; let si=0, so=0; state.transactions.forEach(tx=>{ if(tx.type === 'transfer') return; const txDate=new Date(tx.date); const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear()); if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; } let inc=false; if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } else { if(bi !== -1) inc=true; } if(inc){ const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount; if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; } else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; } } });
+                let totalSankeyEMI = 0; buckets.forEach(b => { let inRange = false; if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true; else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true; else if(analysisRange === '1Y') inRange = true; if(inRange) { state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } }); } });
+                if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
+                const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
+                const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
+                const sankeyEl = document.getElementById('sankeyChart'); if(sankeyEl) { const sankeyCtx=sankeyEl.getContext('2d'); if(sankeyInst) sankeyInst.destroy(); const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return '#2563EB'; if(name==='Savings') return '#10B981'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#3B82F6'; return '#F43F5E'; }; sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].from):'#ccc', colorTo: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].to):'#ccc', colorMode: 'gradient', labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 }, nodeWidth: 20, nodePadding: 20 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } } }); }
+
+                // Monthly Bar
+                const barEl = document.getElementById('monthlyBarChart'); if(barEl) { const barCtx = barEl.getContext('2d'); if(barChartInst) barChartInst.destroy(); barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } } }); }
+
+                // Asset Pie
+                const pieCtxEl = document.getElementById('assetPieChart'); if(pieCtxEl) { const pieCtx = pieCtxEl.getContext('2d'); if(assetPieInst) assetPieInst.destroy(); assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } }); const totalAssets=assets||1; setHtml('asset-legend', `<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`); }
+
+                // Main Line Chart
+                if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
+                const mainCtxEl = document.getElementById('mainChart'); if(mainCtxEl) { const ctx = mainCtxEl.getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } }); }
+            }
             
             const debtsView = document.getElementById('view-debts');
             if(debtsView && debtsView.classList.contains('active')) { const debtSplitEl = document.getElementById('debtSplitChart'); if(debtSplitEl) { const debtSplitCtx = debtSplitEl.getContext('2d'); if(debtSplitInst) debtSplitInst.destroy(); debtSplitInst = new Chart(debtSplitCtx, { type: 'bar', data: { labels: ['Liability'], datasets: [ { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 8 }, { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 8 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } }, plugins: { legend: { position: 'bottom' } } } }); } const debtPieEl = document.getElementById('debtPieChart'); if(debtPieEl) { const debtPieCtx = debtPieEl.getContext('2d'); if(debtPieInst) debtPieInst.destroy(); debtPieInst = new Chart(debtPieCtx, { type: 'doughnut', data: { labels: debtCompositionLabels, datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } } }); } setHtml('debt-list-container', debtListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active debts found.</div>'); }
-
-            const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); const rangeMonths = analysisRange === '1Y' ? 11 : 5; for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
-            state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });
-            const flows={}; const WALLET="Wallet"; let si=0, so=0; state.transactions.forEach(tx=>{ if(tx.type === 'transfer') return; const txDate=new Date(tx.date); const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear()); if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; } let inc=false; if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } else { if(bi !== -1) inc=true; } if(inc){ const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount; if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; } else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; } } });
-            let totalSankeyEMI = 0; buckets.forEach(b => { let inRange = false; if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true; else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true; else if(analysisRange === '1Y') inRange = true; if(inRange) { state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } }); } });
-            if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
-            const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
-            const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
-            const sankeyEl = document.getElementById('sankeyChart'); if(sankeyEl) { const sankeyCtx=sankeyEl.getContext('2d'); if(sankeyInst) sankeyInst.destroy(); const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return '#2563EB'; if(name==='Savings') return '#10B981'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#3B82F6'; return '#F43F5E'; }; sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].from):'#ccc', colorTo: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].to):'#ccc', colorMode: 'gradient', labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 }, nodeWidth: 20, nodePadding: 20 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } } }); }
-            const barEl = document.getElementById('monthlyBarChart'); if(barEl) { const barCtx = barEl.getContext('2d'); if(barChartInst) barChartInst.destroy(); barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } } }); }
-
-            const tc=document.getElementById('full-tx-list'); 
-            if(tc) { tc.innerHTML=''; const term=document.getElementById('tx-search').value.toLowerCase(); const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term)); if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`; else { let lastDate = null; filteredTx.forEach(t => { const isInc=t.type==='income'; const isTrf=t.type==='transfer'; const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); let dateStr = formatDateIN(t.date); if(txDate.toDateString() === today.toDateString()) dateStr = "Today"; else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday"; else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; } let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'; let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900'; let sign = isTrf ? '' : isInc ? '+' : '-'; let icon = getCategoryIcon(t.cat); let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName; tc.innerHTML+=`<div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="flex items-center gap-2 mt-0.5"><div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div><span class="text-[10px] text-slate-400 font-medium">${subText}</span></div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span><button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button></div></div>`; }); } }
         }
 
         window.router=(v)=>{document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); const el=document.getElementById('view-'+v); if(el) el.classList.add('active'); document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e=>e.classList.remove('active')); if(document.getElementById('d-nav-'+v))document.getElementById('d-nav-'+v).classList.add('active'); if(document.getElementById('m-nav-'+v))document.getElementById('m-nav-'+v).classList.add('active'); render();};

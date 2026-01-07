@@ -24,7 +24,7 @@
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-        :root { --bg-body: #F8FAFC; --primary: #10b981; --primary-rgb: 16, 185, 129; }
+        :root { --bg-body: #F8FAFC; --primary: #4F46E5; }
         .dark { --bg-body: #0F172A; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); transition: background-color 0.3s; color: #1E293B; }
         .dark body { color: #F8FAFC; }
@@ -40,19 +40,13 @@
         .view-section.active { display: block; animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
         @keyframes slideUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Dynamic Theme Classes */
-        .text-primary { color: var(--primary); }
-        .bg-primary { background-color: var(--primary); }
-        .border-primary { border-color: var(--primary); }
-        .ring-primary:focus { --tw-ring-color: var(--primary); }
-
         .desktop-nav-item { border-radius: 12px; margin-bottom: 4px; color: #64748B; font-weight: 600; }
         .dark .desktop-nav-item { color: #94A3B8; }
         .desktop-nav-item:hover { background: #F8FAFC; color: #334155; }
         .dark .desktop-nav-item:hover { background: #334155; color: white; }
-        .desktop-nav-item.active { background: rgba(var(--primary-rgb), 0.1); color: var(--primary); }
-        
-        /* Privacy Blur */
+        .desktop-nav-item.active { background: #EEF2FF; color: var(--primary); }
+        .dark .desktop-nav-item.active { background: rgba(79, 70, 229, 0.2); color: #818CF8; }
+
         .privacy-active .money-val { filter: blur(6px); transition: filter 0.3s; }
         .money-val { transition: filter 0.3s; }
 
@@ -65,20 +59,13 @@
         .nav-item.active { color: var(--primary); transform: scale(1.1); }
         .nav-item { transition: all 0.3s; }
 
-        /* Toast */
         #toast-container { position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%); z-index: 100; pointer-events: none; }
         .toast { background: #1E293B; color: white; padding: 12px 24px; border-radius: 12px; margin-top: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); font-weight: 600; font-size: 14px; opacity: 0; transform: translateY(20px); transition: all 0.3s; display: flex; align-items: center; gap: 8px; pointer-events: auto; }
         .toast.show { opacity: 1; transform: translateY(0); }
         .toast.success { background: #064E3B; border: 1px solid #059669; }
         .toast.error { background: #7F1D1D; border: 1px solid #DC2626; }
 
-        /* Color Swatches */
-        .color-swatch { width: 40px; height: 40px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: transform 0.2s; }
-        .color-swatch.active { border-color: white; box-shadow: 0 0 0 2px #94A3B8; transform: scale(1.1); }
-        .dark .color-swatch.active { border-color: #0F172A; box-shadow: 0 0 0 2px white; }
-
-        /* Full Screen Loader */
-        #loading-screen { position: fixed; inset: 0; background: rgba(255,255,255,0.9); dark:background: rgba(15,23,42,0.9); backdrop-filter: blur(10px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; pointer-events: all; }
+        #loading-screen { position: fixed; inset: 0; background: rgba(255,255,255,0.95); dark:background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; pointer-events: all; }
         .dark #loading-screen { background: rgba(15,23,42,0.95); }
         .loader-spin { width: 40px; height: 40px; border: 4px solid #E2E8F0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
@@ -92,7 +79,7 @@
     <div id="loading-screen" class="hidden">
         <div class="loader-spin mb-4"></div>
         <div class="text-slate-900 dark:text-white font-bold text-lg">Syncing...</div>
-        <div class="text-slate-500 text-sm">Please wait</div>
+        <div class="text-slate-500 text-sm" id="loading-text">Connecting to secure cloud</div>
     </div>
 
     <!-- TOAST CONTAINER -->
@@ -102,7 +89,7 @@
     <!-- AUTH OVERLAY -->
     <div id="auth-overlay" class="fixed inset-0 z-50 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl flex flex-col items-center justify-center p-6">
         <div class="bg-white dark:bg-slate-800 p-10 rounded-[32px] max-w-sm w-full text-center shadow-2xl border border-slate-100 dark:border-slate-700">
-            <div class="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl rotate-3 bg-primary">
+            <div class="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl rotate-3">
                 <i class="fas fa-wave-square text-white text-4xl"></i>
             </div>
             <h1 class="text-4xl font-extrabold text-slate-900 dark:text-white mb-2">Cash Flow.</h1>
@@ -118,7 +105,7 @@
     <aside class="hidden md:flex flex-col w-72 bg-white dark:bg-slate-900 border-r border-slate-100 dark:border-slate-800 z-20 transition-colors">
         <div class="p-8">
             <div class="flex items-center gap-3 text-2xl font-bold text-slate-900 dark:text-white">
-                <div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white text-lg"><i class="fas fa-wave-square"></i></div>
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg"><i class="fas fa-wave-square"></i></div>
                 Cash Flow
             </div>
         </div>
@@ -128,11 +115,19 @@
             <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
             <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
-            <button onclick="router('settings')" id="d-nav-settings" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-cog w-5"></i> Settings</button>
-            <button onclick="openModal('categoryModal')" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 text-primary font-bold bg-slate-50 dark:bg-slate-800"><i class="fas fa-tags w-5"></i> Categories</button>
+            <button onclick="openModal('categoryModal')" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 text-indigo-500 font-bold bg-indigo-50 dark:bg-indigo-900/10"><i class="fas fa-tags w-5"></i> Categories</button>
+            <button onclick="openModal('backupModal'); renderBackups()" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/10"><i class="fas fa-cloud w-5"></i> Backups</button>
         </nav>
         <div class="p-6 border-t border-slate-50 dark:border-slate-800">
             <div id="connection-status" class="text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-wide">Waiting...</div>
+            <div class="flex items-center justify-between mb-4">
+                <button onclick="toggleTheme()" class="text-slate-400 hover:text-indigo-500"><i class="fas fa-moon text-lg"></i></button>
+                <button onclick="togglePrivacy()" class="text-slate-400 hover:text-indigo-500" title="Privacy Mode"><i class="fas fa-eye text-lg"></i></button>
+            </div>
+            <div class="flex gap-2 mb-2">
+                <button onclick="exportCSV()" class="flex-1 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition"><i class="fas fa-download mr-1"></i> Export</button>
+                <button onclick="document.getElementById('csvFileInput').click()" class="flex-1 py-2 text-xs font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition"><i class="fas fa-upload mr-1"></i> Import</button>
+            </div>
             <button id="btn-logout" class="w-full py-2 text-xs font-bold text-rose-600 bg-rose-50 dark:bg-rose-900/20 hover:bg-rose-100 dark:hover:bg-rose-900/30 rounded-xl transition">Sign Out</button>
         </div>
     </aside>
@@ -143,7 +138,9 @@
         <header class="md:hidden flex items-center justify-between p-6 pb-2 z-30 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0">
             <div><h1 class="text-2xl font-extrabold dark:text-white">Hello!</h1><p class="text-slate-500 text-sm font-medium">Financial Overview</p></div>
             <div class="flex gap-2">
-                <button onclick="openModal('categoryModal')" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 text-primary rounded-full flex items-center justify-center"><i class="fas fa-tags"></i></button>
+                <button onclick="toggleTheme()" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-500"><i class="fas fa-moon"></i></button>
+                <button onclick="togglePrivacy()" class="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center text-slate-500"><i class="fas fa-eye"></i></button>
+                <button onclick="openModal('categoryModal')" class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center"><i class="fas fa-tags"></i></button>
             </div>
         </header>
 
@@ -151,24 +148,24 @@
         <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
                 <!-- Net Worth -->
-                <div class="relative overflow-hidden rounded-[32px] bg-primary text-white shadow-xl shadow-slate-200 dark:shadow-none p-8 transition-all">
+                <div class="relative overflow-hidden rounded-[32px] bg-indigo-600 text-white shadow-xl shadow-indigo-200 dark:shadow-none p-8">
                     <div class="absolute -top-20 -right-20 w-64 h-64 bg-white opacity-10 rounded-full blur-3xl"></div>
-                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-white opacity-10 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-0 left-0 w-48 h-48 bg-purple-500 opacity-20 rounded-full blur-3xl"></div>
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                        <div><div class="text-white text-sm font-medium mb-1 uppercase tracking-wider opacity-90">Total Net Worth</div><div class="text-4xl md:text-5xl font-bold tracking-tight money-val" id="dash-networth">...</div></div>
-                        <div class="flex gap-3"><button onclick="openNewTx()" class="bg-white text-primary px-6 py-3 rounded-xl font-bold text-sm hover:opacity-90 transition shadow-lg"><i class="fas fa-plus mr-2"></i> Add Tx</button></div>
+                        <div><div class="text-indigo-100 text-sm font-medium mb-1 uppercase tracking-wider opacity-80">Total Net Worth</div><div class="text-4xl md:text-5xl font-bold tracking-tight money-val" id="dash-networth">...</div></div>
+                        <div class="flex gap-3"><button onclick="openNewTx()" class="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold text-sm hover:bg-indigo-50 transition shadow-lg"><i class="fas fa-plus mr-2"></i> Add Tx</button></div>
                     </div>
                 </div>
 
                 <!-- Upcoming Bills Widget -->
                 <div class="neo-card p-6" id="upcoming-bills-card" style="display:none">
-                    <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-primary"></i> Upcoming Bills</h3>
+                    <h3 class="font-bold text-lg mb-4 text-slate-900 dark:text-white flex items-center gap-2"><i class="fas fa-calendar-alt text-indigo-500"></i> Upcoming Bills</h3>
                     <div id="upcoming-list" class="space-y-3"></div>
                 </div>
                 
                 <!-- Budgets -->
                 <div class="neo-card p-6">
-                    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg dark:text-white">Monthly Budgets</h3><button onclick="openModal('budgetModal')" class="text-xs font-bold text-primary bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-lg hover:bg-slate-100 transition">+ Set Limit</button></div>
+                    <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-lg dark:text-white">Monthly Budgets</h3><button onclick="openModal('budgetModal')" class="text-xs font-bold text-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1 rounded-lg hover:bg-indigo-100 transition">+ Set Limit</button></div>
                     <div id="budget-list" class="space-y-4"></div>
                 </div>
 
@@ -181,61 +178,6 @@
                 <div class="neo-card p-6">
                     <div class="flex justify-between items-center mb-6"><h3 class="font-bold text-lg dark:text-white">Growth Trend</h3><span class="bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-3 py-1 rounded-full text-xs font-bold">1 Year</span></div>
                     <div class="chart-wrapper p-2" style="height: 220px;"><canvas id="mainChart"></canvas></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SETTINGS VIEW -->
-        <div id="view-settings" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
-            <div class="max-w-2xl mx-auto space-y-8">
-                <h2 class="text-3xl font-bold dark:text-white">Settings</h2>
-                
-                <!-- Appearance -->
-                <div class="neo-card p-6">
-                    <h3 class="font-bold text-lg dark:text-white mb-4">Appearance</h3>
-                    
-                    <div class="flex items-center justify-between mb-6">
-                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Dark Mode</span>
-                        <button onclick="toggleTheme()" class="w-12 h-6 bg-slate-200 dark:bg-slate-700 rounded-full relative transition"><div class="w-4 h-4 bg-white rounded-full absolute top-1 left-1 transition-all dark:left-7"></div></button>
-                    </div>
-
-                    <div class="mb-4">
-                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300 block mb-3">Accent Color</span>
-                        <div class="flex gap-4 flex-wrap">
-                            <div onclick="setTheme('emerald')" class="color-swatch bg-emerald-500 active"></div>
-                            <div onclick="setTheme('blue')" class="color-swatch bg-blue-600"></div>
-                            <div onclick="setTheme('violet')" class="color-swatch bg-violet-600"></div>
-                            <div onclick="setTheme('rose')" class="color-swatch bg-rose-500"></div>
-                            <div onclick="setTheme('amber')" class="color-swatch bg-amber-500"></div>
-                            <div onclick="setTheme('cyan')" class="color-swatch bg-cyan-500"></div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center justify-between">
-                        <span class="text-sm font-medium text-slate-600 dark:text-slate-300">Privacy Blur</span>
-                        <button onclick="togglePrivacy()" class="text-primary font-bold text-sm">Toggle</button>
-                    </div>
-                </div>
-
-                <!-- Currency -->
-                <div class="neo-card p-6">
-                    <h3 class="font-bold text-lg dark:text-white mb-4">Currency</h3>
-                    <select onchange="setCurrency(this.value)" id="currencySelect" class="neo-input appearance-none">
-                        <option value="INR">Indian Rupee (₹)</option>
-                        <option value="USD">US Dollar ($)</option>
-                        <option value="EUR">Euro (€)</option>
-                        <option value="GBP">British Pound (£)</option>
-                        <option value="JPY">Japanese Yen (¥)</option>
-                    </select>
-                </div>
-
-                <!-- Data -->
-                <div class="neo-card p-6">
-                    <h3 class="font-bold text-lg dark:text-white mb-4">Data Management</h3>
-                    <div class="space-y-3">
-                        <button onclick="exportCSV()" class="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 transition">Export CSV</button>
-                        <button onclick="document.getElementById('csvFileInput').click()" class="w-full py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 transition">Import CSV</button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -276,10 +218,18 @@
 
         <!-- ACCOUNTS & TRANSACTIONS -->
         <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
-            <div class="max-w-4xl mx-auto"><div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 dark:bg-[#0F172A]/95 backdrop-blur z-10 py-2"><h2 class="text-3xl font-bold dark:text-white">Accounts</h2><div class="flex gap-2"><button onclick="openModal('transferModal')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl font-bold text-sm hover:bg-indigo-200 transition"><i class="fas fa-exchange-alt mr-2"></i> Transfer</button><button onclick="openModal('accountModal')" class="bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button></div></div><div id="accounts-container" class="space-y-6"></div></div>
+            <div class="max-w-4xl mx-auto"><div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 dark:bg-[#0F172A]/95 backdrop-blur z-10 py-2"><h2 class="text-3xl font-bold dark:text-white">Accounts</h2><div class="flex gap-2"><button onclick="openModal('transferModal')" class="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-xl font-bold text-sm hover:bg-indigo-200 transition"><i class="fas fa-exchange-alt mr-2"></i> Transfer</button><button onclick="openModal('accountModal')" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button></div></div><div id="accounts-container" class="space-y-6"></div></div>
         </div>
         <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
-            <div class="max-w-4xl mx-auto h-full flex flex-col"><div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-bold dark:text-white">Activity</h2><button onclick="openNewTx()" class="bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button></div><div class="neo-card flex-1 flex flex-col overflow-hidden"><div class="p-4 border-b border-slate-100 dark:border-slate-700"><div class="relative"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div></div></div>
+            <div class="max-w-4xl mx-auto h-full flex flex-col">
+                <div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-bold dark:text-white">Activity</h2>
+                    <div class="flex gap-2">
+                        <input type="month" id="txDateFilter" onchange="renderTransactions()" class="neo-input w-auto py-2 px-3 text-xs">
+                        <button onclick="openNewTx()" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
+                    </div>
+                </div>
+                <div class="neo-card flex-1 flex flex-col overflow-hidden"><div class="p-4 border-b border-slate-100 dark:border-slate-700"><div class="relative"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div></div>
+            </div>
         </div>
     </main>
 
@@ -288,57 +238,36 @@
         <div class="nav-dock flex justify-between items-center px-6 py-4 bg-white/90 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700">
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
             <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
-            <div class="relative -top-8"><button onclick="openNewTx()" class="w-14 h-14 bg-primary rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-primary hover:scale-110 transition-transform border-4 border-white dark:border-slate-900"><i class="fas fa-plus"></i></button></div>
+            <div class="relative -top-8"><button onclick="openNewTx()" class="w-14 h-14 bg-indigo-600 rounded-full flex items-center justify-center text-white text-xl shadow-xl shadow-indigo-300 hover:scale-110 transition-transform border-4 border-white dark:border-slate-900"><i class="fas fa-plus"></i></button></div>
             <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-receipt text-xl"></i></button>
-            <button onclick="router('settings')" id="m-nav-settings" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-cog text-xl"></i></button>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
         </div>
     </nav>
 
-    <!-- MODAL: SET BUDGET -->
-    <div id="budgetModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
+    <!-- BACKUP MODAL -->
+    <div id="backupModal" class="fixed inset-0 z-[60] hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
         <div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]">
-            <h3 class="text-2xl font-bold mb-6 dark:text-white">Set Budget</h3>
-            <form onsubmit="saveBudget(event)" class="space-y-5">
-                <select id="budgCat" class="neo-input appearance-none"></select>
-                <input type="number" step="1" id="budgAmount" required class="neo-input" placeholder="Monthly Limit (e.g. 5000)">
-                <div class="flex gap-4 pt-2">
-                    <button type="button" onclick="closeModal('budgetModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl hover:bg-slate-200 transition">Cancel</button>
-                    <button type="submit" class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl hover:opacity-90 shadow-lg shadow-primary transition">Set</button>
-                </div>
-            </form>
+            <div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold dark:text-white">Cloud Backups</h3><button onclick="closeModal('backupModal')" class="text-slate-400"><i class="fas fa-times"></i></button></div>
+            <div class="bg-emerald-50 dark:bg-emerald-900/10 p-4 rounded-2xl mb-6"><p class="text-sm text-emerald-700 dark:text-emerald-400 font-bold mb-2">Daily Auto-Backup</p><p class="text-xs text-slate-600 dark:text-slate-400">Snapshot saved daily to database.</p></div>
+            <h4 class="font-bold text-sm text-slate-500 uppercase tracking-wide mb-3">Available Points</h4>
+            <div id="backup-list" class="space-y-3 max-h-60 overflow-y-auto mb-6"></div>
+            <button onclick="forceBackup()" class="w-full py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition shadow-lg">Backup Now</button>
         </div>
     </div>
 
-    <!-- MODAL: MANAGE CATEGORIES -->
-    <div id="categoryModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
-        <div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out] flex flex-col max-h-[80vh]">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold dark:text-white">Manage Categories</h3>
-                <button onclick="closeModal('categoryModal')" class="text-slate-400 hover:text-primary"><i class="fas fa-times text-xl"></i></button>
-            </div>
-            <div class="flex gap-2 mb-4">
-                <input type="text" id="newCatName" class="neo-input" placeholder="New Category (e.g. Pets)">
-                <select id="newCatType" class="neo-input w-32"><option value="expense">Exp</option><option value="income">Inc</option></select>
-                <button onclick="addCategory()" class="bg-primary text-white px-4 rounded-xl shadow-lg"><i class="fas fa-plus"></i></button>
-            </div>
-            <div id="category-list" class="flex-1 overflow-y-auto space-y-2"></div>
-        </div>
-    </div>
-
-    <!-- MODAL: TRANSFER -->
-    <div id="transferModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 flex items-center gap-2 dark:text-white"><i class="fas fa-exchange-alt text-primary"></i> Transfer</h3><form onsubmit="processTransfer(event)" class="space-y-5"><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">From</label><select id="tfFrom" required class="neo-input appearance-none"></select></div><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">To</label><select id="tfTo" required class="neo-input appearance-none"></select></div><input type="number" step="1" id="tfAmount" required class="neo-input text-lg font-bold text-primary" placeholder="Amount"><input type="text" id="tfDesc" class="neo-input" placeholder="Note (Optional)"><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('transferModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl">Transfer</button></div></form></div></div>
-
-    <!-- MODAL: ADD/EDIT TRANSACTION -->
-    <div id="txModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 dark:text-white" id="txModalTitle">Log Transaction</h3><form onsubmit="saveTransaction(event)" class="space-y-5"><input type="text" id="txDesc" required class="neo-input" placeholder="What is this for?"><div class="grid grid-cols-2 gap-4"><input type="number" step="1" id="txAmount" required class="neo-input" placeholder="Amount"><input type="date" id="txDate" required class="neo-input text-slate-500"></div><div class="grid grid-cols-2 gap-4"><select id="txType" class="neo-input appearance-none" onchange="renderCategorySelect()"><option value="expense">Expense</option><option value="income">Income</option></select><select id="txCat" class="neo-input appearance-none"></select></div><div><label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block">Account</label><select id="txAccount" required class="neo-input appearance-none"></select></div><div class="flex items-center gap-2 mb-2"><input type="checkbox" id="txRecurring" class="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary"><label for="txRecurring" class="text-sm text-slate-600 dark:text-slate-300 font-medium">Recurring (Monthly Bill)</label></div><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl" id="txSaveBtn">Save</button></div></form></div></div>
-
-    <!-- MODAL: ADD ACCOUNT -->
-    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 dark:text-white">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Account Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Current Balance"><select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment</option><option value="property">Property</option><option value="credit">Credit Card (Debt)</option><option value="loan">Loan (Debt)</option></select><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-900/30"><div class="col-span-2"><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Start Date</label><input type="date" id="accStartDate" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm text-slate-600 dark:text-white"></div><div><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="8.5"></div><div><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="60"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1" id="emi-preview"></div></div><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-primary text-white font-bold rounded-2xl">Save</button></div></form></div></div>
+    <!-- MODALS -->
+    <div id="budgetModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 dark:text-white">Set Budget</h3><form onsubmit="saveBudget(event)" class="space-y-5"><select id="budgCat" class="neo-input appearance-none"></select><input type="number" step="1" id="budgAmount" required class="neo-input" placeholder="Monthly Limit"><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('budgetModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Set</button></div></form></div></div>
+    <div id="categoryModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out] flex flex-col max-h-[80vh]"><div class="flex justify-between items-center mb-6"><h3 class="text-2xl font-bold dark:text-white">Manage Categories</h3><button onclick="closeModal('categoryModal')" class="text-slate-400 hover:text-indigo-500"><i class="fas fa-times text-xl"></i></button></div><div class="flex gap-2 mb-4"><input type="text" id="newCatName" class="neo-input" placeholder="New Category"><select id="newCatType" class="neo-input w-32"><option value="expense">Exp</option><option value="income">Inc</option></select><button onclick="addCategory()" class="bg-indigo-600 text-white px-4 rounded-xl shadow-lg"><i class="fas fa-plus"></i></button></div><div id="category-list" class="flex-1 overflow-y-auto space-y-2"></div></div></div>
+    <div id="transferModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 flex items-center gap-2 dark:text-white"><i class="fas fa-exchange-alt text-indigo-500"></i> Transfer</h3><form onsubmit="processTransfer(event)" class="space-y-5"><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">From</label><select id="tfFrom" required class="neo-input appearance-none"></select></div><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">To</label><select id="tfTo" required class="neo-input appearance-none"></select></div><input type="number" step="1" id="tfAmount" required class="neo-input text-lg font-bold text-indigo-600" placeholder="Amount"><input type="text" id="tfDesc" class="neo-input" placeholder="Note (Optional)"><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('transferModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Transfer</button></div></form></div></div>
+    <div id="txModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 dark:text-white" id="txModalTitle">Log Transaction</h3><form onsubmit="saveTransaction(event)" class="space-y-5"><input type="text" id="txDesc" required class="neo-input" placeholder="What is this for?"><div class="grid grid-cols-2 gap-4"><input type="number" step="1" id="txAmount" required class="neo-input" placeholder="Amount"><input type="date" id="txDate" required class="neo-input text-slate-500"></div><div class="grid grid-cols-2 gap-4"><select id="txType" class="neo-input appearance-none" onchange="renderCategorySelect()"><option value="expense">Expense</option><option value="income">Income</option></select><select id="txCat" class="neo-input appearance-none"></select></div><div><label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block">Account</label><select id="txAccount" required class="neo-input appearance-none"></select></div><div class="flex items-center gap-2 mb-2"><input type="checkbox" id="txRecurring" class="w-4 h-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500"><label for="txRecurring" class="text-sm text-slate-600 dark:text-slate-300 font-medium">Recurring (Monthly Bill)</label></div><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl" id="txSaveBtn">Save</button></div></form></div></div>
+    <div id="accountModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 dark:text-white">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Account Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Current Balance"><select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment</option><option value="property">Property</option><option value="credit">Credit Card (Debt)</option><option value="loan">Loan (Debt)</option></select><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-rose-50 dark:bg-rose-900/20 rounded-2xl border border-rose-100 dark:border-rose-900/30"><div class="col-span-2"><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Start Date</label><input type="date" id="accStartDate" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm text-slate-600 dark:text-white"></div><div><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="8.5"></div><div><label class="text-[10px] text-rose-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="bg-white dark:bg-slate-800 rounded-lg p-2 w-full mt-1 border-none focus:ring-0 text-sm" placeholder="60"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1" id="emi-preview"></div></div><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
+    <div id="payDebtModal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all"><div class="bg-white dark:bg-slate-800 rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out]"><h3 class="text-2xl font-bold mb-6 flex items-center gap-2 dark:text-white"><i class="fas fa-money-bill-wave text-emerald-500"></i> Pay Debt</h3><form onsubmit="processDebtPayment(event)" class="space-y-5"><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Paying Loan</label><input type="text" id="pdLoanName" class="neo-input opacity-60" readonly></div><div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-1 block">Pay From</label><select id="pdSource" required class="neo-input appearance-none"></select></div><input type="number" step="1" id="pdAmount" required class="neo-input text-lg font-bold text-emerald-600" placeholder="Amount"><div class="flex gap-4 pt-2"><button type="button" onclick="closeModal('payDebtModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 dark:bg-slate-700 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-emerald-600 text-white font-bold rounded-2xl">Pay</button></div></form></div></div>
 
     <!-- LOGIC & FIREBASE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, orderBy, query, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // CONFIG
         const firebaseConfig = {
@@ -355,25 +284,17 @@
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
         
-        // DEFAULTS & THEMES
+        // DEFAULTS
         const defaultCategories = {
             income: ['Salary', 'Freelance', 'Business', 'Other Income'],
             expense: ['Food & Dining', 'Housing', 'Transportation', 'Shopping', 'Entertainment', 'Health', 'EMI/Debt', 'Misc']
         };
-        const themes = {
-            emerald: { color: '#10b981', rgb: '16, 185, 129' },
-            blue: { color: '#2563eb', rgb: '37, 99, 235' },
-            violet: { color: '#7c3aed', rgb: '124, 58, 237' },
-            rose: { color: '#f43f5e', rgb: '244, 63, 94' },
-            amber: { color: '#f59e0b', rgb: '245, 158, 11' },
-            cyan: { color: '#06b6d4', rgb: '6, 182, 212' }
-        };
 
         let currentUser = null;
         let isDataLoaded = false;
-        let state = { accounts: [], transactions: [], history: [0], budgets: {}, categories: JSON.parse(JSON.stringify(defaultCategories)), settings: { theme: 'emerald', currency: 'INR' } };
+        let state = { accounts: [], transactions: [], history: [0], budgets: {}, categories: JSON.parse(JSON.stringify(defaultCategories)) };
         let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, analysisRange='6M';
-        let editingTxId = null;
+        let editingTxId = null, payingLoanId = null;
 
         const els = { overlay: document.getElementById('auth-overlay'), status: document.getElementById('auth-status'), name: document.getElementById('user-name'), avatar: document.getElementById('user-avatar'), nw: document.getElementById('dash-networth'), as: document.getElementById('dash-assets'), db: document.getElementById('dash-debts') };
 
@@ -388,57 +309,71 @@
 
         function initSync() {
             document.getElementById('loading-screen').classList.remove('hidden');
+            const timeout = setTimeout(() => { if(!isDataLoaded) { document.getElementById('loading-screen').classList.add('hidden'); alert("Sync timed out. Using local/default mode."); }}, 8000);
+
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
+                clearTimeout(timeout);
                 isDataLoaded = true;
                 document.getElementById('loading-screen').classList.add('hidden');
+                
                 if(doc.exists()) { 
                     const data = doc.data();
                     state = { ...state, ...data }; 
                     if(!state.categories) state.categories = JSON.parse(JSON.stringify(defaultCategories)); 
-                    if(!state.settings) state.settings = { theme: 'emerald', currency: 'INR' };
-                    applySettings();
                     render(); 
-                    document.getElementById('connection-status').innerText = "Sync Active";
-                    document.getElementById('connection-status').className = "text-[10px] font-bold text-emerald-500 mb-2 text-center uppercase tracking-wide";
+                    if(document.getElementById('connection-status')) {
+                        document.getElementById('connection-status').innerText = "Sync Active";
+                        document.getElementById('connection-status').className = "text-[10px] font-bold text-emerald-500 mb-2 text-center uppercase tracking-wide";
+                    }
                 } else { 
                     save(); 
-                    document.getElementById('connection-status').innerText = "New User";
                 }
+            }, (error) => {
+                clearTimeout(timeout);
+                document.getElementById('loading-screen').classList.add('hidden');
+                console.error("Firebase Sync Error:", error);
+                showToast("Connection Failed", "error");
             });
-            // Local Prefs Fallback
+            checkAndRunDailyBackup();
             if(localStorage.getItem('theme')==='dark') document.documentElement.classList.add('dark');
+            if(localStorage.getItem('privacy')==='true') document.getElementById('main-container').classList.add('privacy-active');
         }
-        async function save() { if(currentUser && isDataLoaded) await setDoc(doc(db, "users", currentUser.uid), state); }
-
-        // --- SETTINGS LOGIC ---
-        window.toggleTheme = () => { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark')?'dark':'light'); };
-        window.togglePrivacy = () => { document.getElementById('main-container').classList.toggle('privacy-active'); };
         
-        window.setTheme = (name) => {
-            state.settings.theme = name;
-            save();
-            applySettings();
-            showToast(`Theme changed to ${name}`);
-        };
-
-        window.setCurrency = (code) => {
-            state.settings.currency = code;
-            save();
-            render();
-            showToast(`Currency set to ${code}`);
-        };
-
-        function applySettings() {
-            const t = themes[state.settings.theme] || themes.emerald;
-            document.documentElement.style.setProperty('--primary', t.color);
-            document.documentElement.style.setProperty('--primary-rgb', t.rgb);
-            document.querySelectorAll('.color-swatch').forEach(el => el.classList.remove('active'));
-            // Highlight active swatch in settings would require IDs, skipping for simplicity
-            document.getElementById('currencySelect').value = state.settings.currency;
-            render();
+        async function save() { 
+            if(currentUser && isDataLoaded) {
+                await setDoc(doc(db, "users", currentUser.uid), state); 
+            }
         }
 
-        // --- TOAST NOTIFICATIONS ---
+        // --- BACKUP LOGIC ---
+        async function checkAndRunDailyBackup() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastBackup = localStorage.getItem('lastBackupDate');
+            if (lastBackup !== today) { await forceBackup(true); }
+        }
+        window.forceBackup = async (isAuto = false) => {
+            if(!currentUser || !isDataLoaded) return;
+            const today = new Date().toISOString().split('T')[0];
+            const backupRef = collection(db, "users", currentUser.uid, "backups");
+            try {
+                await addDoc(backupRef, { timestamp: new Date(), dateStr: today, data: state });
+                localStorage.setItem('lastBackupDate', today);
+                if(!isAuto) { showToast("Backup created successfully"); renderBackups(); }
+            } catch(e) { console.error("Backup Failed", e); if(!isAuto) showToast("Backup Failed", "error"); }
+        };
+        window.restoreBackup = async (id) => { if(!confirm("Restore this backup? Current data will be overwritten.")) return; showToast("Restoring... (Refresh page after 5s)"); };
+        window.renderBackups = async () => {
+            const list = document.getElementById('backup-list'); list.innerHTML = '<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading...</div>';
+            try {
+                const q = query(collection(db, "users", currentUser.uid, "backups"), orderBy("timestamp", "desc"), limit(5));
+                const snap = await getDocs(q); list.innerHTML = ''; if(snap.empty) { list.innerHTML = '<div class="text-xs text-slate-400 text-center">No backups yet</div>'; return; }
+                snap.forEach(doc => { const b = doc.data(); const date = b.timestamp.toDate().toLocaleString(); list.innerHTML += `<div class="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-700/50 rounded-xl"><div><div class="text-sm font-bold dark:text-white">${date}</div><div class="text-[10px] text-slate-400">Auto Backup</div></div><button class="text-xs bg-white dark:bg-slate-600 px-3 py-1 rounded-lg border border-slate-200 dark:border-slate-500 shadow-sm hover:bg-indigo-50">Saved</button></div>`; });
+            } catch(e) { list.innerHTML = '<div class="text-xs text-rose-500">Error loading backups</div>'; }
+        };
+
+        window.toggleTheme = () => { document.documentElement.classList.toggle('dark'); localStorage.setItem('theme', document.documentElement.classList.contains('dark')?'dark':'light'); };
+        window.togglePrivacy = () => { document.getElementById('main-container').classList.toggle('privacy-active'); localStorage.setItem('privacy', document.getElementById('main-container').classList.contains('privacy-active')); };
+        
         function showToast(msg, type='success') {
             const el = document.createElement('div');
             el.className = `toast ${type}`;
@@ -448,98 +383,47 @@
             setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3000);
         }
 
-        // --- CATEGORY MANAGEMENT ---
         window.addCategory = () => {
-            const name = document.getElementById('newCatName').value.trim();
-            const type = document.getElementById('newCatType').value;
+            const name = document.getElementById('newCatName').value.trim(); const type = document.getElementById('newCatType').value;
             if(!name) return;
             if(state.categories[type].includes(name)) { showToast("Category exists", "error"); return; }
-            state.categories[type].push(name);
-            save();
-            document.getElementById('newCatName').value = '';
-            renderCategoryList();
-            showToast("Category added");
+            state.categories[type].push(name); save(); document.getElementById('newCatName').value = ''; renderCategoryList(); showToast("Category added");
         };
-
-        window.deleteCategory = (type, name) => {
-            if(confirm(`Delete category '${name}'?`)) {
-                state.categories[type] = state.categories[type].filter(c => c !== name);
-                save();
-                renderCategoryList();
-                showToast("Category deleted");
-            }
-        };
-
+        window.deleteCategory = (type, name) => { if(confirm(`Delete category '${name}'?`)) { state.categories[type] = state.categories[type].filter(c => c !== name); save(); renderCategoryList(); showToast("Category deleted"); } };
         function renderCategoryList() {
-            const list = document.getElementById('category-list');
-            list.innerHTML = '';
+            const list = document.getElementById('category-list'); list.innerHTML = '';
             ['income', 'expense'].forEach(type => {
                 const color = type === 'income' ? 'text-emerald-500' : 'text-rose-500';
-                state.categories[type].forEach(cat => {
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700">
-                            <span class="${color} font-bold text-sm">${cat}</span>
-                            <button onclick="deleteCategory('${type}', '${cat}')" class="text-slate-400 hover:text-rose-500"><i class="fas fa-trash"></i></button>
-                        </div>
-                    `;
-                });
+                state.categories[type].forEach(cat => { list.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700"><span class="${color} font-bold text-sm">${cat}</span><button onclick="deleteCategory('${type}', '${cat}')" class="text-slate-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></div>`; });
             });
         }
 
         window.renderCategorySelect = () => {
-            const type = document.getElementById('txType').value;
-            const catSelect = document.getElementById('txCat');
-            const budgSelect = document.getElementById('budgCat');
-            if(catSelect) {
-                catSelect.innerHTML = '';
-                state.categories[type].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
-            }
-            if(budgSelect) {
-                budgSelect.innerHTML = '';
-                state.categories['expense'].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; budgSelect.appendChild(opt); });
-            }
+            const type = document.getElementById('txType').value; const catSelect = document.getElementById('txCat'); const budgSelect = document.getElementById('budgCat');
+            if(catSelect) { catSelect.innerHTML = ''; state.categories[type].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); }); }
+            if(budgSelect) { budgSelect.innerHTML = ''; state.categories['expense'].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; budgSelect.appendChild(opt); }); }
         };
 
-        // --- BUDGET LOGIC ---
-        window.saveBudget = (e) => {
-            e.preventDefault();
-            const cat = document.getElementById('budgCat').value;
-            const amt = parseFloat(document.getElementById('budgAmount').value);
-            state.budgets[cat] = amt;
-            save(); closeModal('budgetModal'); showToast("Budget updated");
-        };
-
+        window.saveBudget = (e) => { e.preventDefault(); state.budgets[document.getElementById('budgCat').value] = parseFloat(document.getElementById('budgAmount').value); save(); closeModal('budgetModal'); showToast("Budget updated"); };
         function renderBudgets() {
             const container = document.getElementById('budget-list');
             if(Object.keys(state.budgets).length === 0) { container.innerHTML = '<div class="text-center text-slate-400 text-sm py-4">No budgets set. Click + to add.</div>'; return; }
             container.innerHTML = '';
             const cm = new Date().getMonth(); const cy = new Date().getFullYear();
             const spend = {};
-            state.transactions.forEach(t => {
-                const d = new Date(t.date);
-                if(t.type === 'expense' && d.getMonth()===cm && d.getFullYear()===cy) { spend[t.cat] = (spend[t.cat] || 0) + t.amount; }
-            });
-
+            state.transactions.forEach(t => { const d = new Date(t.date); if(t.type === 'expense' && d.getMonth()===cm && d.getFullYear()===cy) { spend[t.cat] = (spend[t.cat] || 0) + t.amount; } });
             for(const [cat, limit] of Object.entries(state.budgets)) {
-                const used = spend[cat] || 0;
-                const pct = Math.min(100, (used/limit)*100);
-                const color = pct > 100 ? 'bg-rose-500' : (pct > 80 ? 'bg-orange-400' : 'bg-emerald-500');
+                const used = spend[cat] || 0; const pct = Math.min(100, (used/limit)*100); const color = pct > 100 ? 'bg-rose-500' : (pct > 80 ? 'bg-orange-400' : 'bg-emerald-500');
                 container.innerHTML += `<div class="mb-3"><div class="flex justify-between text-xs font-bold mb-1 text-slate-700 dark:text-slate-300"><span>${cat}</span><span class="money-val">${money(used)} / ${money(limit)}</span></div><div class="budget-bar-bg w-full"><div class="budget-bar-fill ${color}" style="width: ${pct}%"></div></div></div>`;
             }
         }
 
-        // --- UPCOMING BILLS ---
         function renderUpcoming() {
-            const container = document.getElementById('upcoming-list');
-            const card = document.getElementById('upcoming-bills-card');
-            const today = new Date().getDate();
+            const container = document.getElementById('upcoming-list'); const card = document.getElementById('upcoming-bills-card'); const today = new Date().getDate();
             const upcoming = state.transactions.filter(t => t.recurring).map(t => {
-                const d = new Date(t.date).getDate();
-                let daysLeft = d - today;
-                if(daysLeft < 0) daysLeft += 30; 
+                const d = new Date(t.date).getDate(); let daysLeft = d - today; if(daysLeft < 0) daysLeft += 30; 
                 return { ...t, daysLeft };
             }).sort((a,b) => a.daysLeft - b.daysLeft).slice(0, 3);
-
             if(upcoming.length === 0) { card.style.display = 'none'; return; }
             card.style.display = 'block'; container.innerHTML = '';
             upcoming.forEach(t => {
@@ -628,8 +512,50 @@
             }
         };
 
+        // NEW: PAY DEBT LOGIC
+        window.openPayDebt = (loanId) => {
+            payingLoanId = loanId;
+            const loan = state.accounts.find(a => a.id === loanId);
+            if(loan) {
+                document.getElementById('pdLoanName').value = loan.name;
+                document.getElementById('pdAmount').value = loan.emi || 0;
+                
+                // Populate Source (Only Assets)
+                const select = document.getElementById('pdSource'); select.innerHTML = '';
+                const assets = state.accounts.filter(a => ['cash', 'investment'].includes(a.type));
+                assets.forEach(a => { const o = document.createElement('option'); o.value = a.id; o.innerText = `${a.name} (${money(a.balance)})`; select.appendChild(o); });
+                
+                openModal('payDebtModal');
+            }
+        };
+
+        window.processDebtPayment = (e) => {
+            e.preventDefault();
+            const sourceId = parseFloat(document.getElementById('pdSource').value);
+            const amount = parseFloat(document.getElementById('pdAmount').value);
+            
+            const sourceAcc = state.accounts.find(a => a.id === sourceId);
+            const loanAcc = state.accounts.find(a => a.id === payingLoanId);
+
+            if(sourceAcc && loanAcc) {
+                sourceAcc.balance -= amount; // Deduct from bank
+                loanAcc.balance -= amount; // Reduce loan
+                
+                state.transactions.unshift({
+                    id: Date.now(),
+                    desc: `EMI: ${loanAcc.name}`,
+                    amount: amount,
+                    date: new Date().toISOString().split('T')[0],
+                    type: 'expense',
+                    cat: 'EMI/Debt',
+                    accName: sourceAcc.name
+                });
+                save(); closeModal('payDebtModal'); showToast("EMI Paid Successfully");
+            }
+        };
+
         window.deleteItem = (list, id) => { if(confirm('Delete?')) { state[list] = state[list].filter(i=>i.id!==id); save(); showToast("Deleted"); } };
-        const money = (n) => new Intl.NumberFormat('en-US', { style: 'currency', currency: state.settings.currency, maximumFractionDigits: 0 }).format(n);
+        const money = (n) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(n);
         const formatDateIN = (d) => { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
         window.setAnalysisRange = (range) => { analysisRange = range; render(); };
 
@@ -687,8 +613,6 @@
             const isDark = document.documentElement.classList.contains('dark');
             const textColor = isDark ? '#F1F5F9' : '#1E293B';
             const gridColor = isDark ? '#334155' : '#E2E8F0';
-            const primaryColor = getComputedStyle(document.documentElement).getPropertyValue('--primary').trim();
-            const primaryRgb = getComputedStyle(document.documentElement).getPropertyValue('--primary-rgb').trim();
 
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
@@ -710,7 +634,7 @@
                         const payoffDate = new Date(); payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
                         const principalPercent = totalRemainingPayable > 0 ? (a.balance / totalRemainingPayable) * 100 : 0;
                         const interestPercent = 100 - principalPercent;
-                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg dark:text-white">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 dark:text-white text-xl money-val">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-primary h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-3"><span class="flex items-center gap-1"><div class="w-2 h-2 bg-primary rounded-full"></div> Principal: ${money(a.balance)}</span><span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 dark:border-slate-700 text-xs"><div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700 dark:text-slate-300">${a.roi}%</span></div><div class="text-right"><span class="text-slate-400 block">Payoff Est.</span><span class="font-bold text-slate-700 dark:text-slate-300">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div></div></div>`;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg dark:text-white">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 dark:text-white text-xl money-val">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-primary h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-3"><span class="flex items-center gap-1"><div class="w-2 h-2 bg-primary rounded-full"></div> Principal: ${money(a.balance)}</span><span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-50 dark:border-slate-700"><div class="text-xs"><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700 dark:text-slate-300">${a.roi}%</span></div><button onclick="openPayDebt(${a.id})" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md hover:scale-105 transition">Pay</button></div></div>`;
                     } else {
                         debtListHTML += `<div class="neo-card p-5 border-l-4 border-orange-400 mb-3"><div class="flex justify-between items-center"><h4 class="font-bold text-slate-900 dark:text-white">${a.name}</h4><div class="font-bold text-slate-900 dark:text-white text-lg money-val">${money(a.balance)}</div></div><div class="text-xs text-slate-400 mt-1">Revolving Credit / Untracked Loan</div></div>`;
                     }
@@ -722,13 +646,13 @@
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
-            const ctx = document.getElementById('mainChart').getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: primaryColor, backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,`rgba(${primaryRgb},0.2)`);gradient.addColorStop(1,`rgba(${primaryRgb},0)`);return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
+            const ctx = document.getElementById('mainChart').getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } });
 
             const pieCtx = document.getElementById('assetPieChart').getContext('2d'); if(assetPieInst) assetPieInst.destroy(); assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } });
             const totalAssets=assets||1; document.getElementById('asset-legend').innerHTML=`<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`;
 
             if(document.getElementById('view-debts').classList.contains('active')) {
-                const debtSplitCtx = document.getElementById('debtSplitChart').getContext('2d'); if(debtSplitInst) debtSplitInst.destroy(); debtSplitInst = new Chart(debtSplitCtx, { type: 'bar', data: { labels: ['Liability'], datasets: [{ label: 'Principal', data: [totalDebtPrincipal], backgroundColor: primaryColor, borderRadius: 6 }, { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } } });
+                const debtSplitCtx = document.getElementById('debtSplitChart').getContext('2d'); if(debtSplitInst) debtSplitInst.destroy(); debtSplitInst = new Chart(debtSplitCtx, { type: 'bar', data: { labels: ['Liability'], datasets: [{ label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 6 }, { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } } } });
                 const debtPieCtx = document.getElementById('debtPieChart').getContext('2d'); if(debtPieInst) debtPieInst.destroy(); debtPieInst = new Chart(debtPieCtx, { type: 'doughnut', data: { labels: debtCompositionLabels, datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10 } } } } });
                 document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="text-center text-slate-400 py-10">No active debts found.</div>';
             }
@@ -751,7 +675,7 @@
             const sankeyCtx=document.getElementById('sankeyChart').getContext('2d');
             if(sankeyInst) sankeyInst.destroy();
             if(sankeyData.length > 0) {
-                const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return primaryColor; if(name==='Surplus') return '#6366F1'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#10B981'; return '#F43F5E'; };
+                const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return '#2563EB'; if(name==='Surplus') return '#6366F1'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#10B981'; return '#F43F5E'; };
                 sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].from):'#ccc', colorTo: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].to):'#ccc', colorMode: 'gradient', labels: { color: textColor, font: { weight: 'bold', size: 11 }, padding: 10 }, nodeWidth: 20, nodePadding: 20 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } } });
             } else { sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [] } }); }
 
@@ -775,9 +699,15 @@
 
             const tc=document.getElementById('full-tx-list'); tc.innerHTML='';
             const term=document.getElementById('tx-search').value.toLowerCase();
-            state.transactions.filter(t=>t.desc.toLowerCase().includes(term)).forEach(t=>{
+            const dateFilter = document.getElementById('txDateFilter').value;
+            let fTx = state.transactions;
+            if(term) fTx = fTx.filter(t => t.desc.toLowerCase().includes(term));
+            if(dateFilter) { const [y, m] = dateFilter.split('-'); fTx = fTx.filter(t => { const d = new Date(t.date); return d.getFullYear() === parseInt(y) && (d.getMonth() + 1) === parseInt(m); }); }
+
+            if(fTx.length === 0) tc.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fas fa-wind text-2xl mb-2"></i><p>No activity found</p></div>';
+            else fTx.forEach(t=>{
                 const isInc=t.type==='income';
-                let rec = t.recurring ? '<span class="text-[10px] bg-primary text-white px-1 rounded ml-1">↻</span>' : '';
+                let rec = t.recurring ? '<span class="text-[10px] bg-indigo-100 text-indigo-700 px-1 rounded ml-1">↻</span>' : '';
                 tc.innerHTML+=`<div class="flex justify-between items-center p-3 mb-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-50 dark:border-slate-700 hover:shadow-md transition"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${isInc?'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30':'bg-rose-50 text-rose-600 dark:bg-rose-900/30'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'}"></i></div><div><div class="font-bold text-slate-800 dark:text-white text-sm">${t.desc} ${rec}</div><div class="text-[10px] text-slate-400 font-medium">${formatDateIN(t.date)} • ${t.accName}</div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${isInc?'text-emerald-600':'text-slate-900 dark:text-white'} money-val">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="openEditTx(${t.id})" class="text-slate-300 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button><button onclick="deleteItem('transactions', ${t.id})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`;
             });
         }

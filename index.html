@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Stable</title>
+    <title>Cash Flow | Infinity</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,28 +15,44 @@
     <style>
         :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
+        
+        /* Layout */
         .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; }
         .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
+        
+        /* Components */
         .neo-card { background: white; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
         .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; font-size: 14px; }
         .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
+        
+        /* Nav */
         .nav-dock { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.05); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); }
+        .nav-item { font-size: 10px; font-weight: 600; color: #94A3B8; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .desktop-nav-item:hover { background: white; color: #334155; }
         .desktop-nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+
+        /* Utils */
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
         .money-val { font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
         body.privacy-active .money-val { filter: blur(6px); user-select: none; }
         .meter-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
-        .cal-day { aspect-ratio: 1/1; border-radius: 12px; background: #FFF; border: 1px solid #F1F5F9; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.1s; position: relative; }
+        .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
+        .cal-day { aspect-ratio: 1/1; border-radius: 10px; background: #FFF; border: 1px solid #F1F5F9; padding: 2px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.1s; position: relative; }
         .cal-day:active { transform: scale(0.95); }
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
-        @media (min-width: 768px) { .app-container { flex-direction: row; } .nav-dock { display: none; } .main-scroll { padding: 40px; padding-bottom: 40px; } .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } }
+        
+        @media (min-width: 768px) { 
+            .app-container { flex-direction: row; } 
+            .nav-dock { display: none; } 
+            .main-scroll { padding: 40px; padding-bottom: 40px; } 
+            .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } 
+            .calendar-grid { gap: 8px; }
+        }
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .filter-btn.inactive { color: #94A3B8; }
@@ -47,10 +63,10 @@
     <div id="auth-overlay" class="fixed inset-0 z-[60] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="bg-white p-8 md:p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200 rotate-3">
-                <i class="fas fa-wallet text-white text-4xl"></i>
+                <i class="fas fa-infinity text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Vibranium X Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Infinity Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -67,28 +83,25 @@
                 </div>
             </div>
             <nav class="flex-1 px-6 space-y-1 overflow-y-auto">
-                <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Dashboard</button>
+                <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Home</button>
+                <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
+                <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
+                <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
-                <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
-                <button onclick="router('planning')" id="d-nav-planning" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-compass w-5"></i> Planning</button>
-                <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
-                <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
-                <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
             </nav>
             <div class="p-6 border-t border-slate-100">
-                <div class="flex items-center gap-3 mb-4">
+                <button onclick="router('settings')" class="flex items-center gap-3 mb-4 w-full text-left group">
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Vibranium</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-indigo-600">Settings</div>
                     </div>
-                </div>
+                </button>
                 <div class="flex gap-2 mb-2">
                     <button onclick="togglePrivacy()" id="btn-privacy" class="flex-1 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1"><i class="fas fa-eye-slash"></i> Hide</button>
                     <button onclick="exportCSV()" class="flex-1 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1"><i class="fas fa-download"></i> CSV</button>
                 </div>
-                <button id="btn-logout" class="w-full py-2 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl transition">Sign Out</button>
             </div>
         </aside>
 
@@ -100,11 +113,11 @@
                 </div>
                 <div class="flex gap-2">
                     <button onclick="togglePrivacy()" id="mob-btn-privacy" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-eye"></i></button>
+                    <button onclick="router('settings')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-user-cog"></i></button>
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 relative">
                         <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute top-0 right-0 m-1"></div>
                         <i class="fas fa-cloud text-slate-400 text-xs"></i>
                     </div>
-                    <button id="mob-btn-logout" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-rose-500"><i class="fas fa-power-off text-sm"></i></button>
                 </div>
             </header>
 
@@ -139,15 +152,7 @@
 
                     <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]">
                         <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4>
-                            <p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p>
-                        </div>
-                    </div>
-
-                    <div id="recurring-section" class="hidden">
-                        <h3 class="font-bold text-slate-900 text-lg mb-4">Active Subscriptions</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="recurring-list"></div>
+                        <div><h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4><p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p></div>
                     </div>
 
                     <div class="neo-card p-8 border-indigo-100 border-2">
@@ -164,81 +169,23 @@
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-6">
-                            <div class="neo-card p-6">
-                                <h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3>
-                                <div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div>
-                            </div>
-                            <div class="neo-card p-6">
-                                <h3 class="font-bold text-slate-900 text-lg mb-6">Monthly Income/Expense</h3>
-                                <div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div>
-                            </div>
+                            <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div></div>
+                            <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Monthly Income/Expense</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div></div>
                         </div>
                         <div class="space-y-6">
                             <div class="grid grid-cols-2 gap-4">
-                                <div class="neo-card p-6 flex flex-col justify-center">
-                                    <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div>
-                                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div>
-                                    <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div>
-                                </div>
-                                <div class="neo-card p-6 flex flex-col justify-center">
-                                    <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div>
-                                    <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div>
-                                    <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div>
-                                </div>
+                                <div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div></div>
+                                <div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div></div>
                             </div>
-                            <div class="neo-card p-6 h-full flex flex-col">
-                                <h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3>
-                                <div class="flex-1 flex items-center justify-center">
-                                    <div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div>
-                                    <div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div>
-                                </div>
-                            </div>
+                            <div class="neo-card p-6 h-full flex flex-col"><h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3><div class="flex-1 flex items-center justify-center"><div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div>
                         </div>
                     </div>
                 </div>
 
-                <div id="view-calendar" class="view-section space-y-6">
-                    <div class="flex justify-between items-center mb-2">
-                        <div><h2 class="text-3xl font-extrabold text-slate-900">Calendar</h2><p class="text-slate-500 font-medium">Financial Heatmap</p></div>
-                        <div class="text-xl font-bold text-slate-700 bg-white px-4 py-2 rounded-xl shadow-sm" id="cal-month-name">...</div>
-                    </div>
-                    <div class="neo-card p-4 md:p-6">
-                        <div class="grid grid-cols-7 gap-2 mb-4 text-center">
-                            <div class="text-[10px] md:text-xs font-bold text-slate-400">SUN</div><div class="text-[10px] md:text-xs font-bold text-slate-400">MON</div><div class="text-[10px] md:text-xs font-bold text-slate-400">TUE</div><div class="text-[10px] md:text-xs font-bold text-slate-400">WED</div><div class="text-[10px] md:text-xs font-bold text-slate-400">THU</div><div class="text-[10px] md:text-xs font-bold text-slate-400">FRI</div><div class="text-[10px] md:text-xs font-bold text-slate-400">SAT</div>
-                        </div>
-                        <div id="calendar-grid" class="calendar-grid"></div>
-                    </div>
-                    <div id="cal-day-detail" class="hidden neo-card p-6 animate-[fadeIn_0.2s_ease-out]">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="font-bold text-slate-900" id="cal-sel-date">Selected Date</h3>
-                            <button onclick="document.getElementById('cal-day-detail').classList.add('hidden')" class="text-slate-400"><i class="fas fa-times"></i></button>
-                        </div>
-                        <div id="cal-tx-list" class="space-y-2"></div>
-                    </div>
-                </div>
-
-                <div id="view-future" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Future</h2><p class="text-slate-500 font-medium">Wealth Projection & FIRE</p></div>
-                    <div class="neo-card p-8 bg-slate-900 text-white relative overflow-hidden">
-                        <div class="absolute -top-10 -right-10 w-48 h-48 bg-purple-600 opacity-20 rounded-full blur-3xl"></div>
-                        <h3 class="font-bold text-xl mb-6 relative z-10"><i class="fas fa-fire text-orange-500 mr-2"></i> FIRE Calculator</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10">
-                            <div><label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label><input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()"></div>
-                            <div class="flex flex-col justify-center"><div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div><div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div><div class="text-sm text-slate-400 mt-2" id="fire-progress">Rule of 25</div></div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="md:col-span-1 space-y-4">
-                            <h3 class="font-bold text-slate-900 text-lg">Simulator</h3>
-                            <div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Monthly Investment</label><input type="number" id="fc-monthly" class="neo-input p-3" value="10000" oninput="calcFuture()"></div>
-                            <div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Annual Return (%)</label><input type="number" id="fc-rate" class="neo-input p-3" value="12" oninput="calcFuture()"></div>
-                            <div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Years</label><input type="number" id="fc-years" class="neo-input p-3" value="15" oninput="calcFuture()"></div>
-                        </div>
-                        <div class="md:col-span-2 neo-card p-6 flex flex-col">
-                            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Projected Wealth</h3><div class="text-right"><div class="text-[10px] text-slate-400 uppercase font-bold">Estimated Total</div><div class="text-2xl font-bold text-indigo-600 money-val" id="fc-total">...</div></div></div>
-                            <div class="flex-1 chart-wrapper"><canvas id="futureChart"></canvas></div>
-                        </div>
-                    </div>
+                <div id="view-debts" class="view-section space-y-6">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Debts</h2><p class="text-slate-500 font-medium">Liability Tracking</p></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">True Cost</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div></div><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">Composition</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div></div></div>
+                    <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
                 <div id="view-investments" class="view-section space-y-6">
@@ -254,35 +201,57 @@
                     <div id="invest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <div id="view-planning" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Planning</h2><p class="text-slate-500 font-medium">Budget & Tools</p></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="neo-card p-6 border-l-4 border-indigo-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Quick SIP</h3><div class="grid grid-cols-2 gap-3 mb-4"><input type="number" id="calc-sip-amt" class="neo-input p-2 text-sm" placeholder="Amount" oninput="runSipCalc()"><input type="number" id="calc-sip-yrs" class="neo-input p-2 text-sm" placeholder="Years" oninput="runSipCalc()"></div><div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl"><span class="text-xs text-indigo-900 font-bold uppercase">Future Value</span><span class="font-bold text-indigo-700" id="calc-sip-res">0</span></div></div>
-                        <div class="neo-card p-6 border-l-4 border-rose-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-rose-500 mr-2"></i>Quick EMI</h3><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="calc-emi-p" class="neo-input p-2 text-sm" placeholder="Loan" oninput="runEmiCalc()"><input type="number" id="calc-emi-r" class="neo-input p-2 text-sm" placeholder="Rate" oninput="runEmiCalc()"><input type="number" id="calc-emi-n" class="neo-input p-2 text-sm" placeholder="Yrs" oninput="runEmiCalc()"></div><div class="flex justify-between items-center bg-rose-50 p-3 rounded-xl"><span class="text-xs text-rose-900 font-bold uppercase">EMI</span><span class="font-bold text-rose-700" id="calc-emi-res">0</span></div></div>
-                    </div>
-                    <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Budgets</h3><button onclick="addBudget()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="budget-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
-                </div>
-
-                <div id="view-debts" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Debts</h2><p class="text-slate-500 font-medium">Tracking</p></div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">True Cost</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div></div><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-1">Composition</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div></div></div>
-                    <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-                </div>
-
                 <div id="view-accounts" class="view-section space-y-6"><div class="flex justify-between items-center mb-8 sticky top-0 z-10 py-2"><div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2></div><button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div id="accounts-container" class="space-y-6"></div></div>
+
+                <div id="view-calendar" class="view-section space-y-6">
+                    <div class="flex justify-between items-center mb-2"><div><h2 class="text-3xl font-extrabold text-slate-900">Calendar</h2><p class="text-slate-500 font-medium">Financial Heatmap</p></div><div class="text-xl font-bold text-slate-700 bg-white px-4 py-2 rounded-xl shadow-sm" id="cal-month-name">...</div></div>
+                    <div class="neo-card p-4 md:p-6"><div class="grid grid-cols-7 gap-2 mb-4 text-center"><div class="text-[10px] md:text-xs font-bold text-slate-400">SUN</div><div class="text-[10px] md:text-xs font-bold text-slate-400">MON</div><div class="text-[10px] md:text-xs font-bold text-slate-400">TUE</div><div class="text-[10px] md:text-xs font-bold text-slate-400">WED</div><div class="text-[10px] md:text-xs font-bold text-slate-400">THU</div><div class="text-[10px] md:text-xs font-bold text-slate-400">FRI</div><div class="text-[10px] md:text-xs font-bold text-slate-400">SAT</div></div><div id="calendar-grid" class="calendar-grid"></div></div>
+                    <div id="cal-day-detail" class="hidden neo-card p-6 animate-[fadeIn_0.2s_ease-out]"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900" id="cal-sel-date">Selected Date</h3><button onclick="document.getElementById('cal-day-detail').classList.add('hidden')" class="text-slate-400"><i class="fas fa-times"></i></button></div><div id="cal-tx-list" class="space-y-2"></div></div>
+                </div>
+
+                <div id="view-future" class="view-section space-y-6">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Future & Planning</h2><p class="text-slate-500 font-medium">Strategy Hub</p></div>
+                    
+                    <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Monthly Budgets</h3><button onclick="addBudget()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="budget-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+
+                    <div class="neo-card p-8 bg-slate-900 text-white relative overflow-hidden"><div class="absolute -top-10 -right-10 w-48 h-48 bg-purple-600 opacity-20 rounded-full blur-3xl"></div><h3 class="font-bold text-xl mb-6 relative z-10"><i class="fas fa-fire text-orange-500 mr-2"></i> FIRE Calculator</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10"><div><label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label><input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()"></div><div class="flex flex-col justify-center"><div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div><div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div><div class="text-sm text-slate-400 mt-2" id="fire-progress">Rule of 25</div></div></div></div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="md:col-span-1 space-y-4"><h3 class="font-bold text-slate-900 text-lg">Wealth Sim</h3><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Monthly Investment</label><input type="number" id="fc-monthly" class="neo-input p-3" value="10000" oninput="calcFuture()"></div><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Annual Return (%)</label><input type="number" id="fc-rate" class="neo-input p-3" value="12" oninput="calcFuture()"></div><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Years</label><input type="number" id="fc-years" class="neo-input p-3" value="15" oninput="calcFuture()"></div></div>
+                        <div class="md:col-span-2 neo-card p-6 flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Projection</h3><div class="text-right"><div class="text-[10px] text-slate-400 uppercase font-bold">Estimated Total</div><div class="text-2xl font-bold text-indigo-600 money-val" id="fc-total">...</div></div></div><div class="flex-1 chart-wrapper"><canvas id="futureChart"></canvas></div></div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6 border-l-4 border-indigo-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Quick SIP</h3><div class="grid grid-cols-2 gap-3 mb-4"><input type="number" id="calc-sip-amt" class="neo-input p-2 text-sm" placeholder="Amount" oninput="runSipCalc()"><input type="number" id="calc-sip-yrs" class="neo-input p-2 text-sm" placeholder="Years" oninput="runSipCalc()"></div><div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl"><span class="text-xs text-indigo-900 font-bold uppercase">Future Value</span><span class="font-bold text-indigo-700" id="calc-sip-res">0</span></div></div><div class="neo-card p-6 border-l-4 border-rose-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-rose-500 mr-2"></i>Quick EMI</h3><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="calc-emi-p" class="neo-input p-2 text-sm" placeholder="Loan" oninput="runEmiCalc()"><input type="number" id="calc-emi-r" class="neo-input p-2 text-sm" placeholder="Rate" oninput="runEmiCalc()"><input type="number" id="calc-emi-n" class="neo-input p-2 text-sm" placeholder="Yrs" oninput="runEmiCalc()"></div><div class="flex justify-between items-center bg-rose-50 p-3 rounded-xl"><span class="text-xs text-rose-900 font-bold uppercase">EMI</span><span class="font-bold text-rose-700" id="calc-emi-res">0</span></div></div></div>
+                </div>
+
+                <div id="view-settings" class="view-section space-y-6">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Settings</h2><p class="text-slate-500 font-medium">Preferences & Data</p></div>
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 mb-4">Currency</h3>
+                        <div class="flex gap-2">
+                            <button onclick="changeCurrency('INR', 'en-IN')" class="flex-1 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition">₹ INR (India)</button>
+                            <button onclick="changeCurrency('USD', 'en-US')" class="flex-1 py-3 bg-slate-50 text-slate-700 font-bold rounded-xl border border-slate-100 hover:bg-slate-100 transition">$ USD (US)</button>
+                        </div>
+                    </div>
+                    <div class="neo-card p-6 border border-rose-100">
+                        <h3 class="font-bold text-rose-600 mb-4">Danger Zone</h3>
+                        <button onclick="nukeData()" class="w-full py-4 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition shadow-lg shadow-rose-200">Reset All Data</button>
+                    </div>
+                </div>
+
                 <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
-            
             </div>
         </div>
     </div>
 
     <nav class="md:hidden fixed bottom-4 left-4 right-4 z-50">
-        <div class="nav-dock flex justify-between items-center px-6 py-4 rounded-[28px]">
-            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
-            <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-calendar-alt text-xl"></i></button>
-            <div class="relative -top-10"><button onclick="openTxModal()" class="w-16 h-16 bg-indigo-600 rounded-[22px] flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button></div>
-            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
-            <button onclick="router('planning')" id="m-nav-planning" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-compass text-xl"></i></button>
+        <div class="nav-dock flex justify-between items-center px-4 py-3 rounded-[24px]">
+            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-home text-lg"></i>Home</button>
+            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-file-invoice text-lg"></i>Debts</button>
+            <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-chart-line text-lg"></i>Inv</button>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-wallet text-lg"></i>Acc</button>
+            <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-calendar-alt text-lg"></i>Cal</button>
+            <button onclick="router('future')" id="m-nav-future" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-rocket text-lg"></i>Fut</button>
         </div>
     </nav>
 
@@ -295,7 +264,7 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const config = { currency: 'INR', locale: 'en-IN' };
+        let config = { currency: 'INR', locale: 'en-IN' };
 
         // --- PASTE YOUR FIREBASE CONFIG HERE ---
         const firebaseConfig = {
@@ -313,7 +282,7 @@
         const provider = new GoogleAuthProvider();
         
         let currentUser = null;
-        let state = { accounts: [], transactions: [], history: [0], budgets: {} };
+        let state = { accounts: [], transactions: [], history: [0], budgets: {}, settings: {} };
         let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, invPieInst=null, futureChartInst=null, analysisRange='6M';
         let isPrivacyMode = false;
 
@@ -335,7 +304,7 @@
         });
 
         function setGreeting() { const h = new Date().getHours(); setTxt('greeting', h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening"); }
-        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; render(); } else { save(); } }); }
+        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; if(state.settings && state.settings.currency) { config.currency = state.settings.currency; config.locale = state.settings.locale; } render(); } else { save(); } }); }
         async function save() { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), state); }
 
         const money = (n) => `<span class="money-val">${new Intl.NumberFormat(config.locale, { style: 'currency', currency: config.currency, maximumFractionDigits: 0 }).format(n)}</span>`;
@@ -367,6 +336,8 @@
         window.deleteBudget = (cat) => { if(confirm(`Delete budget for ${cat}?`)) { delete state.budgets[cat]; save(); render(); } };
         window.calcFire = () => { const exp = parseFloat(getVal('fire-expenses')); if(exp) { const fireNum = exp * 12 * 25; setHtml('fire-number', money(fireNum)); const elNw = document.getElementById('dash-networth'); if(elNw) { const currentNw = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const pct = Math.min(100, (currentNw / fireNum) * 100); setTxt('fire-progress', `You are ${pct.toFixed(1)}% of the way to freedom.`); } } };
         window.calcFuture = () => { const elNw = document.getElementById('dash-networth'); if(!elNw) return; const P = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const PMT = parseFloat(getVal('fc-monthly')) || 0; const r = (parseFloat(getVal('fc-rate')) || 10) / 100; const years = parseFloat(getVal('fc-years')) || 10; const n = 12; let balance = P; const dataPoints = [], labels = []; for(let i=0; i<=years; i++) { labels.push(`Year ${i}`); if (i===0) dataPoints.push(balance); else { const months = i * 12; const futureValue = P * Math.pow(1 + r/n, months) + (PMT * (Math.pow(1 + r/n, months) - 1)) / (r/n); balance = futureValue; dataPoints.push(balance); } } setHtml('fc-total', money(balance)); const ctxEl = document.getElementById('futureChart'); if(ctxEl) { const ctx = ctxEl.getContext('2d'); if(futureChartInst) futureChartInst.destroy(); futureChartInst = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Net Worth', data: dataPoints, borderColor: '#4F46E5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } } }); } };
+        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
+        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, settings: {} }; save(); render(); } };
 
         // CALENDAR LOGIC
         function renderCalendar() {
@@ -403,7 +374,7 @@
 
         function render() {
             if(!state) return;
-            // ENSURE LISTS RENDER FIRST (The Fix)
+            // 1. RENDER LISTS FIRST (Safe Render)
             const ac=document.getElementById('accounts-container'); 
             if(ac) { 
                 const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] }; 
@@ -438,6 +409,7 @@
                 } 
             }
 
+            // 2. CALCULATE MATH (After lists are safe)
             updateAccountSelect();
             ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
 
@@ -454,12 +426,12 @@
             generateInsights(assets, debts, burnPct, topCat); renderRecurrings();
             setTxt('burn-percent', `${burnPct.toFixed(0)}%`); const burnBar = document.getElementById('burn-bar'); if(burnBar) { burnBar.style.width = `${burnPct}%`; burnBar.className = `meter-fill ${burnPct < 50 ? 'bg-emerald-500' : burnPct < 80 ? 'bg-orange-400' : 'bg-rose-500'}`; } setHtml('burn-expense', `Out: ${money(mExp)}`); setHtml('burn-income', `In: ${money(mInc)}`);
 
-            if(document.getElementById('view-planning').classList.contains('active')) { const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { const spent = cats[cat] || 0; const pct = Math.min(100, (spent / limit) * 100); const color = pct > 90 ? 'bg-rose-500' : pct > 75 ? 'bg-orange-400' : 'bg-emerald-500'; bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden"><div class="${color} h-full transition-all duration-500" style="width: ${pct}%"></div></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>${money(spent)} spent</span><span>${money(limit)} limit</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set. Click "Set Limit" to start.</div>`; bContainer.innerHTML = bHtml; } }
+            if(document.getElementById('view-planning') && document.getElementById('view-planning').classList.contains('active')) { const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { const spent = cats[cat] || 0; const pct = Math.min(100, (spent / limit) * 100); const color = pct > 90 ? 'bg-rose-500' : pct > 75 ? 'bg-orange-400' : 'bg-emerald-500'; bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden"><div class="${color} h-full transition-all duration-500" style="width: ${pct}%"></div></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>${money(spent)} spent</span><span>${money(limit)} limit</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set. Click "Set Limit" to start.</div>`; bContainer.innerHTML = bHtml; } }
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendar();
             if(document.getElementById('view-future').classList.contains('active')) calcFuture();
             if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
 
-            // RENDER DASHBOARD CHARTS (MERGED ANALYSIS)
+            // 3. RENDER CHARTS (Only if visible, safer)
             if(document.getElementById('view-dashboard').classList.contains('active')) {
                 // Sankey
                 const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); const rangeMonths = analysisRange === '1Y' ? 11 : 5; for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }

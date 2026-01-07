@@ -65,10 +65,13 @@
         .toast.success { background: #064E3B; border: 1px solid #059669; }
         .toast.error { background: #7F1D1D; border: 1px solid #DC2626; }
 
-        #loading-screen { position: fixed; inset: 0; background: rgba(255,255,255,0.95); dark:background: rgba(15,23,42,0.95); backdrop-filter: blur(10px); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; pointer-events: all; }
-        .dark #loading-screen { background: rgba(15,23,42,0.95); }
+        #loading-screen { position: fixed; inset: 0; background: rgba(255,255,255,0.98); dark:background: rgba(15,23,42,0.98); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; pointer-events: all; }
+        .dark #loading-screen { background: rgba(15,23,42,0.98); }
         .loader-spin { width: 40px; height: 40px; border: 4px solid #E2E8F0; border-top: 4px solid var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* Error Box */
+        #error-log { display: none; margin-top: 20px; padding: 15px; background: #FEF2F2; border: 1px solid #FECACA; color: #991B1B; border-radius: 12px; font-size: 12px; font-family: monospace; max-width: 90%; word-break: break-all; }
 
         ::-webkit-scrollbar { width: 0px; }
     </style>
@@ -79,7 +82,9 @@
     <div id="loading-screen" class="hidden">
         <div class="loader-spin mb-4"></div>
         <div class="text-slate-900 dark:text-white font-bold text-lg">Syncing...</div>
-        <div class="text-slate-500 text-sm" id="loading-text">Connecting to secure cloud</div>
+        <div class="text-slate-500 text-sm mb-4" id="loading-text">Connecting to secure cloud</div>
+        <div id="error-log"></div>
+        <button onclick="enableGuestMode()" class="mt-4 text-xs font-bold text-indigo-500 underline hidden" id="guest-btn">Switch to Guest Mode (Offline)</button>
     </div>
 
     <!-- TOAST CONTAINER -->
@@ -98,6 +103,7 @@
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
             <p id="auth-status" class="text-xs text-rose-500 mt-6 min-h-[1rem] font-medium"></p>
+            <button onclick="enableGuestMode()" class="mt-4 text-xs text-slate-400 hover:text-indigo-500 underline">Continue as Guest (No Sync)</button>
         </div>
     </div>
 
@@ -116,7 +122,6 @@
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
             <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
             <button onclick="openModal('categoryModal')" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 text-indigo-500 font-bold bg-indigo-50 dark:bg-indigo-900/10"><i class="fas fa-tags w-5"></i> Categories</button>
-            <button onclick="openModal('backupModal'); renderBackups()" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 text-emerald-600 font-bold bg-emerald-50 dark:bg-emerald-900/10"><i class="fas fa-cloud w-5"></i> Backups</button>
         </nav>
         <div class="p-6 border-t border-slate-50 dark:border-slate-800">
             <div id="connection-status" class="text-[10px] font-bold text-slate-400 mb-2 text-center uppercase tracking-wide">Waiting...</div>
@@ -224,11 +229,15 @@
             <div class="max-w-4xl mx-auto h-full flex flex-col">
                 <div class="flex justify-between items-center mb-8"><h2 class="text-3xl font-bold dark:text-white">Activity</h2>
                     <div class="flex gap-2">
-                        <input type="month" id="txDateFilter" onchange="renderTransactions()" class="neo-input w-auto py-2 px-3 text-xs">
-                        <button onclick="openNewTx()" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white w-12 h-12 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
+                        <!-- NEW FILTER DROPDOWNS -->
+                        <select id="txCatFilter" onchange="renderTransactionsList()" class="neo-input w-32 py-2 px-3 text-xs h-9">
+                            <option value="">All Categories</option>
+                        </select>
+                        <input type="month" id="txDateFilter" onchange="renderTransactionsList()" class="neo-input w-auto py-2 px-3 text-xs h-9">
+                        <button onclick="openNewTx()" class="bg-slate-900 dark:bg-white dark:text-slate-900 text-white w-9 h-9 rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform"><i class="fas fa-plus"></i></button>
                     </div>
                 </div>
-                <div class="neo-card flex-1 flex flex-col overflow-hidden"><div class="p-4 border-b border-slate-100 dark:border-slate-700"><div class="relative"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div></div>
+                <div class="neo-card flex-1 flex flex-col overflow-hidden"><div class="p-4 border-b border-slate-100 dark:border-slate-700"><div class="relative"><i class="fas fa-search absolute left-4 top-3.5 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search transactions..." onkeyup="renderTransactionsList()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="overflow-y-auto flex-1 p-2"></div></div>
             </div>
         </div>
     </main>
@@ -307,42 +316,70 @@
             else { currentUser = null; els.overlay.classList.remove('hidden'); els.status.innerText = ""; isDataLoaded = false; }
         });
 
-        function initSync() {
-            document.getElementById('loading-screen').classList.remove('hidden');
-            const timeout = setTimeout(() => { if(!isDataLoaded) { document.getElementById('loading-screen').classList.add('hidden'); alert("Sync timed out. Using local/default mode."); }}, 8000);
+        // GUEST MODE
+        window.enableGuestMode = () => {
+            document.getElementById('auth-overlay').classList.add('hidden');
+            document.getElementById('loading-screen').classList.add('hidden');
+            state = { accounts: [], transactions: [], history: [0], budgets: {}, categories: JSON.parse(JSON.stringify(defaultCategories)) };
+            isDataLoaded = true; // Local mode
+            currentUser = null;
+            render();
+            if(document.getElementById('connection-status')) {
+                document.getElementById('connection-status').innerText = "Guest (Local Only)";
+                document.getElementById('connection-status').className = "text-[10px] font-bold text-amber-500 mb-2 text-center uppercase tracking-wide";
+            }
+        };
 
-            onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
-                clearTimeout(timeout);
+        async function initSync() {
+            document.getElementById('loading-screen').classList.remove('hidden');
+            const statusEl = document.getElementById('connection-status');
+            
+            // 1. Get Live Data
+            try {
+                const userDoc = await getDoc(doc(db, "users", currentUser.uid));
+                if(userDoc.exists()) {
+                    const data = userDoc.data();
+                    state = { ...state, ...data };
+                    if(!state.categories) state.categories = JSON.parse(JSON.stringify(defaultCategories)); 
+                } else {
+                    await setDoc(doc(db, "users", currentUser.uid), state);
+                }
                 isDataLoaded = true;
                 document.getElementById('loading-screen').classList.add('hidden');
                 
-                if(doc.exists()) { 
-                    const data = doc.data();
-                    state = { ...state, ...data }; 
-                    if(!state.categories) state.categories = JSON.parse(JSON.stringify(defaultCategories)); 
-                    render(); 
-                    if(document.getElementById('connection-status')) {
-                        document.getElementById('connection-status').innerText = "Sync Active";
-                        document.getElementById('connection-status').className = "text-[10px] font-bold text-emerald-500 mb-2 text-center uppercase tracking-wide";
-                    }
-                } else { 
-                    save(); 
+                // 2. Daily Backup Check
+                checkAndRunDailyBackup();
+                
+                render();
+                if(statusEl) {
+                    statusEl.innerText = "Sync Active";
+                    statusEl.className = "text-[10px] font-bold text-emerald-500 mb-2 text-center uppercase tracking-wide";
                 }
-            }, (error) => {
-                clearTimeout(timeout);
-                document.getElementById('loading-screen').classList.add('hidden');
-                console.error("Firebase Sync Error:", error);
-                showToast("Connection Failed", "error");
-            });
-            checkAndRunDailyBackup();
+            } catch(e) {
+                console.error("Sync Error", e);
+                document.getElementById('loading-text').innerText = "Connection Failed: " + e.code;
+                document.getElementById('loading-text').classList.add('text-rose-500');
+                
+                if(statusEl) {
+                    statusEl.innerText = "Sync Error";
+                    statusEl.className = "text-[10px] font-bold text-rose-500 mb-2 text-center uppercase tracking-wide";
+                }
+                
+                // Show Error on screen
+                const errLog = document.getElementById('error-log');
+                errLog.style.display = 'block';
+                errLog.innerText = e.message;
+                
+                // Show Guest Button
+                document.getElementById('guest-btn').classList.remove('hidden');
+            }
+
             if(localStorage.getItem('theme')==='dark') document.documentElement.classList.add('dark');
             if(localStorage.getItem('privacy')==='true') document.getElementById('main-container').classList.add('privacy-active');
         }
-        
+
         async function save() { 
-            if(currentUser && isDataLoaded) {
-                await setDoc(doc(db, "users", currentUser.uid), state); 
-            }
+            if(currentUser && isDataLoaded) { await setDoc(doc(db, "users", currentUser.uid), state); } 
         }
 
         // --- BACKUP LOGIC ---
@@ -397,11 +434,29 @@
                 state.categories[type].forEach(cat => { list.innerHTML += `<div class="flex justify-between items-center bg-slate-50 dark:bg-slate-700/50 p-3 rounded-xl border border-slate-100 dark:border-slate-700"><span class="${color} font-bold text-sm">${cat}</span><button onclick="deleteCategory('${type}', '${cat}')" class="text-slate-400 hover:text-rose-500"><i class="fas fa-trash"></i></button></div>`; });
             });
         }
-
+        
         window.renderCategorySelect = () => {
-            const type = document.getElementById('txType').value; const catSelect = document.getElementById('txCat'); const budgSelect = document.getElementById('budgCat');
-            if(catSelect) { catSelect.innerHTML = ''; state.categories[type].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); }); }
-            if(budgSelect) { budgSelect.innerHTML = ''; state.categories['expense'].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; budgSelect.appendChild(opt); }); }
+            const type = document.getElementById('txType').value;
+            const catSelect = document.getElementById('txCat');
+            const budgSelect = document.getElementById('budgCat');
+            const filterSelect = document.getElementById('txCatFilter');
+
+            if(catSelect) {
+                catSelect.innerHTML = '';
+                state.categories[type].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; catSelect.appendChild(opt); });
+            }
+            if(budgSelect) {
+                budgSelect.innerHTML = '';
+                state.categories['expense'].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; budgSelect.appendChild(opt); });
+            }
+            if(filterSelect && filterSelect.options.length <= 1) { 
+                ['income', 'expense'].forEach(t => {
+                    const optgroup = document.createElement('optgroup');
+                    optgroup.label = t.toUpperCase();
+                    state.categories[t].forEach(c => { const opt = document.createElement('option'); opt.value = c; opt.innerText = c; optgroup.appendChild(opt); });
+                    filterSelect.appendChild(optgroup);
+                });
+            }
         };
 
         window.saveBudget = (e) => { e.preventDefault(); state.budgets[document.getElementById('budgCat').value] = parseFloat(document.getElementById('budgAmount').value); save(); closeModal('budgetModal'); showToast("Budget updated"); };
@@ -560,9 +615,9 @@
         window.setAnalysisRange = (range) => { analysisRange = range; render(); };
 
         window.exportCSV = () => {
-            let csv = "ID,Date,Description,Amount,Type,Category,Account\n";
+            let csv = "\uFEFFID,Date,Description,Amount,Type,Category,Account\n";
             state.transactions.forEach(t => csv += `${t.id},${t.date},"${t.desc}",${t.amount},${t.type},${t.cat},"${t.accName}"\n`);
-            const blob = new Blob([csv], { type: 'text/csv' });
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a'); a.href = url; a.download = 'cashflow.csv'; a.click();
         };
@@ -634,7 +689,7 @@
                         const payoffDate = new Date(); payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
                         const principalPercent = totalRemainingPayable > 0 ? (a.balance / totalRemainingPayable) * 100 : 0;
                         const interestPercent = 100 - principalPercent;
-                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg dark:text-white">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 dark:text-white text-xl money-val">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-primary h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-3"><span class="flex items-center gap-1"><div class="w-2 h-2 bg-primary rounded-full"></div> Principal: ${money(a.balance)}</span><span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="flex justify-between items-center mt-3 pt-2 border-t border-slate-50 dark:border-slate-700"><div class="text-xs"><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700 dark:text-slate-300">${a.roi}%</span></div><button onclick="openPayDebt(${a.id})" class="bg-emerald-600 text-white px-3 py-1 rounded-lg text-xs font-bold shadow-md hover:scale-105 transition">Pay</button></div></div>`;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg dark:text-white">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 dark:text-white text-xl money-val">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 dark:bg-slate-700 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-primary h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 dark:text-slate-400 mb-3"><span class="flex items-center gap-1"><div class="w-2 h-2 bg-primary rounded-full"></div> Principal: ${money(a.balance)}</span><span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 dark:border-slate-700 text-xs"><div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700 dark:text-slate-300">${a.roi}%</span></div><div class="text-right"><span class="text-slate-400 block">Payoff Est.</span><span class="font-bold text-slate-700 dark:text-slate-300">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div></div></div>`;
                     } else {
                         debtListHTML += `<div class="neo-card p-5 border-l-4 border-orange-400 mb-3"><div class="flex justify-between items-center"><h4 class="font-bold text-slate-900 dark:text-white">${a.name}</h4><div class="font-bold text-slate-900 dark:text-white text-lg money-val">${money(a.balance)}</div></div><div class="text-xs text-slate-400 mt-1">Revolving Credit / Untracked Loan</div></div>`;
                     }
@@ -697,15 +752,23 @@
                 }
             }
 
+            renderTransactionsList();
+        }
+
+        // --- NEW: SEPARATE TX RENDERER FOR PERFORMANCE ---
+        window.renderTransactionsList = () => {
             const tc=document.getElementById('full-tx-list'); tc.innerHTML='';
             const term=document.getElementById('tx-search').value.toLowerCase();
             const dateFilter = document.getElementById('txDateFilter').value;
+            const catFilter = document.getElementById('txCatFilter').value;
+            
             let fTx = state.transactions;
             if(term) fTx = fTx.filter(t => t.desc.toLowerCase().includes(term));
             if(dateFilter) { const [y, m] = dateFilter.split('-'); fTx = fTx.filter(t => { const d = new Date(t.date); return d.getFullYear() === parseInt(y) && (d.getMonth() + 1) === parseInt(m); }); }
+            if(catFilter) fTx = fTx.filter(t => t.cat === catFilter);
 
             if(fTx.length === 0) tc.innerHTML = '<div class="text-center text-slate-400 py-10"><i class="fas fa-wind text-2xl mb-2"></i><p>No activity found</p></div>';
-            else fTx.forEach(t=>{
+            else fTx.slice(0, 50).forEach(t=>{ // Limit rendering to 50 for speed
                 const isInc=t.type==='income';
                 let rec = t.recurring ? '<span class="text-[10px] bg-indigo-100 text-indigo-700 px-1 rounded ml-1">↻</span>' : '';
                 tc.innerHTML+=`<div class="flex justify-between items-center p-3 mb-2 bg-white dark:bg-slate-800 rounded-xl border border-slate-50 dark:border-slate-700 hover:shadow-md transition"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${isInc?'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/30':'bg-rose-50 text-rose-600 dark:bg-rose-900/30'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'}"></i></div><div><div class="font-bold text-slate-800 dark:text-white text-sm">${t.desc} ${rec}</div><div class="text-[10px] text-slate-400 font-medium">${formatDateIN(t.date)} • ${t.accName}</div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${isInc?'text-emerald-600':'text-slate-900 dark:text-white'} money-val">${isInc?'+':'-'}${money(t.amount)}</span><button onclick="openEditTx(${t.id})" class="text-slate-300 hover:text-blue-500"><i class="fas fa-pencil-alt"></i></button><button onclick="deleteItem('transactions', ${t.id})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`;

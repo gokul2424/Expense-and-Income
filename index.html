@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Titanium</title>
+    <title>Cash Flow | Platinum</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -17,7 +17,7 @@
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
         
         /* UI Elements */
-        .neo-card { background: white; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
+        .neo-card { background: white; border-radius: 24px; box-shadow: 0 4px 15px -3px rgba(0, 0, 0, 0.05); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
         .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; }
         .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
 
@@ -58,7 +58,7 @@
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-10 font-medium">Titanium Edition.</p>
+            <p class="text-slate-500 mb-10 font-medium">Platinum Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -75,6 +75,7 @@
         </div>
         <nav class="flex-1 px-6 space-y-1">
             <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Home</button>
+            <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
             <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
             <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
             <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
@@ -86,7 +87,7 @@
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Titanium</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Platinum</div>
                     </div>
                 </div>
                 <div class="flex gap-2 mb-2">
@@ -177,6 +178,35 @@
             </div>
         </div>
 
+        <div id="view-investments" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
+            <div class="max-w-6xl mx-auto space-y-8">
+                <div class="flex justify-between items-center">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Portfolio</h2><p class="text-slate-500 font-medium">Wealth Tracking</p></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="neo-card p-6 bg-slate-900 text-white">
+                        <div class="flex items-center gap-3 mb-6">
+                            <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fas fa-chart-line"></i></div>
+                            <div><div class="text-xs text-slate-400 uppercase font-bold">Total Invested</div><div class="text-2xl font-bold money-val" id="inv-total">...</div></div>
+                        </div>
+                        <div class="h-[1px] bg-slate-700 w-full mb-6"></div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-coins"></i></div>
+                            <div><div class="text-xs text-slate-400 uppercase font-bold">Monthly SIP</div><div class="text-2xl font-bold money-val" id="inv-sip-total">...</div></div>
+                        </div>
+                    </div>
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4">Allocation</h3>
+                        <div class="chart-wrapper" style="height: 200px;"><canvas id="invPieChart"></canvas></div>
+                    </div>
+                </div>
+
+                <div id="invest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    </div>
+            </div>
+        </div>
+
         <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
@@ -205,7 +235,7 @@
                         <div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div>
                     </div>
                     <div class="neo-card p-6">
-                        <h3 class="font-bold text-slate-900 text-lg mb-6">Allocation</h3>
+                        <h3 class="font-bold text-slate-900 text-lg mb-6">Asset Class</h3>
                         <div class="flex items-center justify-center">
                             <div style="height: 200px; width: 200px;"><canvas id="assetPieChart"></canvas></div>
                             <div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div>
@@ -264,7 +294,7 @@
     <nav class="md:hidden fixed bottom-4 left-4 right-4 z-40">
         <div class="nav-dock flex justify-between items-center px-6 py-4">
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
-            <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
+            <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-line text-xl"></i></button>
             <div class="relative -top-10">
                 <button onclick="openTxModal()" class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 hover:scale-105 transition-transform border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button>
             </div>
@@ -280,15 +310,29 @@
                 <input type="text" id="accName" required class="neo-input" placeholder="Account Name (e.g. HDFC)">
                 <input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Current Balance">
                 <div class="relative">
-                    <select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment</option><option value="property">Property</option><option value="credit">Credit Card (Debt)</option><option value="loan">Loan (Debt)</option></select>
+                    <select id="accType" onchange="toggleAccountFields()" class="neo-input appearance-none">
+                        <option value="cash">Cash / Bank</option>
+                        <option value="investment">Investment / SIP</option>
+                        <option value="property">Property</option>
+                        <option value="credit">Credit Card (Debt)</option>
+                        <option value="loan">Loan (Debt)</option>
+                    </select>
                     <i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i>
                 </div>
+                
                 <div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
                     <div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm text-slate-600"></div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm" placeholder="8.5"></div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm" placeholder="60"></div>
                     <div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div>
                 </div>
+
+                <div id="invest-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100">
+                    <div class="col-span-2"><label class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Monthly SIP Amount</label><input type="number" id="accSip" class="neo-input mt-1 p-3 text-sm" placeholder="5000"></div>
+                    <div><label class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Target Amount</label><input type="number" id="accTarget" class="neo-input mt-1 p-3 text-sm" placeholder="1000000"></div>
+                    <div><label class="text-[10px] text-emerald-600 font-bold uppercase tracking-wider">Exp Return %</label><input type="number" step="0.1" id="accReturn" class="neo-input mt-1 p-3 text-sm" placeholder="12.0"></div>
+                </div>
+
                 <div class="flex gap-4 pt-4">
                     <button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl hover:bg-slate-200 transition">Cancel</button>
                     <button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition">Save</button>
@@ -368,7 +412,7 @@
         
         let currentUser = null;
         let state = { accounts: [], transactions: [], history: [0] };
-        let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, analysisRange='6M';
+        let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, invPieInst=null, analysisRange='6M';
         let isPrivacyMode = false;
 
         // --- SAFE HELPERS ---
@@ -445,7 +489,19 @@
         }
 
         // --- LOGIC ---
-        window.toggleDebtFields = () => { const t=getVal('accType'); const f=document.getElementById('debt-fields'); if(f) { if(['loan','credit'].includes(t)) f.classList.remove('hidden'); else f.classList.add('hidden'); } };
+        window.toggleAccountFields = () => { 
+            const t=getVal('accType'); 
+            const fd=document.getElementById('debt-fields'); 
+            const fi=document.getElementById('invest-fields');
+            
+            if(fd && fi) {
+                fd.classList.add('hidden');
+                fi.classList.add('hidden');
+                if(['loan','credit'].includes(t)) fd.classList.remove('hidden');
+                if(t === 'investment') fi.classList.remove('hidden');
+            }
+        };
+
         window.toggleTxFields = () => {
             const t = getVal('txType');
             const to = document.getElementById('div-to-acc');
@@ -469,12 +525,28 @@
             e.preventDefault();
             const type = getVal('accType');
             let emi = 0, roi = 0, tenure = 0, startDate = '';
+            let sip = 0, target = 0, ret = 0;
+
             if(['loan','credit'].includes(type)) {
                 const p = parseFloat(getVal('accBalance'))||0; roi = parseFloat(getVal('accRoi'))||0; tenure = parseFloat(getVal('accTenure'))||0;
                 emi = calculateEMI(p, roi, tenure); startDate = getVal('accStartDate');
             }
-            state.accounts.push({ id: Date.now(), name: getVal('accName'), balance: parseFloat(getVal('accBalance')), type, roi, tenure, emi, startDate });
-            save(); closeModal('accountModal'); e.target.reset(); if(document.getElementById('debt-fields')) document.getElementById('debt-fields').classList.add('hidden');
+            
+            if(type === 'investment') {
+                sip = parseFloat(getVal('accSip'))||0;
+                target = parseFloat(getVal('accTarget'))||0;
+                ret = parseFloat(getVal('accReturn'))||0;
+            }
+
+            state.accounts.push({ 
+                id: Date.now(), 
+                name: getVal('accName'), 
+                balance: parseFloat(getVal('accBalance')), 
+                type, roi, tenure, emi, startDate, sip, target, ret 
+            });
+            save(); closeModal('accountModal'); e.target.reset(); 
+            document.getElementById('debt-fields').classList.add('hidden');
+            document.getElementById('invest-fields').classList.add('hidden');
         };
 
         window.openTxModal = () => {
@@ -583,10 +655,10 @@
             const debtRatio = assets > 0 ? (debts / assets) * 100 : 0;
             let msg = "";
 
-            if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income. Consider cutting back on discretionary spending.";
-            else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets. Focus on paying down high-interest debt.";
+            if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income.";
+            else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets.";
             else if (topCat) msg = `📊 <b>Spending Trend:</b> Your highest expense category this month is <b>${topCat.name}</b> (${money(topCat.amt)}).`;
-            else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month. Keep it up!";
+            else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month.";
             else msg = "💡 <b>Tip:</b> Log more transactions to get personalized financial advice.";
 
             txt.innerHTML = msg;
@@ -603,7 +675,6 @@
             const recurs = Object.values(counts).filter(x => x.count >= 2);
             const div = document.getElementById('recurring-list');
             const sect = document.getElementById('recurring-section');
-            
             if(div && sect) {
                 if(recurs.length > 0) {
                     sect.classList.remove('hidden');
@@ -611,7 +682,7 @@
                         <div class="bg-white border border-slate-100 p-4 rounded-2xl flex justify-between items-center shadow-sm">
                             <div class="flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fas fa-repeat text-xs"></i></div>
-                                <div><div class="font-bold text-sm text-slate-800">${r.t.desc}</div><div class="text-[10px] text-slate-400">Detected monthly</div></div>
+                                <div><div class="font-bold text-sm text-slate-800">${r.t.desc}</div><div class="text-[10px] text-slate-400">Monthly subscription</div></div>
                             </div>
                             <div class="font-bold text-slate-900">${money(r.t.amount)}</div>
                         </div>
@@ -629,11 +700,59 @@
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
             let totalDebtPrincipal=0, totalEstimatedInterest=0, debtCompositionLabels=[], debtCompositionData=[], debtListHTML="";
+            
+            // Investment Stats
+            let totalInvested = 0, totalMonthlySip = 0, investListHTML = "", investNames = [], investBalances = [];
 
             state.accounts.forEach(a => { 
                 if(['cash','investment','property'].includes(a.type)) { 
                     assets+=a.balance; 
                     if(a.type==='cash') assetMap['Cash']+=a.balance; if(a.type==='investment') assetMap['Investments']+=a.balance; if(a.type==='property') assetMap['Property']+=a.balance; 
+                    
+                    // Investment Specific Logic
+                    if(a.type === 'investment') {
+                        totalInvested += a.balance;
+                        if(a.sip) totalMonthlySip += a.sip;
+                        
+                        // Calculate Projection (FV for 10 years)
+                        // FV = P(1+r)^n + SIP * ...
+                        const r = (a.ret || 10) / 100 / 12;
+                        const n = 10 * 12; // 10 years
+                        const fv = a.balance * Math.pow(1+r, n) + (a.sip ? (a.sip * (Math.pow(1+r, n) - 1) / r) * (1+r) : 0);
+                        const targetPct = a.target ? Math.min(100, (a.balance / a.target) * 100) : 0;
+
+                        investNames.push(a.name);
+                        investBalances.push(a.balance);
+
+                        investListHTML += `
+                        <div class="neo-card p-5 border-l-4 border-emerald-500 mb-3 hover:shadow-lg transition">
+                            <div class="flex justify-between items-start mb-2">
+                                <div>
+                                    <h4 class="font-bold text-slate-900 text-lg">${a.name}</h4>
+                                    <div class="flex gap-2 mt-1">
+                                        ${a.sip ? `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">SIP: ${money(a.sip)}</span>` : ''}
+                                        ${a.ret ? `<span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Exp: ${a.ret}%</span>` : ''}
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-slate-400 uppercase font-bold">Current Value</div>
+                                    <div class="font-bold text-slate-900 text-xl">${money(a.balance)}</div>
+                                </div>
+                            </div>
+                            ${a.target ? `
+                            <div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden">
+                                <div class="bg-emerald-500 h-full" style="width: ${targetPct}%"></div>
+                            </div>
+                            <div class="flex justify-between text-[10px] text-slate-500 mb-2">
+                                <span>Goal Progress</span>
+                                <span>Target: ${money(a.target)}</span>
+                            </div>` : ''}
+                            <div class="mt-3 pt-2 border-t border-slate-50 flex justify-between items-center">
+                                <span class="text-xs text-slate-400 font-bold"><i class="fas fa-chart-line text-emerald-500 mr-1"></i> 10Y Projection</span>
+                                <span class="text-sm font-bold text-emerald-700">${money(fv)}</span>
+                            </div>
+                        </div>`;
+                    }
                 } else { 
                     debts+=a.balance; totalDebtPrincipal += a.balance;
                     if(a.emi) {
@@ -681,6 +800,20 @@
             setHtml('burn-expense', `Out: ${money(mExp)}`);
             setHtml('burn-income', `In: ${money(mInc)}`);
 
+            // NEW INVESTMENT VIEW RENDER
+            if(document.getElementById('view-investments').classList.contains('active')) {
+                setHtml('inv-total', money(totalInvested));
+                setHtml('inv-sip-total', money(totalMonthlySip));
+                setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>');
+                
+                const invCtxEl = document.getElementById('invPieChart');
+                if(invCtxEl) {
+                    const ctx = invCtxEl.getContext('2d');
+                    if(invPieInst) invPieInst.destroy();
+                    invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } });
+                }
+            }
+
             // CHARTS
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             
@@ -717,39 +850,12 @@
             const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
             const rangeMonths = analysisRange === '1Y' ? 11 : 5;
             for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
-            
             state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });
-
             const flows={}; const WALLET="Wallet"; let si=0, so=0;
-            state.transactions.forEach(tx=>{
-                if(tx.type === 'transfer') return;
-                const txDate=new Date(tx.date); 
-                const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear());
-                if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; }
-                let inc=false;
-                if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } 
-                else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; }
-                else { if(bi !== -1) inc=true; }
-                if(inc){
-                    const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount;
-                    if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; }
-                    else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; }
-                }
-            });
-            
-            let totalSankeyEMI = 0;
-            buckets.forEach(b => {
-                let inRange = false;
-                if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true;
-                else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true;
-                else if(analysisRange === '1Y') inRange = true;
-                if(inRange) {
-                    state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } });
-                }
-            });
+            state.transactions.forEach(tx=>{ if(tx.type === 'transfer') return; const txDate=new Date(tx.date); const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear()); if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; } let inc=false; if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } else { if(bi !== -1) inc=true; } if(inc){ const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount; if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; } else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; } } });
+            let totalSankeyEMI = 0; buckets.forEach(b => { let inRange = false; if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true; else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true; else if(analysisRange === '1Y') inRange = true; if(inRange) { state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } }); } });
             if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
             const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
-            
             const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
             const sankeyEl = document.getElementById('sankeyChart');
             if(sankeyEl) {

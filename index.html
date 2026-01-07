@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Unobtainium</title>
+    <title>Cash Flow | Stable</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,49 +15,28 @@
     <style>
         :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
-        
-        /* Layout Engine */
         .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; }
         .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
-        
-        /* UI Elements */
         .neo-card { background: white; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
         .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; font-size: 14px; }
         .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
-
-        /* Navigation */
         .nav-dock { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.05); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .desktop-nav-item:hover { background: white; color: #334155; }
         .desktop-nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-
-        /* View Transitions */
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
-
-        /* Utilities */
         .money-val { font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
         body.privacy-active .money-val { filter: blur(6px); user-select: none; }
         .meter-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
-        
-        /* Calendar Grid */
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; }
         .cal-day { aspect-ratio: 1/1; border-radius: 12px; background: #FFF; border: 1px solid #F1F5F9; padding: 4px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.1s; position: relative; }
         .cal-day:active { transform: scale(0.95); }
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
-        
-        /* Responsive */
-        @media (min-width: 768px) {
-            .app-container { flex-direction: row; }
-            .nav-dock { display: none; }
-            .main-scroll { padding: 40px; padding-bottom: 40px; }
-            .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; }
-        }
-        
-        /* Filter Buttons */
+        @media (min-width: 768px) { .app-container { flex-direction: row; } .nav-dock { display: none; } .main-scroll { padding: 40px; padding-bottom: 40px; } .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } }
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .filter-btn.inactive { color: #94A3B8; }
@@ -70,8 +49,8 @@
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200 rotate-3">
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
-            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Unobtainium.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Financial Intelligence.</p>
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
+            <p class="text-slate-500 mb-8 font-medium">Vibranium X Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -102,7 +81,7 @@
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Unobtainium</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Vibranium</div>
                     </div>
                 </div>
                 <div class="flex gap-2 mb-2">
@@ -117,7 +96,7 @@
             <header class="md:hidden flex items-center justify-between p-6 bg-[#F8FAFC]/90 backdrop-blur-md sticky top-0 z-40">
                 <div>
                     <h1 class="text-2xl font-extrabold text-slate-900" id="greeting">Hello!</h1>
-                    <p class="text-slate-500 text-sm font-medium">Financial Command Center</p>
+                    <p class="text-slate-500 text-sm font-medium">Financial Command</p>
                 </div>
                 <div class="flex gap-2">
                     <button onclick="togglePrivacy()" id="mob-btn-privacy" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-eye"></i></button>
@@ -132,14 +111,6 @@
             <div class="p-4 md:p-0 max-w-6xl mx-auto">
                 
                 <div id="view-dashboard" class="view-section space-y-6">
-                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div>
-                        <div>
-                            <h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4>
-                            <p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p>
-                        </div>
-                    </div>
-
                     <div class="relative overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-2xl shadow-slate-200/50 p-8">
                         <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600 opacity-20 rounded-full blur-3xl"></div>
                         <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-emerald-500 opacity-10 rounded-full blur-3xl"></div>
@@ -163,6 +134,14 @@
                         <div class="flex justify-between mt-2 text-xs font-bold text-slate-400">
                             <span class="money-val" id="burn-expense">Exp: 0</span>
                             <span class="money-val" id="burn-income">Inc: 0</span>
+                        </div>
+                    </div>
+
+                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]">
+                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div>
+                        <div>
+                            <h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4>
+                            <p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p>
                         </div>
                     </div>
 
@@ -302,8 +281,8 @@
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
             <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-calendar-alt text-xl"></i></button>
             <div class="relative -top-10"><button onclick="openTxModal()" class="w-16 h-16 bg-indigo-600 rounded-[22px] flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button></div>
-            <button onclick="router('planning')" id="m-nav-planning" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-compass text-xl"></i></button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
+            <button onclick="router('planning')" id="m-nav-planning" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-compass text-xl"></i></button>
         </div>
     </nav>
 
@@ -424,6 +403,41 @@
 
         function render() {
             if(!state) return;
+            // ENSURE LISTS RENDER FIRST (The Fix)
+            const ac=document.getElementById('accounts-container'); 
+            if(ac) { 
+                const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] }; 
+                ac.innerHTML = '';
+                let hasAccounts = false;
+                for(const[name,types] of Object.entries(groups)){ 
+                    const items=state.accounts.filter(a=>Array.isArray(types)?types.includes(a.type):a.type===types); 
+                    if(items.length){ 
+                        hasAccounts = true;
+                        let h=`<div class="neo-card p-5 mb-4"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">${name}</h4><div class="space-y-4">`; 
+                        items.forEach(i=>{ let sub=i.emi?`<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-full inline-block mt-1">EMI: ${money(i.emi)}</div>`:''; if(i.startDate) sub += ` <span class="text-[10px] text-slate-400 ml-1">Since: ${formatDateIN(i.startDate)}</span>`; h+=`<div class="flex justify-between items-center group"><div><div class="font-bold text-slate-800">${i.name}</div>${sub}</div><div class="flex items-center gap-3"><span class="font-bold text-slate-900">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition"><i class="fas fa-trash"></i></button></div></div>`; }); 
+                        ac.innerHTML+=h+`</div></div>`; 
+                    } 
+                }
+                if(!hasAccounts) ac.innerHTML = '<div class="text-center text-slate-400 py-10">No accounts yet. Click + to add one.</div>';
+            }
+
+            const tc=document.getElementById('full-tx-list'); 
+            if(tc) { 
+                tc.innerHTML=''; 
+                const term=document.getElementById('tx-search') ? document.getElementById('tx-search').value.toLowerCase() : ''; 
+                const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term)); 
+                if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`; 
+                else { 
+                    let lastDate = null; 
+                    filteredTx.forEach(t => { 
+                        const isInc=t.type==='income'; const isTrf=t.type==='transfer'; const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); let dateStr = formatDateIN(t.date); if(txDate.toDateString() === today.toDateString()) dateStr = "Today"; else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday"; else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); 
+                        if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; } 
+                        let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'; let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900'; let sign = isTrf ? '' : isInc ? '+' : '-'; let icon = getCategoryIcon(t.cat); let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName; 
+                        tc.innerHTML+=`<div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="flex items-center gap-2 mt-0.5"><div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div><span class="text-[10px] text-slate-400 font-medium">${subText}</span></div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span><button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button></div></div>`; 
+                    }); 
+                } 
+            }
+
             updateAccountSelect();
             ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
 

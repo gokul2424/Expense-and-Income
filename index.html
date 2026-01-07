@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Pro</title>
+    <title>Cash Flow | Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -13,67 +13,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        :root { 
-            --bg-body: #F8FAFC;       /* Slate 50 */
-            --primary: #4F46E5;       /* Indigo 600 */
-            --primary-soft: #EEF2FF;  /* Indigo 50 */
-        }
-
-        body { 
-            font-family: 'Plus Jakarta Sans', sans-serif; 
-            background-color: var(--bg-body); 
-            color: #1E293B; 
-            -webkit-tap-highlight-color: transparent; 
-        }
+        :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
         
-        /* Modern Cards */
-        .neo-card { 
-            background: white; 
-            border-radius: 24px; 
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            border: 1px solid #F1F5F9;
-            transition: transform 0.2s ease;
-        }
-
-        /* Inputs */
-        .neo-input {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 16px;
-            padding: 16px;
-            font-weight: 600;
-            color: #0F172A;
-            width: 100%;
-            transition: all 0.2s;
-            outline: none;
-        }
-        .neo-input:focus {
-            background: white;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 4px var(--primary-soft);
-        }
+        /* Modern UI Elements */
+        .neo-card { background: white; border-radius: 24px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
+        .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 16px; padding: 16px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; }
+        .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
 
         /* View Transitions */
-        .view-section { display: none; padding-bottom: 140px; } /* Added padding for mobile dock */
+        .view-section { display: none; padding-bottom: 140px; }
         .view-section.active { display: block; animation: fadeIn 0.3s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Mobile Nav Dock */
-        .nav-dock {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.5);
-            box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1);
-            border-radius: 24px;
-            margin: 0 16px 16px 16px;
-        }
-        
+        /* Navigation */
+        .nav-dock { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.5); box-shadow: 0 10px 40px -10px rgba(0,0,0,0.1); border-radius: 24px; margin: 0 16px 16px 16px; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
-        .nav-item { transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-
-        /* Desktop Nav */
-        .desktop-nav-item { border-radius: 12px; margin-bottom: 8px; color: #64748B; font-weight: 600; transition: all 0.2s; }
-        .desktop-nav-item:hover { background: white; color: #334155; box-shadow: 0 2px 5px rgba(0,0,0,0.02); }
+        .desktop-nav-item:hover { background: white; color: #334155; }
         .desktop-nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
 
         /* Scrollbar */
@@ -81,26 +37,12 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 3px; }
         
-        /* Filter Buttons */
-        .filter-btn { padding: 6px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; transition: all 0.2s; }
-        .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); transform: scale(1.05); }
-        .filter-btn.inactive { color: #94A3B8; }
-        .filter-btn.inactive:hover { color: #64748B; }
-
-        /* Date Header for Transactions */
-        .date-header {
-            position: sticky;
-            top: 0;
-            background: rgba(248, 250, 252, 0.95);
-            backdrop-filter: blur(5px);
-            z-index: 10;
-            padding: 12px 0;
-            font-size: 12px;
-            font-weight: 700;
-            color: #64748B;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+        /* Headers */
+        .date-header { position: sticky; top: 0; background: rgba(248, 250, 252, 0.95); backdrop-filter: blur(5px); z-index: 10; padding: 12px 0; font-size: 11px; font-weight: 800; color: #94A3B8; text-transform: uppercase; letter-spacing: 0.05em; }
+        
+        /* Burn Rate Meter */
+        .meter-container { height: 8px; background: #F1F5F9; border-radius: 99px; overflow: hidden; position: relative; }
+        .meter-fill { height: 100%; border-radius: 99px; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden bg-slate-50 text-slate-800">
@@ -108,10 +50,10 @@
     <div id="auth-overlay" class="fixed inset-0 z-50 bg-white/80 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-opacity duration-300">
         <div class="bg-white p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl shadow-indigo-200 rotate-3">
-                <i class="fas fa-wave-square text-white text-4xl"></i>
+                <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-10 font-medium">Master your financial life.</p>
+            <p class="text-slate-500 mb-10 font-medium">Financial Clarity.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -122,16 +64,16 @@
     <aside class="hidden md:flex flex-col w-72 bg-[#F8FAFC] border-r border-slate-200/60 z-20">
         <div class="p-8">
             <div class="flex items-center gap-3 text-2xl font-bold text-slate-900">
-                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-200"><i class="fas fa-wave-square"></i></div>
+                <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white text-lg shadow-lg shadow-indigo-200"><i class="fas fa-wallet"></i></div>
                 Cash Flow
             </div>
         </div>
         <nav class="flex-1 px-6 space-y-1">
-            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-home w-5"></i> Home</button>
-            <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
-            <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
-            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-wallet w-5"></i> Accounts</button>
-            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4"><i class="fas fa-list-ul w-5"></i> Activity</button>
+            <button onclick="router('dashboard')" id="d-nav-dashboard" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-home w-5"></i> Home</button>
+            <button onclick="router('analysis')" id="d-nav-analysis" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-pie w-5"></i> Analysis</button>
+            <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
+            <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
+            <button onclick="router('transactions')" id="d-nav-transactions" class="desktop-nav-item w-full flex items-center px-4 py-3.5 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
         </nav>
         <div class="p-6">
             <div class="bg-white p-4 rounded-3xl shadow-sm border border-slate-100">
@@ -139,7 +81,7 @@
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Pro Account</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Premium</div>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
@@ -158,8 +100,8 @@
             </div>
             <div class="flex gap-2">
                 <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 relative">
-                    <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute"></div>
-                    <i class="fas fa-cloud text-slate-300 text-xs"></i>
+                    <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute top-0 right-0 m-1"></div>
+                    <i class="fas fa-cloud text-slate-400 text-xs"></i>
                 </div>
                 <button onclick="exportCSV()" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-file-csv text-sm"></i></button>
                 <button id="mob-btn-logout" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-rose-500"><i class="fas fa-power-off text-sm"></i></button>
@@ -168,44 +110,60 @@
 
         <div id="view-dashboard" class="view-section flex-1 overflow-y-auto p-6 md:p-10 scroll-smooth">
             <div class="max-w-6xl mx-auto space-y-8">
-                <div class="relative overflow-hidden rounded-[32px] bg-indigo-600 text-white shadow-xl shadow-indigo-200/50 p-8 transition-all hover:scale-[1.01] duration-300">
-                    <div class="absolute -top-24 -right-24 w-72 h-72 bg-white opacity-10 rounded-full blur-3xl"></div>
-                    <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-purple-500 opacity-30 rounded-full blur-3xl"></div>
+                <div class="relative overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-2xl shadow-slate-200 p-8">
+                    <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600 opacity-20 rounded-full blur-3xl"></div>
+                    <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-emerald-500 opacity-10 rounded-full blur-3xl"></div>
                     <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
                         <div>
-                            <div class="flex items-center gap-2 text-indigo-100 text-sm font-bold mb-2 uppercase tracking-wider opacity-80">
+                            <div class="flex items-center gap-2 text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider">
                                 <i class="fas fa-shield-alt"></i> Total Net Worth
                             </div>
                             <div class="text-4xl md:text-6xl font-extrabold tracking-tight" id="dash-networth">...</div>
                         </div>
                         <div class="flex gap-3">
-                            <button onclick="openModal('txModal')" class="bg-white/10 backdrop-blur-md border border-white/20 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-white hover:text-indigo-600 transition shadow-lg flex items-center gap-2">
-                                <i class="fas fa-plus"></i> Add Transaction
+                            <button onclick="openTxModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition shadow-lg shadow-indigo-900/50 flex items-center gap-2">
+                                <i class="fas fa-plus"></i> Add Tx
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <div class="neo-card p-6 md:px-8">
+                    <div class="flex justify-between items-end mb-3">
+                        <div>
+                            <h3 class="font-bold text-slate-900">Monthly Burn Rate</h3>
+                            <p class="text-xs text-slate-500">Expenses vs Income (This Month)</p>
+                        </div>
+                        <div class="text-right">
+                            <div id="burn-percent" class="text-2xl font-bold text-slate-900">0%</div>
+                        </div>
+                    </div>
+                    <div class="meter-container">
+                        <div id="burn-bar" class="meter-fill bg-indigo-600" style="width: 0%"></div>
+                    </div>
+                    <div class="flex justify-between mt-2 text-xs font-bold text-slate-400">
+                        <span id="burn-expense">Exp: 0</span>
+                        <span id="burn-income">Inc: 0</span>
                     </div>
                 </div>
                 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="neo-card p-6 flex flex-col justify-center group hover:border-emerald-200 transition">
-                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl group-hover:scale-110 transition"><i class="fas fa-arrow-up rotate-45"></i></div>
-                        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Assets</div>
+                        <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div>
+                        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div>
                         <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1" id="dash-assets">...</div>
                     </div>
                     <div class="neo-card p-6 flex flex-col justify-center group hover:border-rose-200 transition">
-                        <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl group-hover:scale-110 transition"><i class="fas fa-arrow-down rotate-45"></i></div>
-                        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Total Liabilities</div>
+                        <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div>
+                        <div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div>
                         <div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1" id="dash-debts">...</div>
                     </div>
                 </div>
 
                 <div class="neo-card p-6 md:p-8">
                     <div class="flex justify-between items-center mb-6">
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-xl">Growth Trend</h3>
-                            <p class="text-slate-400 text-sm font-medium">Net Worth History</p>
-                        </div>
-                        <span class="bg-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-xs font-bold">Past Year</span>
+                        <div><h3 class="font-bold text-slate-900 text-xl">Growth</h3></div>
+                        <span class="bg-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-xs font-bold">1 Year</span>
                     </div>
                     <div class="chart-wrapper p-2" style="height: 250px;"><canvas id="mainChart"></canvas></div>
                 </div>
@@ -215,31 +173,26 @@
         <div id="view-analysis" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
                 <div class="flex justify-between items-center">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Analysis</h2><p class="text-slate-500 font-medium">Cash flow & Allocation</p></div>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Analysis</h2><p class="text-slate-500 font-medium">Flows & Allocation</p></div>
                 </div>
-
                 <div class="neo-card p-8 border-indigo-100 border-2">
                     <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                        <div>
-                            <h3 class="font-bold text-slate-900 text-lg flex items-center gap-2"><i class="fas fa-project-diagram text-indigo-500"></i> Money Flow</h3>
-                            <p class="text-xs text-slate-400 mt-1">Visualize where your money goes</p>
-                        </div>
+                        <div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div>
                         <div class="flex bg-slate-100 rounded-xl p-1 gap-1">
-                            <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">Month</button>
-                            <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6 Months</button>
-                            <button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">Year</button>
+                            <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button>
+                            <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button>
+                            <button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button>
                         </div>
                     </div>
                     <div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div>
                 </div>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="neo-card p-6">
                         <h3 class="font-bold text-slate-900 text-lg mb-6">Monthly Trend</h3>
                         <div class="chart-wrapper" style="height: 250px;"><canvas id="monthlyBarChart"></canvas></div>
                     </div>
                     <div class="neo-card p-6">
-                        <h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3>
+                        <h3 class="font-bold text-slate-900 text-lg mb-6">Allocation</h3>
                         <div class="flex items-center justify-center">
                             <div style="height: 200px; width: 200px;"><canvas id="assetPieChart"></canvas></div>
                             <div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div>
@@ -251,32 +204,25 @@
 
         <div id="view-debts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-6xl mx-auto space-y-8">
-                <div class="flex justify-between items-center">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Debt Intel</h2><p class="text-slate-500 font-medium">Liability Tracking & Payoff</p></div>
-                </div>
-
+                <div><h2 class="text-3xl font-extrabold text-slate-900">Debts</h2><p class="text-slate-500 font-medium">Liability Tracking</p></div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div class="neo-card p-6">
                         <h3 class="font-bold text-slate-900 text-lg mb-1">True Cost</h3>
-                        <p class="text-xs text-slate-500 mb-6">Principal vs Future Interest Payable</p>
                         <div class="chart-wrapper" style="height: 250px;"><canvas id="debtSplitChart"></canvas></div>
                     </div>
                     <div class="neo-card p-6">
                         <h3 class="font-bold text-slate-900 text-lg mb-1">Composition</h3>
-                        <p class="text-xs text-slate-500 mb-6">Distribution by Loan Source</p>
                         <div class="chart-wrapper" style="height: 250px;"><canvas id="debtPieChart"></canvas></div>
                     </div>
                 </div>
-
-                <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    </div>
+                <div id="debt-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </div>
         </div>
 
         <div id="view-accounts" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-4xl mx-auto">
                 <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur z-10 py-2">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2><p class="text-slate-500 font-medium">Assets & Liabilities</p></div>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2><p class="text-slate-500 font-medium">Net Worth Components</p></div>
                     <button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl hover:scale-105 transition-transform"><i class="fas fa-plus"></i></button>
                 </div>
                 <div id="accounts-container" class="space-y-6"></div>
@@ -286,8 +232,8 @@
         <div id="view-transactions" class="view-section flex-1 overflow-y-auto p-6 md:p-10">
             <div class="max-w-4xl mx-auto h-full flex flex-col">
                 <div class="flex justify-between items-center mb-8">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2><p class="text-slate-500 font-medium">History Log</p></div>
-                    <button onclick="openModal('txModal')" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl hover:scale-105 transition-transform"><i class="fas fa-plus"></i></button>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2><p class="text-slate-500 font-medium">Tap to Edit</p></div>
+                    <button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl hover:scale-105 transition-transform"><i class="fas fa-plus"></i></button>
                 </div>
                 <div class="neo-card flex-1 flex flex-col overflow-hidden border-0 shadow-none bg-transparent md:bg-white md:shadow-lg md:border">
                     <div class="p-4 md:border-b border-slate-100 bg-white rounded-2xl md:rounded-none mb-4 md:mb-0 shadow-sm md:shadow-none">
@@ -307,7 +253,7 @@
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-home text-xl"></i></button>
             <button onclick="router('analysis')" id="m-nav-analysis" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-chart-pie text-xl"></i></button>
             <div class="relative -top-10">
-                <button onclick="openModal('txModal')" class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 hover:scale-105 transition-transform border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button>
+                <button onclick="openTxModal()" class="w-16 h-16 bg-indigo-600 rounded-2xl flex items-center justify-center text-white text-2xl shadow-xl shadow-indigo-300 hover:scale-105 transition-transform border-[6px] border-[#F8FAFC]"><i class="fas fa-plus"></i></button>
             </div>
             <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-receipt text-xl"></i></button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 text-slate-400"><i class="fas fa-wallet text-xl"></i></button>
@@ -321,20 +267,11 @@
                 <input type="text" id="accName" required class="neo-input" placeholder="Account Name (e.g. HDFC)">
                 <input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Current Balance">
                 <div class="relative">
-                    <select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none cursor-pointer">
-                        <option value="cash">Cash / Bank</option>
-                        <option value="investment">Investment</option>
-                        <option value="property">Property</option>
-                        <option value="credit">Credit Card (Debt)</option>
-                        <option value="loan">Loan (Debt)</option>
-                    </select>
+                    <select id="accType" onchange="toggleDebtFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment</option><option value="property">Property</option><option value="credit">Credit Card (Debt)</option><option value="loan">Loan (Debt)</option></select>
                     <i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i>
                 </div>
                 <div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100">
-                    <div class="col-span-2">
-                        <label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Start Date</label>
-                        <input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm text-slate-600">
-                    </div>
+                    <div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm text-slate-600"></div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Interest %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm" placeholder="8.5"></div>
                     <div><label class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm" placeholder="60"></div>
                     <div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div>
@@ -349,35 +286,40 @@
 
     <div id="txModal" class="fixed inset-0 z-50 hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4 transition-all">
         <div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl animate-[slideUp_0.3s_ease-out] max-h-[90vh] overflow-y-auto">
-            <h3 class="text-2xl font-bold text-slate-900 mb-6">Log Transaction</h3>
-            <form onsubmit="addTransaction(event)" class="space-y-5">
-                <input type="text" id="txDesc" required class="neo-input" placeholder="Description (e.g. Grocery)">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6" id="txModalTitle">Transaction</h3>
+            <form onsubmit="saveTransaction(event)" class="space-y-5">
+                <input type="hidden" id="txId"> <input type="text" id="txDesc" required class="neo-input" placeholder="Description (e.g. Grocery)">
                 <div class="grid grid-cols-2 gap-4">
                     <input type="number" step="1" id="txAmount" required class="neo-input" placeholder="0.00">
                     <input type="date" id="txDate" required class="neo-input text-slate-500 p-3">
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="relative">
-                        <select id="txType" class="neo-input appearance-none"><option value="expense">Expense</option><option value="income">Income</option></select>
+                        <select id="txType" onchange="toggleTxFields()" class="neo-input appearance-none">
+                            <option value="expense">Expense</option>
+                            <option value="income">Income</option>
+                            <option value="transfer">Transfer</option>
+                        </select>
                         <i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i>
                     </div>
                     <div class="relative">
                         <select id="txCat" class="neo-input appearance-none">
-                            <optgroup label="Income">
-                                <option value="Salary">Salary</option><option value="Freelance">Freelance</option><option value="Business">Business</option><option value="Other Income">Other Income</option>
-                            </optgroup>
-                            <optgroup label="Expenses">
-                                <option value="Food & Dining">Food & Dining</option><option value="Housing">Housing</option><option value="Transportation">Transportation</option><option value="Shopping">Shopping</option><option value="Entertainment">Entertainment</option><option value="Health">Health</option><option value="EMI/Debt">EMI/Debt</option><option value="Misc">Misc</option>
-                            </optgroup>
+                            <optgroup label="Common"><option value="Food & Dining">Food</option><option value="Transport">Transport</option><option value="Shopping">Shopping</option></optgroup>
+                            <optgroup label="Bills"><option value="Housing">Housing</option><option value="Utilities">Utilities</option><option value="EMI">EMI</option></optgroup>
+                            <optgroup label="Income"><option value="Salary">Salary</option><option value="Business">Business</option></optgroup>
+                            <optgroup label="Other"><option value="Transfer">Transfer</option><option value="Misc">Misc</option></optgroup>
                         </select>
                         <i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i>
                     </div>
                 </div>
-                <div>
-                    <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block">Source / Destination Account</label>
-                    <div class="relative">
-                        <select id="txAccount" required class="neo-input appearance-none"></select>
-                        <i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block" id="lbl-from-acc">Account</label>
+                        <div class="relative"><select id="txAccount" required class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i></div>
+                    </div>
+                    <div id="div-to-acc" class="hidden">
+                        <label class="text-[10px] text-slate-400 font-bold uppercase tracking-wider ml-2 mb-1 block">To Account</label>
+                        <div class="relative"><select id="txToAccount" class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400 pointer-events-none"></i></div>
                     </div>
                 </div>
                 <div class="flex gap-4 pt-4">
@@ -393,13 +335,10 @@
         import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // --- USER CONFIGURATION ---
-        const config = {
-            currency: 'INR', // Change to 'USD', 'EUR', etc.
-            locale: 'en-IN'  // Change to 'en-US' for Dollar formatting
-        };
+        // --- USER CONFIG ---
+        const config = { currency: 'INR', locale: 'en-IN' };
 
-        // --- FIREBASE CONFIG (REPLACE WITH YOUR KEYS) ---
+        // --- FIREBASE CONFIG (INSERT YOUR KEYS HERE) ---
         const firebaseConfig = {
             apiKey: "AIzaSyDVCcds_UxopRp6Vw3vL0YYzr9IjIjR6Lc",
             authDomain: "expense-and-income-faf13.firebaseapp.com",
@@ -422,8 +361,8 @@
 
         // --- AUTH ---
         document.getElementById('btn-login').onclick = async () => { els.status.innerText = "Connecting..."; try { await signInWithPopup(auth, provider); } catch(e) { els.status.innerText = e.message; } };
-        document.getElementById('btn-logout').onclick = () => signOut(auth);
-        if(document.getElementById('mob-btn-logout')) document.getElementById('mob-btn-logout').onclick = () => signOut(auth);
+        document.getElementById('btn-logout').onclick = () => { if(confirm("Sign out?")) signOut(auth); };
+        if(document.getElementById('mob-btn-logout')) document.getElementById('mob-btn-logout').onclick = () => { if(confirm("Sign out?")) signOut(auth); };
 
         onAuthStateChanged(auth, (user) => {
             if(user) { currentUser = user; els.overlay.classList.add('hidden', 'opacity-0'); setTimeout(()=>els.overlay.classList.add('hidden'),300); els.name.innerText = user.displayName; els.avatar.src = user.photoURL; els.avatar.classList.remove('hidden'); initSync(); setGreeting(); } 
@@ -436,7 +375,7 @@
             if(document.getElementById('greeting')) document.getElementById('greeting').innerText = g;
         }
 
-        // --- DATABASE ---
+        // --- DB ---
         function initSync() {
             onSnapshot(doc(db, "users", currentUser.uid), (doc) => {
                 if(doc.exists()) { state = doc.data(); render(); const ind=document.getElementById('mob-sync-status'); if(ind){ind.classList.remove('bg-emerald-500'); ind.classList.add('bg-white','animate-ping'); setTimeout(()=>{ind.classList.remove('bg-white','animate-ping');ind.classList.add('bg-emerald-500');},500);} } else { save(); }
@@ -449,21 +388,29 @@
         const formatDateIN = (d) => { if(!d) return ''; const [y,m,dd] = d.split('-'); return `${dd}/${m}/${y}`; };
         
         window.exportCSV = () => {
-            if(!state.transactions.length) return alert("No transactions to export.");
-            const headers = ["Date", "Description", "Amount", "Type", "Category", "Account"];
-            const rows = state.transactions.map(t => [t.date, t.desc, t.amount, t.type, t.cat, t.accName].join(","));
+            if(!state.transactions.length) return alert("No transactions.");
+            const headers = ["Date", "Description", "Amount", "Type", "Category", "Account", "To Account"];
+            const rows = state.transactions.map(t => [t.date, t.desc, t.amount, t.type, t.cat, t.accName, t.toAccName||''].join(","));
             const csvContent = "data:text/csv;charset=utf-8," + [headers.join(","), ...rows].join("\n");
-            const encodedUri = encodeURI(csvContent);
-            const link = document.createElement("a");
-            link.setAttribute("href", encodedUri);
-            link.setAttribute("download", `cashflow_export_${new Date().toISOString().slice(0,10)}.csv`);
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            const link = document.createElement("a"); link.setAttribute("href", encodeURI(csvContent)); link.setAttribute("download", `cashflow_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
         };
 
-        // --- CORE LOGIC ---
+        const getCategoryIcon = (cat) => {
+            const map = { 'Food & Dining':'utensils', 'Transport':'car', 'Shopping':'bag-shopping', 'Housing':'house', 'Utilities':'bolt', 'EMI':'file-invoice', 'Salary':'money-bill-wave', 'Business':'briefcase', 'Transfer':'right-left', 'Misc':'layer-group' };
+            return map[cat] || 'circle';
+        }
+
+        // --- LOGIC ---
         window.toggleDebtFields = () => { const t=document.getElementById('accType').value; const f=document.getElementById('debt-fields'); if(['loan','credit'].includes(t)) f.classList.remove('hidden'); else f.classList.add('hidden'); };
+        window.toggleTxFields = () => {
+            const t = document.getElementById('txType').value;
+            const to = document.getElementById('div-to-acc');
+            const lbl = document.getElementById('lbl-from-acc');
+            if(t === 'transfer') { to.classList.remove('hidden'); lbl.innerText = "From Account"; } 
+            else { to.classList.add('hidden'); lbl.innerText = "Account"; }
+        };
+
         function calculateEMI(p, r, n) { if(!p||!r||!n) return 0; const rm = r/12/100; return Math.round(p * rm * (Math.pow(1+rm, n) / (Math.pow(1+rm, n)-1))); }
         ['accBalance','accRoi','accTenure'].forEach(id => { document.getElementById(id).addEventListener('input', () => { const p = parseFloat(document.getElementById('accBalance').value)||0, r = parseFloat(document.getElementById('accRoi').value)||0, n = parseFloat(document.getElementById('accTenure').value)||0; if(p&&r&&n) document.getElementById('emi-preview').innerText = `Estimated EMI: ${money(calculateEMI(p,r,n))}/mo`; }); });
 
@@ -473,109 +420,198 @@
             let emi = 0, roi = 0, tenure = 0, startDate = '';
             if(['loan','credit'].includes(type)) {
                 const p = parseFloat(document.getElementById('accBalance').value)||0; roi = parseFloat(document.getElementById('accRoi').value)||0; tenure = parseFloat(document.getElementById('accTenure').value)||0;
-                emi = calculateEMI(p, roi, tenure);
-                startDate = document.getElementById('accStartDate').value;
+                emi = calculateEMI(p, roi, tenure); startDate = document.getElementById('accStartDate').value;
             }
             state.accounts.push({ id: Date.now(), name: document.getElementById('accName').value, balance: parseFloat(document.getElementById('accBalance').value), type, roi, tenure, emi, startDate });
             save(); closeModal('accountModal'); e.target.reset(); document.getElementById('debt-fields').classList.add('hidden');
         };
 
-        window.addTransaction = (e) => {
+        // OPEN MODAL FOR ADD
+        window.openTxModal = () => {
+            document.getElementById('txModalTitle').innerText = "New Transaction";
+            document.getElementById('txId').value = ""; // Clear ID
+            document.getElementById('txDesc').value = "";
+            document.getElementById('txAmount').value = "";
+            document.getElementById('txDate').valueAsDate = new Date();
+            openModal('txModal');
+        };
+
+        // OPEN MODAL FOR EDIT
+        window.editTransaction = (id) => {
+            const tx = state.transactions.find(t => t.id === id);
+            if(!tx) return;
+            document.getElementById('txModalTitle').innerText = "Edit Transaction";
+            document.getElementById('txId').value = tx.id;
+            document.getElementById('txDesc').value = tx.desc;
+            document.getElementById('txAmount').value = tx.amount;
+            document.getElementById('txDate').value = tx.date;
+            document.getElementById('txType').value = tx.type;
+            document.getElementById('txCat').value = tx.cat;
+            
+            // Populating Accounts needs a slight timeout to ensure render options exist, but here we just set value
+            // We assume account list is consistent. 
+            // NOTE: If account was deleted, this might fail visually, but logic handles it.
+            updateAccountSelect(); // Ensure selects are populated
+            document.getElementById('txAccount').value = tx.accId || "";
+            if(tx.type === 'transfer') {
+                document.getElementById('txToAccount').value = tx.toAccId || "";
+            }
+            
+            toggleTxFields();
+            openModal('txModal');
+        };
+
+        window.saveTransaction = (e) => {
             e.preventDefault();
+            const id = document.getElementById('txId').value;
+            const isEdit = !!id;
             const amount = parseFloat(document.getElementById('txAmount').value);
             const type = document.getElementById('txType').value;
             const accId = parseFloat(document.getElementById('txAccount').value);
-            const accIndex = state.accounts.findIndex(a => a.id === accId);
-            if(accIndex !== -1) {
-                const acc = state.accounts[accIndex];
-                if (type === 'income') { if(['credit', 'loan'].includes(acc.type)) acc.balance -= amount; else acc.balance += amount; }
-                else { if(['credit', 'loan'].includes(acc.type)) acc.balance += amount; else acc.balance -= amount; }
-                state.transactions.unshift({ id: Date.now(), desc: document.getElementById('txDesc').value, amount: amount, date: document.getElementById('txDate').value, type: type, cat: document.getElementById('txCat').value, accName: acc.name });
-                save(); closeModal('txModal'); e.target.reset(); document.getElementById('txDate').valueAsDate=new Date();
+            const toAccId = type === 'transfer' ? parseFloat(document.getElementById('txToAccount').value) : null;
+
+            // Helper to modify balance
+            const modifyBalance = (aId, amt, direction) => { // direction: 1 = add, -1 = subtract
+                const a = state.accounts.find(x => x.id === aId);
+                if(a) {
+                    // Logic: Asset (Cash/Inv) -> Add increases, Sub decreases. Debt (Credit/Loan) -> Add decreases (payment), Sub increases (spending)
+                    const isDebt = ['credit','loan'].includes(a.type);
+                    if(!isDebt) a.balance += (amt * direction);
+                    else a.balance -= (amt * direction); // For debt, adding money (payment) reduces balance
+                }
+                return a ? a.name : 'Unknown';
+            };
+            
+            // If Edit: Reverse old transaction effect first
+            if(isEdit) {
+                const oldTx = state.transactions.find(t => t.id == id);
+                if(oldTx) {
+                    if(oldTx.type === 'income') modifyBalance(oldTx.accId, oldTx.amount, -1);
+                    else if(oldTx.type === 'expense') modifyBalance(oldTx.accId, oldTx.amount, 1);
+                    else if(oldTx.type === 'transfer') {
+                        modifyBalance(oldTx.accId, oldTx.amount, 1); // Add back to source
+                        modifyBalance(oldTx.toAccId, oldTx.amount, -1); // Remove from dest
+                    }
+                    // Remove old tx from array temporarily (will push new one)
+                    state.transactions = state.transactions.filter(t => t.id != id);
+                }
             }
+
+            // Apply New Transaction
+            let accName = '', toAccName = '';
+            if(type === 'income') accName = modifyBalance(accId, amount, 1);
+            else if(type === 'expense') accName = modifyBalance(accId, amount, -1);
+            else if(type === 'transfer') {
+                accName = modifyBalance(accId, amount, -1); // Subtract from source
+                toAccName = modifyBalance(toAccId, amount, 1); // Add to dest
+            }
+
+            const newTx = {
+                id: isEdit ? parseFloat(id) : Date.now(),
+                desc: document.getElementById('txDesc').value,
+                amount: amount,
+                date: document.getElementById('txDate').value,
+                type: type,
+                cat: document.getElementById('txCat').value,
+                accId: accId,
+                accName: accName,
+                toAccId: toAccId,
+                toAccName: toAccName
+            };
+
+            // Insert sorted (simple unshift for now, real sort in render)
+            state.transactions.unshift(newTx);
+            state.transactions.sort((a,b) => new Date(b.date) - new Date(a.date));
+
+            save(); closeModal('txModal'); e.target.reset();
         };
 
-        window.deleteItem = (list, id) => { if(confirm('Delete this item?')) { state[list] = state[list].filter(i=>i.id!==id); save(); } };
+        window.deleteItem = (list, id) => { 
+            if(confirm('Delete this item?')) {
+                if(list === 'transactions') {
+                    // Reverse Balance logic
+                    const t = state.transactions.find(x => x.id === id);
+                    if(t) {
+                        const a = state.accounts.find(x => x.id === t.accId);
+                        if(a) {
+                            const isDebt = ['credit','loan'].includes(a.type);
+                            if(t.type === 'income') a.balance -= t.amount * (isDebt?-1:1); 
+                            else if(t.type === 'expense') a.balance += t.amount * (isDebt?-1:1);
+                            else if(t.type === 'transfer') {
+                                a.balance += t.amount * (isDebt?-1:1);
+                                const dest = state.accounts.find(x => x.id === t.toAccId);
+                                if(dest) dest.balance -= t.amount * (['credit','loan'].includes(dest.type)?-1:1);
+                            }
+                        }
+                    }
+                }
+                state[list] = state[list].filter(i=>i.id!==id); save(); 
+            } 
+        };
         window.setAnalysisRange = (range) => { analysisRange = range; render(); };
 
         function updateAccountSelect() {
-            const select = document.getElementById('txAccount'); select.innerHTML = '';
-            const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type));
-            const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type));
-            if(assets.length) { const g=document.createElement('optgroup'); g.label="Assets"; assets.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.innerText=`${a.name} (${money(a.balance)})`;g.appendChild(o);}); select.appendChild(g); }
-            if(debts.length) { const g=document.createElement('optgroup'); g.label="Credit"; debts.forEach(a=>{const o=document.createElement('option');o.value=a.id;o.innerText=`${a.name} (Due: ${money(a.balance)})`;g.appendChild(o);}); select.appendChild(g); }
+            const select = document.getElementById('txAccount'); 
+            const toSelect = document.getElementById('txToAccount');
+            const genOpts = () => {
+                let html = '';
+                const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type));
+                const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type));
+                if(assets.length) { html+=`<optgroup label="Assets">`+assets.map(a=>`<option value="${a.id}">${a.name} (${money(a.balance)})</option>`).join('')+`</optgroup>`; }
+                if(debts.length) { html+=`<optgroup label="Credit/Loan">`+debts.map(a=>`<option value="${a.id}">${a.name} (Due: ${money(a.balance)})</option>`).join('')+`</optgroup>`; }
+                return html;
+            };
+            const h = genOpts(); select.innerHTML = h; toSelect.innerHTML = h;
         }
 
         // --- RENDER ---
         function render() {
             updateAccountSelect();
-            ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(r===analysisRange) btn.className="filter-btn active"; else btn.className="filter-btn inactive"; });
+            ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
 
             let assets=0, debts=0, totalScheduledEMI=0;
             let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
-            let totalDebtPrincipal = 0, totalEstimatedInterest = 0, debtCompositionLabels = [], debtCompositionData = [], debtListHTML = "";
+            let totalDebtPrincipal=0, totalEstimatedInterest=0, debtCompositionLabels=[], debtCompositionData=[], debtListHTML="";
 
             state.accounts.forEach(a => { 
                 if(['cash','investment','property'].includes(a.type)) { 
                     assets+=a.balance; 
-                    if(a.type==='cash') assetMap['Cash']+=a.balance; 
-                    if(a.type==='investment') assetMap['Investments']+=a.balance; 
-                    if(a.type==='property') assetMap['Property']+=a.balance; 
-                } 
-                else { 
-                    debts+=a.balance; 
-                    totalDebtPrincipal += a.balance;
-                    
+                    if(a.type==='cash') assetMap['Cash']+=a.balance; if(a.type==='investment') assetMap['Investments']+=a.balance; if(a.type==='property') assetMap['Property']+=a.balance; 
+                } else { 
+                    debts+=a.balance; totalDebtPrincipal += a.balance;
                     if(a.emi) {
                         totalScheduledEMI+=a.emi;
+                        // Detailed Debt Logic
                         let monthsElapsed = 0;
-                        if(a.startDate) {
-                            const start = new Date(a.startDate); const now = new Date();
-                            monthsElapsed = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-                        }
+                        if(a.startDate) { const start = new Date(a.startDate); const now = new Date(); monthsElapsed = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()); }
                         const remainingTenure = Math.max(0, (a.tenure || 0) - monthsElapsed);
                         const totalRemainingPayable = a.emi * remainingTenure;
-                        const interestComponent = Math.max(0, totalRemainingPayable - a.balance);
-                        totalEstimatedInterest += interestComponent;
-                        
+                        totalEstimatedInterest += Math.max(0, totalRemainingPayable - a.balance);
                         const payoffDate = new Date(); payoffDate.setMonth(payoffDate.getMonth() + remainingTenure);
                         const principalPercent = totalRemainingPayable > 0 ? (a.balance / totalRemainingPayable) * 100 : 0;
-                        const interestPercent = 100 - principalPercent;
-
-                        debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-rose-500 mb-3 hover:shadow-lg transition">
-                                <div class="flex justify-between items-start mb-2">
-                                    <div><h4 class="font-bold text-slate-900 text-lg">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div>
-                                    <div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Total Liability</div><div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div></div>
-                                </div>
-                                <div class="w-full bg-slate-100 h-3 rounded-full mt-3 mb-1 overflow-hidden flex">
-                                    <div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div>
-                                    <div class="bg-rose-400 h-full" style="width: ${interestPercent}%"></div>
-                                </div>
-                                <div class="flex justify-between text-[10px] text-slate-500 mb-4 font-medium">
-                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-indigo-500 rounded-full"></div> Principal: ${money(a.balance)}</span>
-                                    <span class="flex items-center gap-1"><div class="w-2 h-2 bg-rose-400 rounded-full"></div> Interest: ${money(totalRemainingPayable - a.balance)}</span>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4 pt-3 border-t border-slate-50 text-xs">
-                                    <div><span class="text-slate-400 block font-bold uppercase tracking-wider text-[10px]">Interest Rate</span><span class="font-bold text-slate-700 text-sm">${a.roi}%</span></div>
-                                    <div class="text-right"><span class="text-slate-400 block font-bold uppercase tracking-wider text-[10px]">Free Date</span><span class="font-bold text-emerald-600 text-sm">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div>
-                                </div>
-                            </div>`;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3 hover:shadow-lg transition"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${100-principalPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 mb-3"><span class="flex items-center gap-1">Principal: ${money(a.balance)}</span><span class="flex items-center gap-1">Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-xs"><div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700">${a.roi}%</span></div><div class="text-right"><span class="text-slate-400 block">Free Date</span><span class="font-bold text-emerald-600">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div></div></div>`;
                     } else {
-                        debtListHTML += `
-                            <div class="neo-card p-5 border-l-4 border-orange-400 mb-3 hover:shadow-lg transition">
-                                <div class="flex justify-between items-center"><h4 class="font-bold text-slate-900">${a.name}</h4><div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div></div>
-                                <div class="text-xs text-slate-400 mt-1 font-medium bg-slate-50 inline-block px-2 py-1 rounded">Revolving Credit / Untracked Loan</div>
-                            </div>`;
+                        debtListHTML += `<div class="neo-card p-5 border-l-4 border-orange-400 mb-3 hover:shadow-lg transition"><div class="flex justify-between items-center"><h4 class="font-bold text-slate-900">${a.name}</h4><div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div></div></div>`;
                     }
-                    debtCompositionLabels.push(a.name);
-                    debtCompositionData.push(a.balance);
+                    debtCompositionLabels.push(a.name); debtCompositionData.push(a.balance);
                 } 
             });
             const nw = assets - debts;
             els.nw.innerText = money(nw); els.as.innerText = money(assets); els.db.innerText = money(debts);
 
-            // Chart Logic
+            // BURN RATE METER logic
+            const now = new Date();
+            const thisMonthTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
+            const mInc = thisMonthTx.filter(t => t.type === 'income').reduce((a,b) => a+b.amount, 0);
+            const mExp = thisMonthTx.filter(t => t.type === 'expense').reduce((a,b) => a+b.amount, 0);
+            const burnPct = mInc > 0 ? Math.min(100, (mExp / mInc) * 100) : 0;
+            document.getElementById('burn-percent').innerText = `${burnPct.toFixed(0)}%`;
+            document.getElementById('burn-bar').style.width = `${burnPct}%`;
+            document.getElementById('burn-bar').className = `meter-fill ${burnPct < 50 ? 'bg-emerald-500' : burnPct < 80 ? 'bg-orange-400' : 'bg-rose-500'}`;
+            document.getElementById('burn-expense').innerText = `Out: ${money(mExp)}`;
+            document.getElementById('burn-income').innerText = `In: ${money(mInc)}`;
+
+            // CHARTS
             if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
             const ctx = document.getElementById('mainChart').getContext('2d');
             if(chartInst) chartInst.destroy();
@@ -593,26 +629,20 @@
                 const debtPieCtx = document.getElementById('debtPieChart').getContext('2d');
                 if(debtPieInst) debtPieInst.destroy();
                 debtPieInst = new Chart(debtPieCtx, { type: 'doughnut', data: { labels: debtCompositionLabels, datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } } });
-                document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="col-span-2 text-center text-slate-400 py-10 bg-white rounded-3xl border border-slate-100 border-dashed">No active debts found.</div>';
+                document.getElementById('debt-list-container').innerHTML = debtListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active debts found.</div>';
             }
 
-            // Sankey & Bar Logic
+            // --- SANKEY & BAR Logic (Exclude Transfers from Flow) ---
             const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear();
             const rangeMonths = analysisRange === '1Y' ? 11 : 5;
             for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
             
-            state.accounts.forEach(a => {
-                if(a.emi && a.emi > 0) {
-                    buckets.forEach(b => {
-                        const bucketDate = new Date(b.year, b.month, 1);
-                        const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1);
-                        if (bucketDate >= loanStart) b.expense += a.emi;
-                    });
-                }
-            });
+            // EMI to Buckets
+            state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });
 
             const flows={}; const WALLET="Wallet"; let si=0, so=0;
             state.transactions.forEach(tx=>{
+                if(tx.type === 'transfer') return; // Exclude transfers from income/expense analysis
                 const txDate=new Date(tx.date); 
                 const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear());
                 if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; }
@@ -627,6 +657,7 @@
                 }
             });
             
+            // EMI flow
             let totalSankeyEMI = 0;
             buckets.forEach(b => {
                 let inRange = false;
@@ -634,16 +665,9 @@
                 else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true;
                 else if(analysisRange === '1Y') inRange = true;
                 if(inRange) {
-                    state.accounts.forEach(a => {
-                        if(a.emi && a.emi > 0) {
-                            const bDate = new Date(b.year, b.month, 1);
-                            const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1);
-                            if(bDate >= lStart) totalSankeyEMI += a.emi;
-                        }
-                    });
+                    state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } });
                 }
             });
-
             if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
             const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
             
@@ -657,6 +681,7 @@
             if(barChartInst) barChartInst.destroy();
             barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } } });
 
+            // Account List
             const ac=document.getElementById('accounts-container'); ac.innerHTML='';
             const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] };
             for(const[name,types] of Object.entries(groups)){
@@ -672,46 +697,44 @@
                 }
             }
 
-            // Transaction Renderer (Grouped by Date)
+            // Tx Renderer
             const tc=document.getElementById('full-tx-list'); tc.innerHTML='';
             const term=document.getElementById('tx-search').value.toLowerCase();
             const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term));
             
-            if(filteredTx.length === 0) {
-                tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`;
-            } else {
+            if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`;
+            else {
                 let lastDate = null;
                 filteredTx.forEach(t => {
-                    const isInc=t.type==='income';
-                    const txDate = new Date(t.date);
-                    const today = new Date();
-                    const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
-                    
+                    const isInc=t.type==='income'; const isTrf=t.type==='transfer';
+                    const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1);
                     let dateStr = formatDateIN(t.date);
                     if(txDate.toDateString() === today.toDateString()) dateStr = "Today";
                     else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday";
                     else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+                    if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; }
 
-                    if(dateStr !== lastDate) {
-                        tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`;
-                        lastDate = dateStr;
-                    }
+                    let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600';
+                    let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900';
+                    let sign = isTrf ? '' : isInc ? '+' : '-';
+                    let icon = getCategoryIcon(t.cat);
+                    let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName;
 
                     tc.innerHTML+=`
-                    <div class="flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0">
+                    <div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group">
                         <div class="flex gap-4 items-center">
-                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${isInc?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}">
-                                <i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'} text-sm"></i>
-                            </div>
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div>
                             <div>
                                 <div class="font-bold text-slate-800 text-sm">${t.desc}</div>
-                                <div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded inline-block mt-0.5">${t.cat || 'Misc'}</div>
-                                <span class="text-[10px] text-slate-400 ml-1 font-medium">${t.accName}</span>
+                                <div class="flex items-center gap-2 mt-0.5">
+                                    <div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div>
+                                    <span class="text-[10px] text-slate-400 font-medium">${subText}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="flex gap-3 items-center">
-                            <span class="font-bold text-sm ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</span>
-                            <button onclick="deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button>
+                            <span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span>
+                            <button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button>
                         </div>
                     </div>`;
                 });

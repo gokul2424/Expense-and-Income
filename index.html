@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Infinity</title>
+    <title>Cash Flow | Omega</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,24 +15,16 @@
     <style>
         :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
-        
-        /* Layout */
         .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; }
         .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
-        
-        /* Components */
         .neo-card { background: white; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
         .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; font-size: 14px; }
         .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
-        
-        /* Nav */
         .nav-dock { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.05); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); }
-        .nav-item { font-size: 10px; font-weight: 600; color: #94A3B8; }
+        .nav-item { color: #94A3B8; font-size: 9px; font-weight: 700; transition: all 0.2s; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .desktop-nav-item:hover { background: white; color: #334155; }
         .desktop-nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
-
-        /* Utils */
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -45,17 +37,10 @@
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
-        
-        @media (min-width: 768px) { 
-            .app-container { flex-direction: row; } 
-            .nav-dock { display: none; } 
-            .main-scroll { padding: 40px; padding-bottom: 40px; } 
-            .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } 
-            .calendar-grid { gap: 8px; }
-        }
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .filter-btn.inactive { color: #94A3B8; }
+        @media (min-width: 768px) { .app-container { flex-direction: row; } .nav-dock { display: none; } .main-scroll { padding: 40px; padding-bottom: 40px; } .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } .calendar-grid { gap: 8px; } }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800">
@@ -63,10 +48,10 @@
     <div id="auth-overlay" class="fixed inset-0 z-[60] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="bg-white p-8 md:p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200 rotate-3">
-                <i class="fas fa-infinity text-white text-4xl"></i>
+                <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Infinity Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Omega Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -91,17 +76,13 @@
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
             </nav>
             <div class="p-6 border-t border-slate-100">
-                <button onclick="router('settings')" class="flex items-center gap-3 mb-4 w-full text-left group">
+                <button onclick="openModal('settingsModal')" class="flex items-center gap-3 mb-4 w-full text-left group">
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
                         <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-indigo-600">Settings</div>
                     </div>
                 </button>
-                <div class="flex gap-2 mb-2">
-                    <button onclick="togglePrivacy()" id="btn-privacy" class="flex-1 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1"><i class="fas fa-eye-slash"></i> Hide</button>
-                    <button onclick="exportCSV()" class="flex-1 py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1"><i class="fas fa-download"></i> CSV</button>
-                </div>
             </div>
         </aside>
 
@@ -112,8 +93,7 @@
                     <p class="text-slate-500 text-sm font-medium">Financial Command</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="togglePrivacy()" id="mob-btn-privacy" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-eye"></i></button>
-                    <button onclick="router('settings')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-user-cog"></i></button>
+                    <button onclick="openModal('settingsModal')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-cog"></i></button>
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 relative">
                         <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute top-0 right-0 m-1"></div>
                         <i class="fas fa-cloud text-slate-400 text-xs"></i>
@@ -128,45 +108,20 @@
                         <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600 opacity-20 rounded-full blur-3xl"></div>
                         <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-emerald-500 opacity-10 rounded-full blur-3xl"></div>
                         <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                            <div>
-                                <div class="flex items-center gap-2 text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider"><i class="fas fa-shield-alt"></i> Total Net Worth</div>
-                                <div class="text-4xl md:text-6xl font-extrabold tracking-tight"><span class="money-val" id="dash-networth">...</span></div>
-                            </div>
-                            <div class="flex gap-3">
-                                <button onclick="openTxModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition shadow-lg flex items-center gap-2"><i class="fas fa-plus"></i> Add Tx</button>
-                            </div>
+                            <div><div class="flex items-center gap-2 text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider"><i class="fas fa-shield-alt"></i> Total Net Worth</div><div class="text-4xl md:text-6xl font-extrabold tracking-tight"><span class="money-val" id="dash-networth">...</span></div></div>
+                            <div class="flex gap-3"><button onclick="openTxModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition shadow-lg flex items-center gap-2"><i class="fas fa-plus"></i> Add Tx</button></div>
                         </div>
                     </div>
-
                     <div class="neo-card p-6 md:px-8">
-                        <div class="flex justify-between items-end mb-3">
-                            <div><h3 class="font-bold text-slate-900">Monthly Burn Rate</h3><p class="text-xs text-slate-500">Expenses vs Income</p></div>
-                            <div class="text-right"><div id="burn-percent" class="text-2xl font-bold text-slate-900">0%</div></div>
-                        </div>
+                        <div class="flex justify-between items-end mb-3"><div><h3 class="font-bold text-slate-900">Monthly Burn Rate</h3><p class="text-xs text-slate-500">Expenses vs Income</p></div><div class="text-right"><div id="burn-percent" class="text-2xl font-bold text-slate-900">0%</div></div></div>
                         <div class="meter-container"><div id="burn-bar" class="meter-fill bg-indigo-600" style="width: 0%"></div></div>
-                        <div class="flex justify-between mt-2 text-xs font-bold text-slate-400">
-                            <span class="money-val" id="burn-expense">Exp: 0</span>
-                            <span class="money-val" id="burn-income">Inc: 0</span>
-                        </div>
+                        <div class="flex justify-between mt-2 text-xs font-bold text-slate-400"><span class="money-val" id="burn-expense">Exp: 0</span><span class="money-val" id="burn-income">Inc: 0</span></div>
                     </div>
-
-                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]">
-                        <div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div>
-                        <div><h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4><p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p></div>
-                    </div>
-
+                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]"><div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div><div><h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4><p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing your data...</p></div></div>
                     <div class="neo-card p-8 border-indigo-100 border-2">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                            <div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div>
-                            <div class="flex bg-slate-100 rounded-xl p-1 gap-1">
-                                <button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button>
-                                <button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button>
-                                <button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button>
-                            </div>
-                        </div>
+                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"><div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div><div class="flex bg-slate-100 rounded-xl p-1 gap-1"><button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button><button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button><button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button></div></div>
                         <div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div>
                     </div>
-                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="space-y-6">
                             <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div></div>
@@ -180,6 +135,10 @@
                             <div class="neo-card p-6 h-full flex flex-col"><h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3><div class="flex-1 flex items-center justify-center"><div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div>
                         </div>
                     </div>
+                    <div class="neo-card p-6">
+                        <h3 class="font-bold text-slate-900 text-lg mb-4">Top Spending Categories</h3>
+                        <div id="category-leaderboard" class="space-y-3"></div>
+                    </div>
                 </div>
 
                 <div id="view-debts" class="view-section space-y-6">
@@ -191,11 +150,7 @@
                 <div id="view-investments" class="view-section space-y-6">
                     <div class="flex justify-between items-center"><div><h2 class="text-3xl font-extrabold text-slate-900">Portfolio</h2><p class="text-slate-500 font-medium">Wealth Tracking</p></div></div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="neo-card p-6 bg-slate-900 text-white">
-                            <div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fas fa-chart-line"></i></div><div><div class="text-xs text-slate-400 uppercase font-bold">Total Invested</div><div class="text-2xl font-bold money-val" id="inv-total">...</div></div></div>
-                            <div class="h-[1px] bg-slate-700 w-full mb-6"></div>
-                            <div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-coins"></i></div><div><div class="text-xs text-slate-400 uppercase font-bold">Monthly SIP</div><div class="text-2xl font-bold money-val" id="inv-sip-total">...</div></div></div>
-                        </div>
+                        <div class="neo-card p-6 bg-slate-900 text-white"><div class="flex items-center gap-3 mb-6"><div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center"><i class="fas fa-chart-line"></i></div><div><div class="text-xs text-slate-400 uppercase font-bold">Total Invested</div><div class="text-2xl font-bold money-val" id="inv-total">...</div></div></div><div class="h-[1px] bg-slate-700 w-full mb-6"></div><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center"><i class="fas fa-coins"></i></div><div><div class="text-xs text-slate-400 uppercase font-bold">Monthly SIP</div><div class="text-2xl font-bold money-val" id="inv-sip-total">...</div></div></div></div>
                         <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-4">Allocation</h3><div class="chart-wrapper" style="height: 200px;"><canvas id="invPieChart"></canvas></div></div>
                     </div>
                     <div id="invest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
@@ -210,33 +165,12 @@
                 </div>
 
                 <div id="view-future" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Future & Planning</h2><p class="text-slate-500 font-medium">Strategy Hub</p></div>
-                    
-                    <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Monthly Budgets</h3><button onclick="addBudget()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="budget-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
-
-                    <div class="neo-card p-8 bg-slate-900 text-white relative overflow-hidden"><div class="absolute -top-10 -right-10 w-48 h-48 bg-purple-600 opacity-20 rounded-full blur-3xl"></div><h3 class="font-bold text-xl mb-6 relative z-10"><i class="fas fa-fire text-orange-500 mr-2"></i> FIRE Calculator</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10"><div><label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label><input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()"></div><div class="flex flex-col justify-center"><div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div><div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div><div class="text-sm text-slate-400 mt-2" id="fire-progress">Rule of 25</div></div></div></div>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="md:col-span-1 space-y-4"><h3 class="font-bold text-slate-900 text-lg">Wealth Sim</h3><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Monthly Investment</label><input type="number" id="fc-monthly" class="neo-input p-3" value="10000" oninput="calcFuture()"></div><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Annual Return (%)</label><input type="number" id="fc-rate" class="neo-input p-3" value="12" oninput="calcFuture()"></div><div class="neo-card p-5"><label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-2">Years</label><input type="number" id="fc-years" class="neo-input p-3" value="15" oninput="calcFuture()"></div></div>
-                        <div class="md:col-span-2 neo-card p-6 flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Projection</h3><div class="text-right"><div class="text-[10px] text-slate-400 uppercase font-bold">Estimated Total</div><div class="text-2xl font-bold text-indigo-600 money-val" id="fc-total">...</div></div></div><div class="flex-1 chart-wrapper"><canvas id="futureChart"></canvas></div></div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6 border-l-4 border-indigo-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Quick SIP</h3><div class="grid grid-cols-2 gap-3 mb-4"><input type="number" id="calc-sip-amt" class="neo-input p-2 text-sm" placeholder="Amount" oninput="runSipCalc()"><input type="number" id="calc-sip-yrs" class="neo-input p-2 text-sm" placeholder="Years" oninput="runSipCalc()"></div><div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl"><span class="text-xs text-indigo-900 font-bold uppercase">Future Value</span><span class="font-bold text-indigo-700" id="calc-sip-res">0</span></div></div><div class="neo-card p-6 border-l-4 border-rose-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-rose-500 mr-2"></i>Quick EMI</h3><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="calc-emi-p" class="neo-input p-2 text-sm" placeholder="Loan" oninput="runEmiCalc()"><input type="number" id="calc-emi-r" class="neo-input p-2 text-sm" placeholder="Rate" oninput="runEmiCalc()"><input type="number" id="calc-emi-n" class="neo-input p-2 text-sm" placeholder="Yrs" oninput="runEmiCalc()"></div><div class="flex justify-between items-center bg-rose-50 p-3 rounded-xl"><span class="text-xs text-rose-900 font-bold uppercase">EMI</span><span class="font-bold text-rose-700" id="calc-emi-res">0</span></div></div></div>
-                </div>
-
-                <div id="view-settings" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Settings</h2><p class="text-slate-500 font-medium">Preferences & Data</p></div>
-                    <div class="neo-card p-6">
-                        <h3 class="font-bold text-slate-900 mb-4">Currency</h3>
-                        <div class="flex gap-2">
-                            <button onclick="changeCurrency('INR', 'en-IN')" class="flex-1 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl border border-indigo-100 hover:bg-indigo-100 transition">₹ INR (India)</button>
-                            <button onclick="changeCurrency('USD', 'en-US')" class="flex-1 py-3 bg-slate-50 text-slate-700 font-bold rounded-xl border border-slate-100 hover:bg-slate-100 transition">$ USD (US)</button>
-                        </div>
-                    </div>
-                    <div class="neo-card p-6 border border-rose-100">
-                        <h3 class="font-bold text-rose-600 mb-4">Danger Zone</h3>
-                        <button onclick="nukeData()" class="w-full py-4 bg-rose-500 text-white font-bold rounded-xl hover:bg-rose-600 transition shadow-lg shadow-rose-200">Reset All Data</button>
-                    </div>
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Strategy</h2><p class="text-slate-500 font-medium">Planning & Projections</p></div>
+                    <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Savings Goals</h3><button onclick="addGoal()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="goal-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div></div>
+                    <div><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-xl">Budgets</h3><button onclick="addBudget()" class="text-indigo-600 text-xs font-bold bg-indigo-50 px-3 py-1.5 rounded-lg hover:bg-indigo-100 transition"><i class="fas fa-plus mr-1"></i> Add</button></div><div id="budget-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6 border-l-4 border-indigo-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Quick SIP</h3><div class="grid grid-cols-2 gap-3 mb-4"><input type="number" id="calc-sip-amt" class="neo-input p-2 text-sm" placeholder="Amount" oninput="runSipCalc()"><input type="number" id="calc-sip-yrs" class="neo-input p-2 text-sm" placeholder="Years" oninput="runSipCalc()"></div><div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl"><span class="text-xs text-indigo-900 font-bold uppercase">FV (12%)</span><span class="font-bold text-indigo-700" id="calc-sip-res">0</span></div></div><div class="neo-card p-6 border-l-4 border-rose-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-rose-500 mr-2"></i>Quick EMI</h3><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="calc-emi-p" class="neo-input p-2 text-sm" placeholder="Loan" oninput="runEmiCalc()"><input type="number" id="calc-emi-r" class="neo-input p-2 text-sm" placeholder="Rate" oninput="runEmiCalc()"><input type="number" id="calc-emi-n" class="neo-input p-2 text-sm" placeholder="Yrs" oninput="runEmiCalc()"></div><div class="flex justify-between items-center bg-rose-50 p-3 rounded-xl"><span class="text-xs text-rose-900 font-bold uppercase">EMI</span><span class="font-bold text-rose-700" id="calc-emi-res">0</span></div></div></div>
+                    <div class="neo-card p-8 bg-slate-900 text-white relative overflow-hidden"><div class="absolute -top-10 -right-10 w-48 h-48 bg-purple-600 opacity-20 rounded-full blur-3xl"></div><h3 class="font-bold text-xl mb-6 relative z-10"><i class="fas fa-fire text-orange-500 mr-2"></i> FIRE Calc</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative z-10"><div><label class="text-xs text-slate-400 uppercase font-bold tracking-wider mb-2 block">Monthly Expenses</label><input type="number" id="fire-expenses" class="w-full bg-slate-800 border border-slate-700 rounded-xl p-4 text-white font-bold focus:outline-none focus:border-indigo-500" placeholder="e.g. 50000" oninput="calcFire()"></div><div class="flex flex-col justify-center"><div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Freedom Number</div><div class="text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-rose-500 mt-1 money-val" id="fire-number">...</div></div></div></div>
+                    <div class="neo-card p-6 flex flex-col"><div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Wealth Sim</h3><div class="text-right"><div class="text-[10px] text-slate-400 uppercase font-bold">Estimated</div><div class="text-xl font-bold text-indigo-600 money-val" id="fc-total">...</div></div></div><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="fc-monthly" class="neo-input p-2 text-xs" value="10000" oninput="calcFuture()"><input type="number" id="fc-rate" class="neo-input p-2 text-xs" value="12" oninput="calcFuture()"><input type="number" id="fc-years" class="neo-input p-2 text-xs" value="15" oninput="calcFuture()"></div><div class="flex-1 chart-wrapper"><canvas id="futureChart"></canvas></div></div>
                 </div>
 
                 <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
@@ -245,9 +179,9 @@
     </div>
 
     <nav class="md:hidden fixed bottom-4 left-4 right-4 z-50">
-        <div class="nav-dock flex justify-between items-center px-4 py-3 rounded-[24px]">
+        <div class="nav-dock flex justify-between items-center px-2 py-3 rounded-[24px]">
             <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-home text-lg"></i>Home</button>
-            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-file-invoice text-lg"></i>Debts</button>
+            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-file-invoice text-lg"></i>Debt</button>
             <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-chart-line text-lg"></i>Inv</button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-wallet text-lg"></i>Acc</button>
             <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1"><i class="fas fa-calendar-alt text-lg"></i>Cal</button>
@@ -255,8 +189,20 @@
         </div>
     </nav>
 
-    <div id="accountModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Balance"><div class="relative"><select id="accType" onchange="toggleAccountFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment / SIP</option><option value="property">Property</option><option value="credit">Credit Card</option><option value="loan">Loan</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100"><div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Rate %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div></div><div id="invest-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100"><div class="col-span-2"><label class="text-[10px] text-emerald-600 font-bold uppercase">SIP Amount</label><input type="number" id="accSip" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Target</label><input type="number" id="accTarget" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Exp %</label><input type="number" step="0.1" id="accReturn" class="neo-input mt-1 p-3 text-sm"></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
+    <div id="settingsModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4">
+        <div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl">
+            <h3 class="text-2xl font-bold text-slate-900 mb-6">Settings</h3>
+            <div class="space-y-6">
+                <div><h4 class="font-bold text-slate-700 mb-3">Currency</h4><div class="flex gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="flex-1 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl">₹ INR</button><button onclick="changeCurrency('USD', 'en-US')" class="flex-1 py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">$ USD</button></div></div>
+                <div><h4 class="font-bold text-slate-700 mb-3">Privacy</h4><button onclick="togglePrivacy(); closeModal('settingsModal')" class="w-full py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Toggle Privacy Mode</button></div>
+                <div><h4 class="font-bold text-rose-600 mb-3">Data</h4><button onclick="nukeData()" class="w-full py-3 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-200">Reset All Data</button></div>
+                <button onclick="document.getElementById('btn-logout').click()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl">Sign Out</button>
+                <button onclick="closeModal('settingsModal')" class="w-full py-3 text-slate-400 font-bold">Close</button>
+            </div>
+        </div>
+    </div>
 
+    <div id="accountModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Balance"><div class="relative"><select id="accType" onchange="toggleAccountFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment / SIP</option><option value="property">Property</option><option value="credit">Credit Card</option><option value="loan">Loan</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100"><div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Rate %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div></div><div id="invest-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100"><div class="col-span-2"><label class="text-[10px] text-emerald-600 font-bold uppercase">SIP Amount</label><input type="number" id="accSip" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Target</label><input type="number" id="accTarget" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Exp %</label><input type="number" step="0.1" id="accReturn" class="neo-input mt-1 p-3 text-sm"></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
     <div id="txModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6" id="txModalTitle">Transaction</h3><form onsubmit="saveTransaction(event)" class="space-y-5"><input type="hidden" id="txId"><input type="text" id="txDesc" required class="neo-input" placeholder="Description"><div class="grid grid-cols-2 gap-4"><input type="number" step="1" id="txAmount" required class="neo-input" placeholder="0.00"><input type="date" id="txDate" required class="neo-input text-slate-500 p-3"></div><div class="grid grid-cols-2 gap-4"><div class="relative"><select id="txType" onchange="toggleTxFields()" class="neo-input appearance-none"><option value="expense">Expense</option><option value="income">Income</option><option value="transfer">Transfer</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div class="relative"><select id="txCat" class="neo-input appearance-none"><optgroup label="Common"><option value="Food & Dining">Food</option><option value="Transport">Transport</option><option value="Shopping">Shopping</option></optgroup><optgroup label="Bills"><option value="Housing">Housing</option><option value="Utilities">Utilities</option><option value="EMI">EMI</option><option value="Subscription">Subscription</option></optgroup><optgroup label="Income"><option value="Salary">Salary</option><option value="Business">Business</option></optgroup><optgroup label="Other"><option value="Transfer">Transfer</option><option value="Misc">Misc</option></optgroup></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div class="grid grid-cols-1 gap-4"><div><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block" id="lbl-from-acc">Account</label><div class="relative"><select id="txAccount" required class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div id="div-to-acc" class="hidden"><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block">To Account</label><div class="relative"><select id="txToAccount" class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
 
     <script type="module">
@@ -282,7 +228,7 @@
         const provider = new GoogleAuthProvider();
         
         let currentUser = null;
-        let state = { accounts: [], transactions: [], history: [0], budgets: {}, settings: {} };
+        let state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} };
         let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, invPieInst=null, futureChartInst=null, analysisRange='6M';
         let isPrivacyMode = false;
 
@@ -304,7 +250,7 @@
         });
 
         function setGreeting() { const h = new Date().getHours(); setTxt('greeting', h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening"); }
-        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; if(state.settings && state.settings.currency) { config.currency = state.settings.currency; config.locale = state.settings.locale; } render(); } else { save(); } }); }
+        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; if(!state.goals) state.goals={}; if(state.settings && state.settings.currency) { config.currency = state.settings.currency; config.locale = state.settings.locale; } render(); } else { save(); } }); }
         async function save() { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), state); }
 
         const money = (n) => `<span class="money-val">${new Intl.NumberFormat(config.locale, { style: 'currency', currency: config.currency, maximumFractionDigits: 0 }).format(n)}</span>`;
@@ -327,17 +273,19 @@
         window.setAnalysisRange = (range) => { analysisRange = range; render(); };
         function updateAccountSelect() { const select = document.getElementById('txAccount'); const toSelect = document.getElementById('txToAccount'); if(!select || !toSelect) return; const genOpts = () => { let html = ''; const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type)); const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type)); if(assets.length) { html+=`<optgroup label="Assets">`+assets.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } if(debts.length) { html+=`<optgroup label="Credit/Loan">`+debts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } return html; }; const h = genOpts(); select.innerHTML = h; toSelect.innerHTML = h; }
 
-        function generateInsights(assets, debts, burnPct, topCat) { const card = document.getElementById('smart-insights'); const txt = document.getElementById('insight-text'); if(!card || !txt) return; const debtRatio = assets > 0 ? (debts / assets) * 100 : 0; let msg = ""; if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income."; else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets."; else if (topCat) msg = `📊 <b>Spending Trend:</b> Your highest expense category this month is <b>${topCat.name}</b> (${money(topCat.amt)}).`; else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month."; else msg = "💡 <b>Tip:</b> Log more transactions to get personalized financial advice."; txt.innerHTML = msg; card.classList.remove('hidden'); }
+        function generateInsights(assets, debts, burnPct, topCat) { const card = document.getElementById('smart-insights'); const txt = document.getElementById('insight-text'); if(!card || !txt) return; const debtRatio = assets > 0 ? (debts / assets) * 100 : 0; let msg = ""; if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income."; else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets."; else if (topCat) msg = `📊 <b>Top Category:</b> You spent the most on <b>${topCat.name}</b> (${money(topCat.amt)}) this month.`; else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month."; else msg = "💡 <b>Tip:</b> Log more transactions to get personalized financial advice."; txt.innerHTML = msg; card.classList.remove('hidden'); }
         function renderRecurrings() { const counts = {}; state.transactions.filter(t=>t.type==='expense').forEach(t => { const k = `${t.desc}|${t.amount}`; if(!counts[k]) counts[k] = { count:0, t:t }; counts[k].count++; }); const recurs = Object.values(counts).filter(x => x.count >= 2); const div = document.getElementById('recurring-list'); const sect = document.getElementById('recurring-section'); if(div && sect) { if(recurs.length > 0) { sect.classList.remove('hidden'); div.innerHTML = recurs.map(r => `<div class="bg-white border border-slate-100 p-4 rounded-2xl flex justify-between items-center shadow-sm"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fas fa-repeat text-xs"></i></div><div><div class="font-bold text-sm text-slate-800">${r.t.desc}</div><div class="text-[10px] text-slate-400">Monthly subscription</div></div></div><div class="font-bold text-slate-900">${money(r.t.amount)}</div></div>`).join(''); } else sect.classList.add('hidden'); } }
 
         window.runSipCalc = () => { const amt = parseFloat(getVal('calc-sip-amt')); const yrs = parseFloat(getVal('calc-sip-yrs')); if(amt && yrs) { const r = 12 / 100 / 12; const n = yrs * 12; const fv = amt * ((Math.pow(1+r, n) - 1) / r) * (1+r); setTxt('calc-sip-res', money(fv).replace(/<[^>]*>?/gm, '')); } };
         window.runEmiCalc = () => { const p = parseFloat(getVal('calc-emi-p')); const r = parseFloat(getVal('calc-emi-r')); const n = parseFloat(getVal('calc-emi-n')) * 12; if(p && r && n) { const res = calculateEMI(p, r, n); setTxt('calc-emi-res', money(res).replace(/<[^>]*>?/gm, '')); } };
         window.addBudget = () => { const cat = prompt("Enter Category Name (e.g. Food & Dining):"); if(cat) { const limit = parseFloat(prompt(`Set Monthly Limit for ${cat}:`)); if(limit) { if(!state.budgets) state.budgets = {}; state.budgets[cat] = limit; save(); render(); } } };
         window.deleteBudget = (cat) => { if(confirm(`Delete budget for ${cat}?`)) { delete state.budgets[cat]; save(); render(); } };
+        window.addGoal = () => { const name = prompt("Goal Name (e.g. New Laptop):"); if(name) { const target = parseFloat(prompt(`Target Amount:`)); if(target) { if(!state.goals) state.goals = {}; state.goals[name] = target; save(); render(); } } };
+        window.deleteGoal = (name) => { if(confirm(`Delete goal ${name}?`)) { delete state.goals[name]; save(); render(); } };
         window.calcFire = () => { const exp = parseFloat(getVal('fire-expenses')); if(exp) { const fireNum = exp * 12 * 25; setHtml('fire-number', money(fireNum)); const elNw = document.getElementById('dash-networth'); if(elNw) { const currentNw = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const pct = Math.min(100, (currentNw / fireNum) * 100); setTxt('fire-progress', `You are ${pct.toFixed(1)}% of the way to freedom.`); } } };
         window.calcFuture = () => { const elNw = document.getElementById('dash-networth'); if(!elNw) return; const P = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const PMT = parseFloat(getVal('fc-monthly')) || 0; const r = (parseFloat(getVal('fc-rate')) || 10) / 100; const years = parseFloat(getVal('fc-years')) || 10; const n = 12; let balance = P; const dataPoints = [], labels = []; for(let i=0; i<=years; i++) { labels.push(`Year ${i}`); if (i===0) dataPoints.push(balance); else { const months = i * 12; const futureValue = P * Math.pow(1 + r/n, months) + (PMT * (Math.pow(1 + r/n, months) - 1)) / (r/n); balance = futureValue; dataPoints.push(balance); } } setHtml('fc-total', money(balance)); const ctxEl = document.getElementById('futureChart'); if(ctxEl) { const ctx = ctxEl.getContext('2d'); if(futureChartInst) futureChartInst.destroy(); futureChartInst = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Net Worth', data: dataPoints, borderColor: '#4F46E5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } } }); } };
-        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
-        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, settings: {} }; save(); render(); } };
+        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); closeModal('settingsModal'); };
+        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); closeModal('settingsModal'); } };
 
         // CALENDAR LOGIC
         function renderCalendar() {
@@ -345,19 +293,14 @@
             const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
             const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
             setTxt('cal-month-name', now.toLocaleString('default', { month: 'long', year: 'numeric' }));
-            
             const dayData = {};
             state.transactions.forEach(t => { const d = new Date(t.date); if(d.getMonth() === month && d.getFullYear() === year) { const day = d.getDate(); if(!dayData[day]) dayData[day] = { inc:0, exp:0, txs:[] }; if(t.type === 'income') dayData[day].inc += t.amount; else if(t.type === 'expense') dayData[day].exp += t.amount; dayData[day].txs.push(t); } });
-
             let html = '';
             for(let i=0; i<firstDay; i++) html += `<div class="cal-day empty"></div>`;
             for(let i=1; i<=daysInMonth; i++) {
                 const data = dayData[i];
                 let content = '';
-                if(data) {
-                    if(data.inc > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>`;
-                    if(data.exp > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>`;
-                }
+                if(data) { if(data.inc > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>`; if(data.exp > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>`; }
                 const hasDataClass = data ? 'has-data' : '';
                 html += `<div onclick="showDayDetails(${i})" class="cal-day ${hasDataClass}"><span class="text-[10px] md:text-xs font-bold text-slate-400">${i}</span><div class="cal-dots">${content}</div></div>`;
             }
@@ -374,7 +317,7 @@
 
         function render() {
             if(!state) return;
-            // 1. RENDER LISTS FIRST (Safe Render)
+            // 1. RENDER LISTS FIRST (Safe Render Priority)
             const ac=document.getElementById('accounts-container'); 
             if(ac) { 
                 const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] }; 
@@ -409,7 +352,7 @@
                 } 
             }
 
-            // 2. CALCULATE MATH (After lists are safe)
+            // 2. MATH
             updateAccountSelect();
             ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
 
@@ -426,13 +369,25 @@
             generateInsights(assets, debts, burnPct, topCat); renderRecurrings();
             setTxt('burn-percent', `${burnPct.toFixed(0)}%`); const burnBar = document.getElementById('burn-bar'); if(burnBar) { burnBar.style.width = `${burnPct}%`; burnBar.className = `meter-fill ${burnPct < 50 ? 'bg-emerald-500' : burnPct < 80 ? 'bg-orange-400' : 'bg-rose-500'}`; } setHtml('burn-expense', `Out: ${money(mExp)}`); setHtml('burn-income', `In: ${money(mInc)}`);
 
-            if(document.getElementById('view-planning') && document.getElementById('view-planning').classList.contains('active')) { const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { const spent = cats[cat] || 0; const pct = Math.min(100, (spent / limit) * 100); const color = pct > 90 ? 'bg-rose-500' : pct > 75 ? 'bg-orange-400' : 'bg-emerald-500'; bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden"><div class="${color} h-full transition-all duration-500" style="width: ${pct}%"></div></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>${money(spent)} spent</span><span>${money(limit)} limit</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set. Click "Set Limit" to start.</div>`; bContainer.innerHTML = bHtml; } }
+            // 3. RENDER CHARTS/TABS (Only if visible to prevent crash)
+            if(document.getElementById('view-future') && document.getElementById('view-future').classList.contains('active')) { 
+                const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { const spent = cats[cat] || 0; const pct = Math.min(100, (spent / limit) * 100); const color = pct > 90 ? 'bg-rose-500' : pct > 75 ? 'bg-orange-400' : 'bg-emerald-500'; bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden"><div class="${color} h-full transition-all duration-500" style="width: ${pct}%"></div></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>${money(spent)} spent</span><span>${money(limit)} limit</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set. Click "Add" to start.</div>`; bContainer.innerHTML = bHtml; } 
+                const gContainer = document.getElementById('goal-container'); if(gContainer) { let gHtml = ""; if(state.goals) { for(const [name, target] of Object.entries(state.goals)) { gHtml += `<div class="neo-card p-5 border-l-4 border-indigo-500"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${name}</h4><button onclick="deleteGoal('${name}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="text-2xl font-bold text-indigo-600">${money(target)}</div><div class="text-[10px] text-slate-400 uppercase font-bold mt-1">Goal Target</div></div>`; } } if(!gHtml) gHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No goals set.</div>`; gContainer.innerHTML = gHtml; } 
+                calcFuture();
+            }
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendar();
-            if(document.getElementById('view-future').classList.contains('active')) calcFuture();
             if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
 
-            // 3. RENDER CHARTS (Only if visible, safer)
             if(document.getElementById('view-dashboard').classList.contains('active')) {
+                // Category Leaderboard (NEW)
+                const lb = document.getElementById('category-leaderboard');
+                if(lb) {
+                    const sortedCats = Object.keys(cats).map(c => ({name:c, amt:cats[c]})).sort((a,b) => b.amt - a.amt).slice(0, 5);
+                    if(sortedCats.length) {
+                        lb.innerHTML = sortedCats.map(c => { const pct = mExp > 0 ? (c.amt/mExp)*100 : 0; return `<div class="flex items-center justify-between text-sm mb-1"><span class="font-bold text-slate-700">${c.name}</span><span class="font-bold text-slate-900">${money(c.amt)}</span></div><div class="w-full bg-slate-100 h-2 rounded-full mb-3"><div class="bg-indigo-500 h-full rounded-full" style="width:${pct}%"></div></div>`; }).join('');
+                    } else lb.innerHTML = '<div class="text-slate-400 text-sm">No spending data this month.</div>';
+                }
+
                 // Sankey
                 const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); const rangeMonths = analysisRange === '1Y' ? 11 : 5; for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
                 state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });

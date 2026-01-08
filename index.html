@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Final</title>
+    <title>Cash Flow | Polished</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -79,7 +79,7 @@
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Final Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Polished Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -210,6 +210,8 @@
                     <div class="neo-card p-6 space-y-3"><h3 class="font-bold text-slate-900">Data</h3><div class="grid grid-cols-2 gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">INR</button><button onclick="changeCurrency('USD', 'en-US')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">USD</button></div><button onclick="togglePrivacy()" id="btn-privacy-2" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Toggle Privacy</button><button onclick="exportCSV()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Export CSV</button><button onclick="backupData()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Backup JSON</button><input type="file" id="restoreFile" class="hidden" onchange="restoreData(this)"><button onclick="document.getElementById('restoreFile').click()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Restore JSON</button><button onclick="nukeData()" class="w-full py-3 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-200">Reset App</button></div>
                     <button onclick="logout()" class="w-full py-4 bg-white text-rose-500 font-bold rounded-xl border border-rose-100 shadow-sm">Sign Out</button>
                 </div>
+
+                <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
             </div>
         </div>
     </div>
@@ -316,8 +318,8 @@
         window.calcFire = () => { const exp = parseFloat(getVal('fire-expenses')); if(exp) { const fireNum = exp * 12 * 25; setHtml('fire-number', money(fireNum)); const elNw = document.getElementById('dash-networth'); if(elNw) { const currentNw = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const pct = Math.min(100, (currentNw / fireNum) * 100); setTxt('fire-progress', `You are ${pct.toFixed(1)}% of the way to freedom.`); } } };
         window.calcFuture = () => { const elNw = document.getElementById('dash-networth'); if(!elNw) return; const P = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const PMT = parseFloat(getVal('fc-monthly')) || 0; const r = (parseFloat(getVal('fc-rate')) || 10) / 100; const years = parseFloat(getVal('fc-years')) || 10; const n = 12; let balance = P; const dataPoints = [], labels = []; for(let i=0; i<=years; i++) { labels.push(`Year ${i}`); if (i===0) dataPoints.push(balance); else { const months = i * 12; const futureValue = P * Math.pow(1 + r/n, months) + (PMT * (Math.pow(1 + r/n, months) - 1)) / (r/n); balance = futureValue; dataPoints.push(balance); } } setHtml('fc-total', money(balance)); const ctxEl = document.getElementById('futureChart'); if(ctxEl) { const ctx = ctxEl.getContext('2d'); if(futureChartInst) futureChartInst.destroy(); futureChartInst = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Net Worth', data: dataPoints, borderColor: '#4F46E5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } } }); } };
         
-        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
-        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); } };
+        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); closeModal('settingsModal'); };
+        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); closeModal('settingsModal'); } };
         window.updateProfileName = async () => { const name = getVal('profile-name-input'); if(name && currentUser) { await updateProfile(currentUser, { displayName: name }); setTxt('user-name', name); alert("Name updated!"); } };
         window.changeTheme = (p, s) => { document.documentElement.style.setProperty('--primary', p); document.documentElement.style.setProperty('--primary-soft', s); const logo = document.getElementById('app-logo-bg'); if(logo) logo.style.backgroundColor = p; };
 
@@ -402,18 +404,6 @@
             const mInc = thisMonthTx.filter(t => t.type === 'income').reduce((a,b) => a+b.amount, 0); const mExp = thisMonthTx.filter(t => t.type === 'expense').reduce((a,b) => a+b.amount, 0); const burnPct = mInc > 0 ? Math.min(100, (mExp / mInc) * 100) : 0; const cats = {}; thisMonthTx.filter(t=>t.type==='expense').forEach(t => { cats[t.cat] = (cats[t.cat]||0) + t.amount; }); let topCat = null; Object.keys(cats).forEach(c => { if(!topCat || cats[c] > topCat.amt) topCat = {name:c, amt:cats[c]}; });
             generateInsights(assets, debts, burnPct, topCat); renderRecurrings();
             setTxt('burn-percent', `${burnPct.toFixed(0)}%`); const burnBar = document.getElementById('burn-bar'); if(burnBar) { burnBar.style.width = `${burnPct}%`; burnBar.className = `meter-fill ${burnPct < 50 ? 'bg-emerald-500' : burnPct < 80 ? 'bg-orange-400' : 'bg-rose-500'}`; } setHtml('burn-expense', `Out: ${money(mExp)}`); setHtml('burn-income', `In: ${money(mInc)}`);
-            
-            // Dashboard Recent Activity
-            const dTx = document.getElementById('dashboard-recent-tx');
-            if(dTx) {
-                if(state.transactions.length === 0) dTx.innerHTML = '<div class="text-slate-400 text-xs">No transactions yet.</div>';
-                else {
-                    dTx.innerHTML = state.transactions.slice(0, 3).map(t => {
-                        const isInc = t.type === 'income';
-                        return `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl mb-2"><div class="flex gap-3 items-center"><div class="w-8 h-8 rounded-full flex items-center justify-center ${isInc?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><div class="font-bold text-xs text-slate-800">${t.desc}</div><div class="text-[10px] text-slate-400">${t.cat}</div></div></div><div class="font-bold text-xs ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</div></div>`;
-                    }).join('');
-                }
-            }
 
             // 3. RENDER CHARTS/TABS (Only if visible to prevent crash)
             if(document.getElementById('view-future') && document.getElementById('view-future').classList.contains('active')) { 
@@ -423,9 +413,6 @@
             }
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendar();
             if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
-
-            // RENDER ACTIVITY VIEW
-            if(document.getElementById('view-activity').classList.contains('active')) renderActivity();
 
             if(document.getElementById('view-dashboard').classList.contains('active')) {
                 const lb = document.getElementById('category-leaderboard');

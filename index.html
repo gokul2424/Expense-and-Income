@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Obsidian Flow</title>
+    <title>Cash Flow | Ultimate</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -15,17 +15,25 @@
     <style>
         :root { --bg-body: #F8FAFC; --primary: #4F46E5; --primary-soft: #EEF2FF; }
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-body); color: #1E293B; -webkit-tap-highlight-color: transparent; }
+        
+        /* Layout */
         .app-container { height: 100vh; height: 100dvh; display: flex; overflow: hidden; }
         .main-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; padding-bottom: 120px; }
+        
+        /* Components */
         .neo-card { background: white; border-radius: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); border: 1px solid #F1F5F9; transition: transform 0.2s ease; }
         .neo-input { background: #F8FAFC; border: 1px solid #E2E8F0; border-radius: 14px; padding: 14px; font-weight: 600; color: #0F172A; width: 100%; transition: all 0.2s; outline: none; font-size: 14px; }
         .neo-input:focus { background: white; border-color: var(--primary); box-shadow: 0 0 0 4px var(--primary-soft); }
-        .nav-dock { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.05); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); overflow-x: auto; }
+        
+        /* Navigation */
+        .nav-dock { background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px); border-top: 1px solid rgba(0,0,0,0.05); box-shadow: 0 -10px 30px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); overflow-x: auto; scrollbar-width: none; }
         .nav-dock::-webkit-scrollbar { display: none; }
         .nav-item { color: #94A3B8; font-size: 9px; font-weight: 700; transition: all 0.2s; min-width: 55px; }
         .nav-item.active { color: var(--primary); transform: translateY(-2px); }
         .desktop-nav-item:hover { background: white; color: #334155; }
         .desktop-nav-item.active { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3); }
+
+        /* Utils */
         .view-section { display: none; }
         .view-section.active { display: block; animation: fadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
@@ -40,12 +48,23 @@
         .filter-btn { padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; transition: all 0.2s; }
         .filter-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .filter-btn.inactive { color: #94A3B8; }
-        .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; }
+        .color-swatch { width: 32px; height: 32px; border-radius: 50%; cursor: pointer; border: 2px solid transparent; transition: transform 0.2s; }
+        .color-swatch:hover { transform: scale(1.1); }
         .color-swatch.active { border-color: #1E293B; transform: scale(1.1); }
         
         /* Toast Notification */
-        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 50px; padding: 16px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
+        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #1e293b; color: #fff; text-align: center; border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 100; left: 50%; bottom: 100px; font-size: 14px; font-weight: 600; box-shadow: 0 10px 25px rgba(0,0,0,0.2); opacity: 0; transition: opacity 0.3s, bottom 0.3s; }
         #toast.show { visibility: visible; opacity: 1; bottom: 110px; }
+
+        /* Print Styles */
+        @media print {
+            aside, nav, header, #btn-login, .no-print, button { display: none !important; }
+            body, .app-container, .main-scroll { height: auto; overflow: visible; background: white; }
+            .neo-card { box-shadow: none; border: 1px solid #ddd; page-break-inside: avoid; margin-bottom: 20px; }
+            #view-reports { display: block !important; }
+            .view-section { display: none !important; }
+            #view-reports { display: block !important; }
+        }
 
         @media (min-width: 768px) { .app-container { flex-direction: row; } .nav-dock { display: none; } .main-scroll { padding: 40px; padding-bottom: 40px; } .cal-day { aspect-ratio: auto; min-height: 80px; padding: 8px; } .calendar-grid { gap: 8px; } #toast { bottom: 40px; } #toast.show { bottom: 50px; } }
     </style>
@@ -54,13 +73,13 @@
 
     <div id="toast"><i class="fas fa-check-circle mr-2"></i>Action Successful</div>
 
-    <div id="auth-overlay" class="fixed inset-0 z-[60] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-500">
+    <div id="auth-overlay" class="fixed inset-0 z-[60] bg-white/95 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="bg-white p-8 md:p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
             <div class="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-200 rotate-3">
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Obsidian Flow Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Zenith Ultimate.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -81,21 +100,13 @@
                 <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
                 <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
                 <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
+                <button onclick="router('activity')" id="d-nav-activity" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
-                <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
-                <div class="h-px bg-slate-200 my-2"></div>
                 <button onclick="router('reports')" id="d-nav-reports" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-alt w-5"></i> Reports</button>
+                <div class="h-px bg-slate-200 my-2"></div>
+                <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
             </nav>
-            <div class="p-6 border-t border-slate-100">
-                <button onclick="router('profile')" class="flex items-center gap-3 mb-4 w-full text-left group">
-                    <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
-                    <div class="overflow-hidden">
-                        <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-indigo-600">Settings</div>
-                    </div>
-                </button>
-            </div>
         </aside>
 
         <div class="main-scroll w-full relative">
@@ -107,43 +118,60 @@
                 <div class="flex gap-2">
                     <button onclick="openTxModal()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
                     <button onclick="router('profile')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-user-circle"></i></button>
-                    <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 relative">
-                        <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute top-0 right-0 m-1"></div>
-                        <i class="fas fa-cloud text-slate-400 text-xs"></i>
-                    </div>
                 </div>
             </header>
 
             <div class="p-4 md:p-0 max-w-6xl mx-auto">
                 
                 <div id="view-dashboard" class="view-section space-y-6">
-                    <div class="relative overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-2xl shadow-slate-200/50 p-8">
-                        <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600 opacity-20 rounded-full blur-3xl"></div>
-                        <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-emerald-500 opacity-10 rounded-full blur-3xl"></div>
-                        <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
-                            <div><div class="flex items-center gap-2 text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider"><i class="fas fa-shield-alt"></i> Total Net Worth</div><div class="text-4xl md:text-6xl font-extrabold tracking-tight"><span class="money-val" id="dash-networth">...</span></div></div>
+                    <div id="onboarding-card" class="hidden neo-card p-8 bg-indigo-600 text-white text-center">
+                        <i class="fas fa-rocket text-4xl mb-4 text-indigo-200"></i>
+                        <h2 class="text-2xl font-bold mb-2">Welcome to Cash Flow!</h2>
+                        <p class="text-indigo-100 mb-6">Start by adding your first account to track your wealth.</p>
+                        <button onclick="openModal('accountModal')" class="bg-white text-indigo-600 px-6 py-3 rounded-xl font-bold">Add Account</button>
+                    </div>
+
+                    <div id="dash-content" class="space-y-6">
+                        <div class="relative overflow-hidden rounded-[32px] bg-slate-900 text-white shadow-2xl shadow-slate-200/50 p-8">
+                            <div class="absolute -top-24 -right-24 w-72 h-72 bg-indigo-600 opacity-20 rounded-full blur-3xl"></div>
+                            <div class="absolute bottom-[-50px] left-[-50px] w-64 h-64 bg-emerald-500 opacity-10 rounded-full blur-3xl"></div>
+                            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
+                                <div><div class="flex items-center gap-2 text-slate-400 text-sm font-bold mb-2 uppercase tracking-wider"><i class="fas fa-shield-alt"></i> Total Net Worth</div><div class="text-4xl md:text-6xl font-extrabold tracking-tight"><span class="money-val" id="dash-networth">...</span></div></div>
+                                <div class="flex gap-3"><button onclick="openTxModal()" class="bg-indigo-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-indigo-500 transition shadow-lg flex items-center gap-2"><i class="fas fa-plus"></i> Add Tx</button></div>
+                            </div>
                         </div>
-                    </div>
-                    <div class="neo-card p-6 md:px-8">
-                        <div class="flex justify-between items-end mb-3"><div><h3 class="font-bold text-slate-900">Monthly Burn Rate</h3><p class="text-xs text-slate-500">Expenses vs Income</p></div><div class="text-right"><div id="burn-percent" class="text-2xl font-bold text-slate-900">0%</div></div></div>
-                        <div class="meter-container"><div id="burn-bar" class="meter-fill bg-indigo-600" style="width: 0%"></div></div>
-                        <div class="flex justify-between mt-2 text-xs font-bold text-slate-400"><span class="money-val" id="burn-expense">Exp: 0</span><span class="money-val" id="burn-income">Inc: 0</span></div>
-                    </div>
-                    <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]"><div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div><div><h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4><p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing...</p></div></div>
-                    <div class="neo-card p-8 border-indigo-100 border-2">
-                        <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"><div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div><div class="flex bg-slate-100 rounded-xl p-1 gap-1"><button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button><button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button><button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button></div></div>
-                        <div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-6"><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div></div><div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-4">Top Spending Categories</h3><div id="category-leaderboard" class="space-y-3"></div></div></div>
-                        <div class="space-y-6">
-                            <div class="grid grid-cols-2 gap-4"><div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div></div><div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div></div></div>
-                            <div class="neo-card p-6 h-full flex flex-col"><h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3><div class="flex-1 flex items-center justify-center"><div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div>
+
+                        <div class="neo-card p-6 md:px-8">
+                            <div class="flex justify-between items-end mb-3"><div><h3 class="font-bold text-slate-900">Monthly Burn Rate</h3><p class="text-xs text-slate-500">Expenses vs Income</p></div><div class="text-right"><div id="burn-percent" class="text-2xl font-bold text-slate-900">0%</div></div></div>
+                            <div class="meter-container"><div id="burn-bar" class="meter-fill bg-indigo-600" style="width: 0%"></div></div>
+                            <div class="flex justify-between mt-2 text-xs font-bold text-slate-400"><span class="money-val" id="burn-expense">Exp: 0</span><span class="money-val" id="burn-income">Inc: 0</span></div>
                         </div>
-                    </div>
-                    <div class="neo-card p-6">
-                        <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Recent Activity</h3><button onclick="router('activity')" class="text-indigo-600 font-bold text-xs">View All</button></div>
-                        <div id="dashboard-recent-tx" class="space-y-2"></div>
+
+                        <div id="smart-insights" class="hidden neo-card bg-gradient-to-br from-white to-indigo-50 p-5 flex items-start gap-4 border-indigo-100 animate-[fadeIn_0.5s_ease-out]"><div class="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 shrink-0"><i class="fas fa-robot"></i></div><div><h4 class="font-bold text-slate-900 text-sm">Smart Insight</h4><p id="insight-text" class="text-sm text-slate-600 mt-1 leading-relaxed">Analyzing...</p></div></div>
+
+                        <div class="neo-card p-8 border-indigo-100 border-2">
+                            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4"><div><h3 class="font-bold text-slate-900 text-lg">Money Flow</h3></div><div class="flex bg-slate-100 rounded-xl p-1 gap-1"><button onclick="setAnalysisRange('1M')" id="btn-range-1m" class="filter-btn inactive">1M</button><button onclick="setAnalysisRange('6M')" id="btn-range-6m" class="filter-btn active">6M</button><button onclick="setAnalysisRange('1Y')" id="btn-range-1y" class="filter-btn inactive">1Y</button></div></div>
+                            <div class="chart-wrapper" style="height: 400px;"><canvas id="sankeyChart"></canvas></div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="space-y-6">
+                                <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-6">Net Worth Trend</h3><div class="chart-wrapper" style="height: 250px;"><canvas id="mainChart"></canvas></div></div>
+                                <div class="neo-card p-6"><h3 class="font-bold text-slate-900 text-lg mb-4">Top Spending Categories</h3><div id="category-leaderboard" class="space-y-3"></div></div>
+                            </div>
+                            <div class="space-y-6">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div></div>
+                                    <div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div></div>
+                                </div>
+                                <div class="neo-card p-6 h-full flex flex-col"><h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3><div class="flex-1 flex items-center justify-center"><div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div>
+                            </div>
+                        </div>
+
+                        <div class="neo-card p-6">
+                            <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Recent Activity</h3><button onclick="router('activity')" class="text-indigo-600 font-bold text-xs">View All</button></div>
+                            <div id="dashboard-recent-tx" class="space-y-2"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -159,11 +187,24 @@
                     <div id="invest-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
                 </div>
 
-                <div id="view-accounts" class="view-section space-y-6"><div class="flex justify-between items-center mb-8 sticky top-0 z-10 py-2"><div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2></div><button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div id="accounts-container" class="space-y-6"></div></div>
+                <div id="view-accounts" class="view-section space-y-6">
+                    <div class="flex justify-between items-center mb-8 sticky top-0 bg-[#F8FAFC]/95 backdrop-blur z-10 py-2">
+                        <div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2>
+                        <p id="acc-summary-text" class="text-slate-500 font-medium text-sm">...</p></div>
+                        <button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-10 h-10 rounded-xl flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+                    </div>
+                    <div id="accounts-container" class="space-y-6"></div>
+                </div>
 
                 <div id="view-activity" class="view-section space-y-6">
                     <div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2><p class="text-slate-500 font-medium">All Transactions</p></div>
-                    <div class="neo-card p-6"><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="act-search" placeholder="Search..." onkeyup="renderActivity()" class="neo-input flex-1"><div class="flex gap-2"><button onclick="setActFilter('all')" id="btn-act-all" class="filter-btn active">All</button><button onclick="setActFilter('income')" id="btn-act-inc" class="filter-btn inactive">Income</button><button onclick="setActFilter('expense')" id="btn-act-exp" class="filter-btn inactive">Expense</button></div></div><div id="activity-list" class="space-y-2"></div></div>
+                    <div class="neo-card p-6">
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <input type="text" id="act-search" placeholder="Search..." onkeyup="renderActivity()" class="neo-input flex-1">
+                            <div class="flex gap-2"><button onclick="setActFilter('all')" id="btn-act-all" class="filter-btn active">All</button><button onclick="setActFilter('income')" id="btn-act-inc" class="filter-btn inactive">Income</button><button onclick="setActFilter('expense')" id="btn-act-exp" class="filter-btn inactive">Expense</button></div>
+                        </div>
+                        <div id="activity-list" class="space-y-2"></div>
+                    </div>
                 </div>
 
                 <div id="view-calendar" class="view-section space-y-6">
@@ -183,7 +224,7 @@
 
                 <div id="view-reports" class="view-section space-y-6">
                     <div><h2 class="text-3xl font-extrabold text-slate-900">Reports</h2><p class="text-slate-500 font-medium">Statements & Breakdowns</p></div>
-                    <div class="neo-card p-6"><div class="flex gap-4 mb-6"><input type="month" id="report-month" class="neo-input w-full" onchange="renderReport()"><button onclick="window.print()" class="bg-slate-900 text-white px-6 rounded-xl font-bold"><i class="fas fa-print"></i></button></div><div id="report-content" class="space-y-6 text-center text-slate-400 py-10">Select a month to view report</div></div>
+                    <div class="neo-card p-6"><div class="flex gap-4 mb-6"><input type="month" id="report-month" class="neo-input w-full" onchange="renderReport()"><button onclick="window.print()" class="bg-slate-900 text-white px-6 rounded-xl font-bold no-print"><i class="fas fa-print"></i></button></div><div id="report-content" class="space-y-6 text-center text-slate-400 py-10">Select a month to view report</div></div>
                 </div>
 
                 <div id="view-profile" class="view-section space-y-6">
@@ -199,10 +240,10 @@
 
     <nav class="md:hidden fixed bottom-4 left-4 right-4 z-50">
         <div class="nav-dock flex justify-between items-center px-2 py-3 rounded-[24px]">
-            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-home text-lg"></i>Home</button>
-            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-file-invoice text-lg"></i>Debt</button>
-            <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-chart-line text-lg"></i>Inv</button>
-            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-wallet text-lg"></i>Acc</button>
+            <button onclick="router('dashboard')" id="m-nav-dashboard" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-home text-xl"></i>Home</button>
+            <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-file-invoice text-xl"></i>Debt</button>
+            <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-chart-line text-xl"></i>Inv</button>
+            <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-wallet text-xl"></i>Acc</button>
             <button onclick="router('activity')" id="m-nav-activity" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-list-ul text-lg"></i>Act</button>
             <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-calendar-alt text-lg"></i>Cal</button>
             <button onclick="router('future')" id="m-nav-future" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-rocket text-lg"></i>Fut</button>
@@ -210,8 +251,6 @@
             <button onclick="router('profile')" id="m-nav-profile" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-user-circle text-lg"></i>Pro</button>
         </div>
     </nav>
-
-    <button onclick="openTxModal()" class="md:hidden fixed bottom-24 right-4 z-50 w-14 h-14 bg-indigo-600 rounded-full text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition"><i class="fas fa-plus"></i></button>
 
     <div id="accountModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Balance"><div class="relative"><select id="accType" onchange="toggleAccountFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment / SIP</option><option value="property">Property</option><option value="credit">Credit Card</option><option value="loan">Loan</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100"><div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Rate %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div></div><div id="invest-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100"><div class="col-span-2"><label class="text-[10px] text-emerald-600 font-bold uppercase">SIP Amount</label><input type="number" id="accSip" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Target</label><input type="number" id="accTarget" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Exp %</label><input type="number" step="0.1" id="accReturn" class="neo-input mt-1 p-3 text-sm"></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
     <div id="txModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6" id="txModalTitle">Transaction</h3><form onsubmit="saveTransaction(event)" class="space-y-5"><input type="hidden" id="txId"><input type="text" id="txDesc" required class="neo-input" placeholder="Description"><div class="grid grid-cols-2 gap-4"><input type="number" step="1" id="txAmount" required class="neo-input" placeholder="0.00"><input type="date" id="txDate" required class="neo-input text-slate-500 p-3"></div><div class="grid grid-cols-2 gap-4"><div class="relative"><select id="txType" onchange="toggleTxFields()" class="neo-input appearance-none"><option value="expense">Expense</option><option value="income">Income</option><option value="transfer">Transfer</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div class="relative"><select id="txCat" class="neo-input appearance-none"><optgroup label="Common"><option value="Food & Dining">Food</option><option value="Transport">Transport</option><option value="Shopping">Shopping</option></optgroup><optgroup label="Bills"><option value="Housing">Housing</option><option value="Utilities">Utilities</option><option value="EMI">EMI</option><option value="Subscription">Subscription</option></optgroup><optgroup label="Income"><option value="Salary">Salary</option><option value="Business">Business</option></optgroup><optgroup label="Other"><option value="Transfer">Transfer</option><option value="Misc">Misc</option></optgroup></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div class="grid grid-cols-1 gap-4"><div><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block" id="lbl-from-acc">Account</label><div class="relative"><select id="txAccount" required class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div id="div-to-acc" class="hidden"><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block">To Account</label><div class="relative"><select id="txToAccount" class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
@@ -261,7 +300,7 @@
         });
 
         function setGreeting() { const h = new Date().getHours(); setTxt('greeting', h < 12 ? "Good Morning" : h < 18 ? "Good Afternoon" : "Good Evening"); }
-        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; if(!state.goals) state.goals={}; if(state.settings && state.settings.currency) { config.currency = state.settings.currency; config.locale = state.settings.locale; } render(); } else { save(); } }); }
+        function initSync() { if(!currentUser) return; onSnapshot(doc(db, "users", currentUser.uid), (doc) => { if(doc.exists()) { state = doc.data(); if(!state.budgets) state.budgets={}; if(!state.goals) state.goals={}; if(state.settings && state.settings.currency) { config.currency = state.settings.currency; config.locale = state.settings.locale; } render(); renderDashboard(); } else { save(); render(); } }); }
         async function save() { if(currentUser) await setDoc(doc(db, "users", currentUser.uid), state); }
 
         const money = (n) => `<span class="money-val">${new Intl.NumberFormat(config.locale, { style: 'currency', currency: config.currency, maximumFractionDigits: 0 }).format(n)}</span>`;
@@ -278,17 +317,14 @@
         function calculateEMI(p, r, n) { if(!p||!r||!n) return 0; const rm = r/12/100; return Math.round(p * rm * (Math.pow(1+rm, n) / (Math.pow(1+rm, n)-1))); }
         ['accBalance','accRoi','accTenure'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', () => { const p = parseFloat(getVal('accBalance'))||0, r = parseFloat(getVal('accRoi'))||0, n = parseFloat(getVal('accTenure'))||0; if(p&&r&&n) setTxt('emi-preview', `Estimated EMI: ${money(calculateEMI(p,r,n))}/mo`.replace(/<[^>]*>?/gm, '')); }); });
 
-        window.addAccount = (e) => { e.preventDefault(); const type = getVal('accType'); let emi = 0, roi = 0, tenure = 0, startDate = '', sip = 0, target = 0, ret = 0; if(['loan','credit'].includes(type)) { const p = parseFloat(getVal('accBalance'))||0; roi = parseFloat(getVal('accRoi'))||0; tenure = parseFloat(getVal('accTenure'))||0; emi = calculateEMI(p, roi, tenure); startDate = getVal('accStartDate'); } if(type === 'investment') { sip = parseFloat(getVal('accSip'))||0; target = parseFloat(getVal('accTarget'))||0; ret = parseFloat(getVal('accReturn'))||0; } state.accounts.push({ id: Date.now(), name: getVal('accName'), balance: parseFloat(getVal('accBalance')), type, roi, tenure, emi, startDate, sip, target, ret }); save(); closeModal('accountModal'); e.target.reset(); document.getElementById('debt-fields').classList.add('hidden'); document.getElementById('invest-fields').classList.add('hidden'); showToast("Account Added!"); };
+        window.addAccount = (e) => { e.preventDefault(); const type = getVal('accType'); let emi = 0, roi = 0, tenure = 0, startDate = '', sip = 0, target = 0, ret = 0; if(['loan','credit'].includes(type)) { const p = parseFloat(getVal('accBalance'))||0; roi = parseFloat(getVal('accRoi'))||0; tenure = parseFloat(getVal('accTenure'))||0; emi = calculateEMI(p, roi, tenure); startDate = getVal('accStartDate'); } if(type === 'investment') { sip = parseFloat(getVal('accSip'))||0; target = parseFloat(getVal('accTarget'))||0; ret = parseFloat(getVal('accReturn'))||0; } state.accounts.push({ id: Date.now(), name: getVal('accName'), balance: parseFloat(getVal('accBalance')), type, roi, tenure, emi, startDate, sip, target, ret }); save(); closeModal('accountModal'); e.target.reset(); document.getElementById('debt-fields').classList.add('hidden'); document.getElementById('invest-fields').classList.add('hidden'); showToast("Account Added!"); render(); };
         window.openTxModal = () => { setTxt('txModalTitle', "New Transaction"); const f = document.getElementById('txId'); if(f) f.value = ""; document.getElementById('txDesc').value = ""; document.getElementById('txAmount').value = ""; document.getElementById('txDate').valueAsDate = new Date(); openModal('txModal'); };
         window.editTransaction = (id) => { const tx = state.transactions.find(t => t.id === id); if(!tx) return; setTxt('txModalTitle', "Edit Transaction"); document.getElementById('txId').value = tx.id; document.getElementById('txDesc').value = tx.desc; document.getElementById('txAmount').value = tx.amount; document.getElementById('txDate').value = tx.date; document.getElementById('txType').value = tx.type; document.getElementById('txCat').value = tx.cat; updateAccountSelect(); document.getElementById('txAccount').value = tx.accId || ""; if(tx.type === 'transfer') document.getElementById('txToAccount').value = tx.toAccId || ""; toggleTxFields(); openModal('txModal'); };
-        window.saveTransaction = (e) => { e.preventDefault(); const id = getVal('txId'); const isEdit = !!id; const amount = parseFloat(getVal('txAmount')); const type = getVal('txType'); const accId = parseFloat(getVal('txAccount')); const toAccId = type === 'transfer' ? parseFloat(getVal('txToAccount')) : null; const modifyBalance = (aId, amt, direction) => { const a = state.accounts.find(x => x.id === aId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(!isDebt) a.balance += (amt * direction); else a.balance -= (amt * direction); } return a ? a.name : 'Unknown'; }; if(isEdit) { const oldTx = state.transactions.find(t => t.id == id); if(oldTx) { if(oldTx.type === 'income') modifyBalance(oldTx.accId, oldTx.amount, -1); else if(oldTx.type === 'expense') modifyBalance(oldTx.accId, oldTx.amount, 1); else if(oldTx.type === 'transfer') { modifyBalance(oldTx.accId, oldTx.amount, 1); modifyBalance(oldTx.toAccId, oldTx.amount, -1); } state.transactions = state.transactions.filter(t => t.id != id); } } let accName = '', toAccName = ''; if(type === 'income') accName = modifyBalance(accId, amount, 1); else if(type === 'expense') accName = modifyBalance(accId, amount, -1); else if(type === 'transfer') { accName = modifyBalance(accId, amount, -1); toAccName = modifyBalance(toAccId, amount, 1); } const newTx = { id: isEdit ? parseFloat(id) : Date.now(), desc: getVal('txDesc'), amount: amount, date: getVal('txDate'), type: type, cat: getVal('txCat'), accId: accId, accName: accName, toAccId: toAccId, toAccName: toAccName }; state.transactions.unshift(newTx); state.transactions.sort((a,b) => new Date(b.date) - new Date(a.date)); save(); closeModal('txModal'); e.target.reset(); showToast("Transaction Saved!"); };
-        window.deleteItem = (list, id) => { if(confirm('Delete this item?')) { if(list === 'transactions') { const t = state.transactions.find(x => x.id === id); if(t) { const a = state.accounts.find(x => x.id === t.accId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(t.type === 'income') a.balance -= t.amount * (isDebt?-1:1); else if(t.type === 'expense') a.balance += t.amount * (isDebt?-1:1); else if(t.type === 'transfer') { a.balance += t.amount * (isDebt?-1:1); const dest = state.accounts.find(x => x.id === t.toAccId); if(dest) dest.balance -= t.amount * (['credit','loan'].includes(dest.type)?-1:1); } } } } state[list] = state[list].filter(i=>i.id!==id); save(); showToast("Item Deleted"); } };
-        window.setAnalysisRange = (range) => { analysisRange = range; render(); };
+        window.saveTransaction = (e) => { e.preventDefault(); const id = getVal('txId'); const isEdit = !!id; const amount = parseFloat(getVal('txAmount')); const type = getVal('txType'); const accId = parseFloat(getVal('txAccount')); const toAccId = type === 'transfer' ? parseFloat(getVal('txToAccount')) : null; const modifyBalance = (aId, amt, direction) => { const a = state.accounts.find(x => x.id === aId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(!isDebt) a.balance += (amt * direction); else a.balance -= (amt * direction); } return a ? a.name : 'Unknown'; }; if(isEdit) { const oldTx = state.transactions.find(t => t.id == id); if(oldTx) { if(oldTx.type === 'income') modifyBalance(oldTx.accId, oldTx.amount, -1); else if(oldTx.type === 'expense') modifyBalance(oldTx.accId, oldTx.amount, 1); else if(oldTx.type === 'transfer') { modifyBalance(oldTx.accId, oldTx.amount, 1); modifyBalance(oldTx.toAccId, oldTx.amount, -1); } state.transactions = state.transactions.filter(t => t.id != id); } } let accName = '', toAccName = ''; if(type === 'income') accName = modifyBalance(accId, amount, 1); else if(type === 'expense') accName = modifyBalance(accId, amount, -1); else if(type === 'transfer') { accName = modifyBalance(accId, amount, -1); toAccName = modifyBalance(toAccId, amount, 1); } const newTx = { id: isEdit ? parseFloat(id) : Date.now(), desc: getVal('txDesc'), amount: amount, date: getVal('txDate'), type: type, cat: getVal('txCat'), accId: accId, accName: accName, toAccId: toAccId, toAccName: toAccName }; state.transactions.unshift(newTx); state.transactions.sort((a,b) => new Date(b.date) - new Date(a.date)); save(); closeModal('txModal'); e.target.reset(); showToast("Transaction Saved!"); render(); };
+        window.deleteItem = (list, id) => { if(confirm('Delete this item?')) { if(list === 'transactions') { const t = state.transactions.find(x => x.id === id); if(t) { const a = state.accounts.find(x => x.id === t.accId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(t.type === 'income') a.balance -= t.amount * (isDebt?-1:1); else if(t.type === 'expense') a.balance += t.amount * (isDebt?-1:1); else if(t.type === 'transfer') { a.balance += t.amount * (isDebt?-1:1); const dest = state.accounts.find(x => x.id === t.toAccId); if(dest) dest.balance -= t.amount * (['credit','loan'].includes(dest.type)?-1:1); } } } } state[list] = state[list].filter(i=>i.id!==id); save(); showToast("Item Deleted"); render(); } };
+        window.setAnalysisRange = (range) => { analysisRange = range; renderDashboard(); };
         window.setActFilter = (f) => { activityFilter = f; renderActivity(); };
         function updateAccountSelect() { const select = document.getElementById('txAccount'); const toSelect = document.getElementById('txToAccount'); if(!select || !toSelect) return; const genOpts = () => { let html = ''; const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type)); const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type)); if(assets.length) { html+=`<optgroup label="Assets">`+assets.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } if(debts.length) { html+=`<optgroup label="Credit/Loan">`+debts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } return html; }; const h = genOpts(); select.innerHTML = h; toSelect.innerHTML = h; }
-
-        function generateInsights(assets, debts, burnPct, topCat) { const card = document.getElementById('smart-insights'); const txt = document.getElementById('insight-text'); if(!card || !txt) return; const debtRatio = assets > 0 ? (debts / assets) * 100 : 0; let msg = ""; if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income."; else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets."; else if (topCat) msg = `📊 <b>Top Category:</b> You spent the most on <b>${topCat.name}</b> (${money(topCat.amt)}) this month.`; else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month."; else msg = "💡 <b>Tip:</b> Log more transactions to get personalized financial advice."; txt.innerHTML = msg; card.classList.remove('hidden'); }
-        function renderRecurrings() { const counts = {}; state.transactions.filter(t=>t.type==='expense').forEach(t => { const k = `${t.desc}|${t.amount}`; if(!counts[k]) counts[k] = { count:0, t:t }; counts[k].count++; }); const recurs = Object.values(counts).filter(x => x.count >= 2); const div = document.getElementById('recurring-list'); const sect = document.getElementById('recurring-section'); if(div && sect) { if(recurs.length > 0) { sect.classList.remove('hidden'); div.innerHTML = recurs.map(r => `<div class="bg-white border border-slate-100 p-4 rounded-2xl flex justify-between items-center shadow-sm"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center"><i class="fas fa-repeat text-xs"></i></div><div><div class="font-bold text-sm text-slate-800">${r.t.desc}</div><div class="text-[10px] text-slate-400">Monthly subscription</div></div></div><div class="font-bold text-slate-900">${money(r.t.amount)}</div></div>`).join(''); } else sect.classList.add('hidden'); } }
 
         window.runSipCalc = () => { const amt = parseFloat(getVal('calc-sip-amt')); const yrs = parseFloat(getVal('calc-sip-yrs')); if(amt && yrs) { const r = 12 / 100 / 12; const n = yrs * 12; const fv = amt * ((Math.pow(1+r, n) - 1) / r) * (1+r); setTxt('calc-sip-res', money(fv).replace(/<[^>]*>?/gm, '')); } };
         window.runEmiCalc = () => { const p = parseFloat(getVal('calc-emi-p')); const r = parseFloat(getVal('calc-emi-r')); const n = parseFloat(getVal('calc-emi-n')) * 12; if(p && r && n) { const res = calculateEMI(p, r, n); setTxt('calc-emi-res', money(res).replace(/<[^>]*>?/gm, '')); } };
@@ -299,23 +335,112 @@
         window.calcFire = () => { const exp = parseFloat(getVal('fire-expenses')); if(exp) { const fireNum = exp * 12 * 25; setHtml('fire-number', money(fireNum)); const elNw = document.getElementById('dash-networth'); if(elNw) { const currentNw = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const pct = Math.min(100, (currentNw / fireNum) * 100); setTxt('fire-progress', `You are ${pct.toFixed(1)}% of the way to freedom.`); } } };
         window.calcFuture = () => { const elNw = document.getElementById('dash-networth'); if(!elNw) return; const P = parseFloat(elNw.innerText.replace(/[^\d.]/g, '')) || 0; const PMT = parseFloat(getVal('fc-monthly')) || 0; const r = (parseFloat(getVal('fc-rate')) || 10) / 100; const years = parseFloat(getVal('fc-years')) || 10; const n = 12; let balance = P; const dataPoints = [], labels = []; for(let i=0; i<=years; i++) { labels.push(`Year ${i}`); if (i===0) dataPoints.push(balance); else { const months = i * 12; const futureValue = P * Math.pow(1 + r/n, months) + (PMT * (Math.pow(1 + r/n, months) - 1)) / (r/n); balance = futureValue; dataPoints.push(balance); } } setHtml('fc-total', money(balance)); const ctxEl = document.getElementById('futureChart'); if(ctxEl) { const ctx = ctxEl.getContext('2d'); if(futureChartInst) futureChartInst.destroy(); futureChartInst = new Chart(ctx, { type: 'line', data: { labels: labels, datasets: [{ label: 'Net Worth', data: dataPoints, borderColor: '#4F46E5', backgroundColor: 'rgba(79, 70, 229, 0.1)', fill: true, tension: 0.4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: '#F1F5F9' } }, x: { grid: { display: false } } } } }); } };
         
-        // NEW REPORTS LOGIC
-        window.renderReport = () => {
-            const input = document.getElementById('report-month').value; if(!input) return;
-            const date = new Date(input); const m = date.getMonth(); const y = date.getFullYear();
-            const txs = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === m && d.getFullYear() === y; });
-            const inc = txs.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
-            const exp = txs.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
-            const cats = {}; txs.filter(t=>t.type==='expense').forEach(t=>{cats[t.cat] = (cats[t.cat]||0)+t.amount});
-            let html = `<div class="text-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900 mb-1">Financial Statement</h2><p class="text-slate-500 font-medium">${date.toLocaleString('default', {month:'long', year:'numeric'})}</p></div>`;
-            html += `<div class="grid grid-cols-2 gap-6 mb-8"><div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 text-center"><div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Total Income</div><div class="text-3xl font-bold text-emerald-900">${money(inc)}</div></div><div class="p-6 bg-rose-50 rounded-2xl border border-rose-100 text-center"><div class="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1">Total Expense</div><div class="text-3xl font-bold text-rose-900">${money(exp)}</div></div></div>`;
-            html += `<div class="p-6 bg-slate-900 text-white rounded-2xl mb-8 flex justify-between items-center shadow-xl"><span class="font-bold text-lg">Net Savings</span><span class="font-bold text-2xl ${inc-exp>=0?'text-emerald-400':'text-rose-400'}">${money(inc-exp)}</span></div>`;
-            html += `<h3 class="font-bold text-slate-900 text-lg mb-4 border-b border-slate-200 pb-2">Expense Breakdown</h3><div class="space-y-3">`;
-            for(const [c, amt] of Object.entries(cats)) { html += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-slate-700">${c}</span><span class="font-bold text-slate-900">${money(amt)}</span></div>`; } html += `</div>`; setHtml('report-content', html);
-        };
-        
-        // NEW ACTIVITY LOGIC
-        window.renderActivity = () => {
+        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
+        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); } };
+        window.updateProfileName = async () => { const name = getVal('profile-name-input'); if(name && currentUser) { await updateProfile(currentUser, { displayName: name }); setTxt('user-name', name); alert("Name updated!"); } };
+        window.changeTheme = (p, s) => { document.documentElement.style.setProperty('--primary', p); document.documentElement.style.setProperty('--primary-soft', s); const logo = document.getElementById('app-logo-bg'); if(logo) logo.style.backgroundColor = p; };
+
+        // MODULAR RENDERERS
+        function render() {
+            if(!state) return;
+            const currentTab = document.querySelector('.view-section.active').id.replace('view-', '');
+            if(currentTab === 'dashboard') renderDashboard();
+            if(currentTab === 'debts') renderDebts();
+            if(currentTab === 'investments') renderInvestments();
+            if(currentTab === 'accounts') renderAccounts();
+            if(currentTab === 'activity') renderActivity();
+            if(currentTab === 'calendar') renderCalendar();
+            if(currentTab === 'future') renderFuture();
+            if(currentTab === 'reports') renderReport();
+        }
+
+        function renderDashboard() {
+            if(!state.accounts.length && document.getElementById('onboarding-card')) { document.getElementById('onboarding-card').classList.remove('hidden'); document.getElementById('dash-content').classList.add('hidden'); return; }
+            if(document.getElementById('onboarding-card')) document.getElementById('onboarding-card').classList.add('hidden');
+            if(document.getElementById('dash-content')) document.getElementById('dash-content').classList.remove('hidden');
+
+            // Recalc Globals
+            let assets=0, debts=0;
+            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) assets+=a.balance; else debts+=a.balance; });
+            const nw = assets - debts;
+            setHtml('dash-networth', money(nw)); setHtml('dash-assets', money(assets)); setHtml('dash-debts', money(debts));
+            
+            // Metrics
+            const now = new Date(); const mTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth()===now.getMonth() && d.getFullYear()===now.getFullYear(); });
+            const mInc = mTx.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0); const mExp = mTx.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
+            const burnPct = mInc>0 ? Math.min(100, (mExp/mInc)*100) : 0;
+            setTxt('burn-percent', `${burnPct.toFixed(0)}%`); 
+            const bb = document.getElementById('burn-bar'); if(bb) { bb.style.width=`${burnPct}%`; bb.className=`meter-fill ${burnPct<50?'bg-emerald-500':burnPct<80?'bg-orange-400':'bg-rose-500'}`; }
+            setHtml('burn-expense', `Exp: ${money(mExp)}`); setHtml('burn-income', `Inc: ${money(mInc)}`);
+            
+            // Recent Activity
+            const dTx = document.getElementById('dashboard-recent-tx');
+            if(dTx) {
+                dTx.innerHTML = state.transactions.slice(0, 3).map(t => {
+                    const isInc = t.type === 'income';
+                    return `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl mb-2"><div class="flex gap-3 items-center"><div class="w-8 h-8 rounded-full flex items-center justify-center ${isInc?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><div class="font-bold text-xs text-slate-800">${t.desc}</div><div class="text-[10px] text-slate-400">${t.cat}</div></div></div><div class="font-bold text-xs ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</div></div>`;
+                }).join('') || '<div class="text-slate-400 text-xs text-center py-2">No activity</div>';
+            }
+
+            // Charts
+            const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); 
+            for(let i=analysisRange==='1M'?0:(analysisRange==='6M'?5:11); i>=0; i--){ const d=new Date(cy,cm-i,1); buckets.push({label:monthNames[d.getMonth()], month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
+            state.transactions.forEach(tx=>{ if(tx.type==='transfer')return; const d=new Date(tx.date); const b=buckets.find(x=>x.month===d.getMonth()&&x.year===d.getFullYear()); if(b){ if(tx.type==='income')b.income+=tx.amount; else b.expense+=tx.amount; } });
+            
+            const barEl = document.getElementById('monthlyBarChart'); if(barEl) { const ctx=barEl.getContext('2d'); if(barChartInst) barChartInst.destroy(); barChartInst = new Chart(ctx, { type: 'bar', data: { labels: buckets.map(b=>b.label), datasets: [{ label: 'Inc', data: buckets.map(b=>b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b=>b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } }, y: { display: false } } } }); }
+            
+            // Net Worth Line
+            if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
+            const mainCtxEl = document.getElementById('mainChart'); if(mainCtxEl) { const ctx=mainCtxEl.getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const g=c.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(79,70,229,0.2)');g.addColorStop(1,'rgba(79,70,229,0)');return g;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } }); }
+
+            // Sankey
+            const flows={}; const WALLET="Wallet"; 
+            state.transactions.forEach(tx=>{ 
+                const d=new Date(tx.date); 
+                // Simple filter for current month for sankey
+                if(d.getMonth()===cm && d.getFullYear()===cy && tx.type!=='transfer') {
+                     if(tx.type==='income'){ const k=`${tx.cat}|${WALLET}`; flows[k]=(flows[k]||0)+tx.amount; } 
+                     else { const k=`${WALLET}|${tx.cat}`; flows[k]=(flows[k]||0)+tx.amount; }
+                }
+            });
+            const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
+            const sankeyEl = document.getElementById('sankeyChart'); if(sankeyEl) { const ctx=sankeyEl.getContext('2d'); if(sankeyInst) sankeyInst.destroy(); sankeyInst = new Chart(ctx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: 'grey', colorTo: 'grey', colorMode: 'gradient', labels: { color: '#111827', font: { size: 10 } } }] }, options: { responsive: true, maintainAspectRatio: false } }); }
+        }
+
+        function renderDebts() {
+            const list = document.getElementById('debt-list-container'); if(!list) return;
+            const debts = state.accounts.filter(a => ['credit','loan'].includes(a.type));
+            list.innerHTML = debts.length ? debts.map(a => {
+                let emiCalc = 0; if(a.emi) emiCalc = a.emi; // Simplified
+                return `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3"><div class="flex justify-between"><div><h4 class="font-bold">${a.name}</h4><div class="text-xs text-rose-500">EMI: ${money(emiCalc)}</div></div><div class="font-bold text-xl">${money(a.balance)}</div></div></div>`;
+            }).join('') : '<div class="text-center text-slate-400 py-10">No debts.</div>';
+        }
+
+        function renderInvestments() {
+            const list = document.getElementById('invest-list-container'); if(!list) return;
+            const invs = state.accounts.filter(a => a.type === 'investment');
+            let total = 0, sip = 0;
+            const names=[], bals=[];
+            invs.forEach(a => { total+=a.balance; sip+=(a.sip||0); names.push(a.name); bals.push(a.balance); });
+            setHtml('inv-total', money(total)); setHtml('inv-sip-total', money(sip));
+            
+            list.innerHTML = invs.length ? invs.map(a => `<div class="neo-card p-5 border-l-4 border-emerald-500 mb-3"><div class="flex justify-between"><div><h4 class="font-bold">${a.name}</h4><div class="text-xs text-emerald-600">SIP: ${money(a.sip||0)}</div></div><div class="font-bold text-xl">${money(a.balance)}</div></div></div>`).join('') : '<div class="text-center text-slate-400 py-10">No investments.</div>';
+            
+            const ctxEl=document.getElementById('invPieChart'); if(ctxEl && names.length) { const ctx=ctxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: names, datasets: [{ data: bals, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '70%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); }
+        }
+
+        function renderAccounts() {
+            const list = document.getElementById('accounts-container'); if(!list) return;
+            let liquid=0, debt=0;
+            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) liquid+=a.balance; else debt+=a.balance; });
+            const accHtml = state.accounts.map(a => {
+               const isDebt = ['credit','loan'].includes(a.type);
+               return `<div class="neo-card p-4 flex justify-between items-center mb-3 border-l-4 ${isDebt?'border-rose-500':'border-emerald-500'}"><div><div class="font-bold text-slate-800">${a.name}</div><div class="text-[10px] text-slate-400 uppercase">${a.type}</div></div><div class="flex items-center gap-3"><span class="font-bold text-lg">${money(a.balance)}</span><button onclick="deleteItem('accounts', ${a.id})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div></div>`; 
+            }).join('');
+            list.innerHTML = accHtml || '<div class="text-center text-slate-400 py-10">No accounts.</div>';
+        }
+
+        function renderActivity() {
             const list = document.getElementById('activity-list'); if(!list) return;
             const term = document.getElementById('act-search').value.toLowerCase();
             const filtered = state.transactions.filter(t => (activityFilter === 'all' || t.type === activityFilter) && t.desc.toLowerCase().includes(term));
@@ -341,147 +466,13 @@
                     </div>`;
                 }).join('');
             }
-        };
-
-        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
-        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); } };
-        window.updateProfileName = async () => { const name = getVal('profile-name-input'); if(name && currentUser) { await updateProfile(currentUser, { displayName: name }); setTxt('user-name', name); alert("Name updated!"); } };
-        window.changeTheme = (p, s) => { document.documentElement.style.setProperty('--primary', p); document.documentElement.style.setProperty('--primary-soft', s); const logo = document.getElementById('app-logo-bg'); if(logo) logo.style.backgroundColor = p; };
-
-        // CALENDAR LOGIC
-        function renderCalendar() {
-            const grid = document.getElementById('calendar-grid'); if(!grid) return;
-            const now = new Date(); const year = now.getFullYear(); const month = now.getMonth();
-            const firstDay = new Date(year, month, 1).getDay(); const daysInMonth = new Date(year, month + 1, 0).getDate();
-            setTxt('cal-month-name', now.toLocaleString('default', { month: 'long', year: 'numeric' }));
-            const dayData = {};
-            state.transactions.forEach(t => { const d = new Date(t.date); if(d.getMonth() === month && d.getFullYear() === year) { const day = d.getDate(); if(!dayData[day]) dayData[day] = { inc:0, exp:0, txs:[] }; if(t.type === 'income') dayData[day].inc += t.amount; else if(t.type === 'expense') dayData[day].exp += t.amount; dayData[day].txs.push(t); } });
-            let html = '';
-            for(let i=0; i<firstDay; i++) html += `<div class="cal-day empty"></div>`;
-            for(let i=1; i<=daysInMonth; i++) {
-                const data = dayData[i];
-                let content = '';
-                if(data) { if(data.inc > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>`; if(data.exp > 0) content += `<div class="w-1.5 h-1.5 rounded-full bg-rose-500"></div>`; }
-                const hasDataClass = data ? 'has-data' : '';
-                html += `<div onclick="showDayDetails(${i})" class="cal-day ${hasDataClass}"><span class="text-[10px] md:text-xs font-bold text-slate-400">${i}</span><div class="cal-dots">${content}</div></div>`;
-            }
-            grid.innerHTML = html;
         }
 
-        window.showDayDetails = (day) => {
-            const now = new Date(); const txs = state.transactions.filter(t => { const d = new Date(t.date); return d.getDate() === day && d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
-            const list = document.getElementById('cal-tx-list'); const det = document.getElementById('cal-day-detail');
-            setTxt('cal-sel-date', `Transactions for ${day} ${now.toLocaleString('default', { month: 'short' })}`);
-            if(txs.length === 0) list.innerHTML = '<div class="text-slate-400 text-sm">No transactions.</div>'; else { list.innerHTML = txs.map(t => { const isInc = t.type === 'income'; return `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="text-sm font-bold text-slate-700">${t.desc}</span><span class="text-sm font-bold ${isInc?'text-emerald-600':'text-rose-600'}">${isInc?'+':'-'}${money(t.amount)}</span></div>`; }).join(''); }
-            det.classList.remove('hidden');
-        };
-
-        function render() {
-            if(!state) return;
-            // 1. RENDER LISTS FIRST (Safe Render Priority)
-            const ac=document.getElementById('accounts-container'); 
-            if(ac) { 
-                const groups={ 'Liquidity': 'cash', 'Investments': 'investment', 'Real Estate': 'property', 'Debt / Loans': ['credit','loan'] }; 
-                ac.innerHTML = '';
-                let hasAccounts = false;
-                for(const[name,types] of Object.entries(groups)){ 
-                    const items=state.accounts.filter(a=>Array.isArray(types)?types.includes(a.type):a.type===types); 
-                    if(items.length){ 
-                        hasAccounts = true;
-                        let h=`<div class="neo-card p-5 mb-4"><h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-50 pb-2">${name}</h4><div class="space-y-4">`; 
-                        items.forEach(i=>{ let sub=i.emi?`<div class="text-[10px] text-rose-500 font-bold bg-rose-50 px-2 py-0.5 rounded-full inline-block mt-1">EMI: ${money(i.emi)}</div>`:''; if(i.startDate) sub += ` <span class="text-[10px] text-slate-400 ml-1">Since: ${formatDateIN(i.startDate)}</span>`; h+=`<div class="flex justify-between items-center group"><div><div class="font-bold text-slate-800">${i.name}</div>${sub}</div><div class="flex items-center gap-3"><span class="font-bold text-slate-900">${money(i.balance)}</span><button onclick="deleteItem('accounts', ${i.id})" class="w-8 h-8 flex items-center justify-center rounded-full text-slate-300 hover:text-rose-500 hover:bg-rose-50 transition"><i class="fas fa-trash"></i></button></div></div>`; }); 
-                        ac.innerHTML+=h+`</div></div>`; 
-                    } 
-                }
-                if(!hasAccounts) ac.innerHTML = '<div class="text-center text-slate-400 py-10">No accounts yet. Click + to add one.</div>';
-            }
-
-            const tc=document.getElementById('full-tx-list'); 
-            if(tc) { 
-                tc.innerHTML=''; 
-                const term=document.getElementById('tx-search') ? document.getElementById('tx-search').value.toLowerCase() : ''; 
-                const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term)); 
-                if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`; 
-                else { 
-                    let lastDate = null; 
-                    filteredTx.forEach(t => { 
-                        const isInc=t.type==='income'; const isTrf=t.type==='transfer'; const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); let dateStr = formatDateIN(t.date); if(txDate.toDateString() === today.toDateString()) dateStr = "Today"; else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday"; else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); 
-                        if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; } 
-                        let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'; let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900'; let sign = isTrf ? '' : isInc ? '+' : '-'; let icon = getCategoryIcon(t.cat); let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName; 
-                        tc.innerHTML+=`<div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="flex items-center gap-2 mt-0.5"><div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div><span class="text-[10px] text-slate-400 font-medium">${subText}</span></div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span><button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button></div></div>`; 
-                    }); 
-                } 
-            }
-
-            // 2. MATH
-            updateAccountSelect();
-            ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
-
-            let assets=0, debts=0, totalScheduledEMI=0; let assetMap = { 'Cash': 0, 'Investments': 0, 'Property': 0 };
-            let totalDebtPrincipal=0, totalEstimatedInterest=0, debtCompositionLabels=[], debtCompositionData=[], debtListHTML="";
-            let totalInvested = 0, totalMonthlySip = 0, investListHTML = "", investNames = [], investBalances = [];
-
-            state.accounts.forEach(a => { if(['cash','investment','property'].includes(a.type)) { assets+=a.balance; if(a.type==='cash') assetMap['Cash']+=a.balance; if(a.type==='investment') assetMap['Investments']+=a.balance; if(a.type==='property') assetMap['Property']+=a.balance; if(a.type === 'investment') { totalInvested += a.balance; if(a.sip) totalMonthlySip += a.sip; const r = (a.ret || 10) / 100 / 12; const n = 10 * 12; const fv = a.balance * Math.pow(1+r, n) + (a.sip ? (a.sip * (Math.pow(1+r, n) - 1) / r) * (1+r) : 0); const targetPct = a.target ? Math.min(100, (a.balance / a.target) * 100) : 0; investNames.push(a.name); investBalances.push(a.balance); investListHTML += `<div class="neo-card p-5 border-l-4 border-emerald-500 mb-3 hover:shadow-lg transition"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg">${a.name}</h4><div class="flex gap-2 mt-1">${a.sip ? `<span class="text-[10px] font-bold bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded">SIP: ${money(a.sip)}</span>` : ''}${a.ret ? `<span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2 py-0.5 rounded">Exp: ${a.ret}%</span>` : ''}</div></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Current Value</div><div class="font-bold text-slate-900 text-xl">${money(a.balance)}</div></div></div>${a.target ? `<div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden"><div class="bg-emerald-500 h-full" style="width: ${targetPct}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 mb-2"><span>Goal Progress</span><span>Target: ${money(a.target)}</span></div>` : ''}<div class="mt-3 pt-2 border-t border-slate-50 flex justify-between items-center"><span class="text-xs text-slate-400 font-bold"><i class="fas fa-chart-line text-emerald-500 mr-1"></i> 10Y Projection</span><span class="text-sm font-bold text-emerald-700">${money(fv)}</span></div></div>`; } } else { debts+=a.balance; totalDebtPrincipal += a.balance; if(a.emi) { totalScheduledEMI+=a.emi; let monthsElapsed = 0; if(a.startDate) { const start = new Date(a.startDate); const now = new Date(); monthsElapsed = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth()); } const remainingTenure = Math.max(0, (a.tenure || 0) - monthsElapsed); const totalRemainingPayable = a.emi * remainingTenure; totalEstimatedInterest += Math.max(0, totalRemainingPayable - a.balance); const payoffDate = new Date(); payoffDate.setMonth(payoffDate.getMonth() + remainingTenure); const principalPercent = totalRemainingPayable > 0 ? (a.balance / totalRemainingPayable) * 100 : 0; debtListHTML += `<div class="neo-card p-5 border-l-4 border-rose-500 mb-3 hover:shadow-lg transition"><div class="flex justify-between items-start mb-2"><div><h4 class="font-bold text-slate-900 text-lg">${a.name}</h4><span class="text-xs font-semibold bg-rose-100 text-rose-600 px-2 py-0.5 rounded">EMI: ${money(a.emi)}</span></div><div class="text-right"><div class="text-xs text-slate-400 uppercase font-bold">Liability</div><div class="font-bold text-slate-900 text-xl">${money(totalRemainingPayable)}</div></div></div><div class="w-full bg-slate-100 h-2 rounded-full mt-2 mb-1 overflow-hidden flex"><div class="bg-indigo-500 h-full" style="width: ${principalPercent}%"></div><div class="bg-rose-400 h-full" style="width: ${100-principalPercent}%"></div></div><div class="flex justify-between text-[10px] text-slate-500 mb-3"><span class="flex items-center gap-1">Principal: ${money(a.balance)}</span><span class="flex items-center gap-1">Interest: ${money(totalRemainingPayable - a.balance)}</span></div><div class="grid grid-cols-2 gap-4 pt-2 border-t border-slate-50 text-xs"><div><span class="text-slate-400 block">Rate</span><span class="font-bold text-slate-700">${a.roi}%</span></div><div class="text-right"><span class="text-slate-400 block">Free Date</span><span class="font-bold text-emerald-600">${payoffDate.toLocaleDateString('en-IN', {month:'short', year:'numeric'})}</span></div></div></div>`; } else { debtListHTML += `<div class="neo-card p-5 border-l-4 border-orange-400 mb-3 hover:shadow-lg transition"><div class="flex justify-between items-center"><h4 class="font-bold text-slate-900">${a.name}</h4><div class="font-bold text-slate-900 text-lg">${money(a.balance)}</div></div></div>`; } debtCompositionLabels.push(a.name); debtCompositionData.push(a.balance); } });
-            const nw = assets - debts; setHtml('dash-networth', money(nw)); setHtml('dash-assets', money(assets)); setHtml('dash-debts', money(debts));
-
-            const now = new Date();
-            const thisMonthTx = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear(); });
-            const mInc = thisMonthTx.filter(t => t.type === 'income').reduce((a,b) => a+b.amount, 0); const mExp = thisMonthTx.filter(t => t.type === 'expense').reduce((a,b) => a+b.amount, 0); const burnPct = mInc > 0 ? Math.min(100, (mExp / mInc) * 100) : 0; const cats = {}; thisMonthTx.filter(t=>t.type==='expense').forEach(t => { cats[t.cat] = (cats[t.cat]||0) + t.amount; }); let topCat = null; Object.keys(cats).forEach(c => { if(!topCat || cats[c] > topCat.amt) topCat = {name:c, amt:cats[c]}; });
-            generateInsights(assets, debts, burnPct, topCat); renderRecurrings();
-            setTxt('burn-percent', `${burnPct.toFixed(0)}%`); const burnBar = document.getElementById('burn-bar'); if(burnBar) { burnBar.style.width = `${burnPct}%`; burnBar.className = `meter-fill ${burnPct < 50 ? 'bg-emerald-500' : burnPct < 80 ? 'bg-orange-400' : 'bg-rose-500'}`; } setHtml('burn-expense', `Out: ${money(mExp)}`); setHtml('burn-income', `In: ${money(mInc)}`);
-            
-            // Dashboard Recent Activity
-            const dTx = document.getElementById('dashboard-recent-tx');
-            if(dTx) {
-                if(state.transactions.length === 0) dTx.innerHTML = '<div class="text-slate-400 text-xs">No transactions yet.</div>';
-                else {
-                    dTx.innerHTML = state.transactions.slice(0, 3).map(t => {
-                        const isInc = t.type === 'income';
-                        return `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl mb-2"><div class="flex gap-3 items-center"><div class="w-8 h-8 rounded-full flex items-center justify-center ${isInc?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'} text-xs"></i></div><div><div class="font-bold text-xs text-slate-800">${t.desc}</div><div class="text-[10px] text-slate-400">${t.cat}</div></div></div><div class="font-bold text-xs ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</div></div>`;
-                    }).join('');
-                }
-            }
-
-            // 3. RENDER CHARTS/TABS (Only if visible to prevent crash)
-            if(document.getElementById('view-future') && document.getElementById('view-future').classList.contains('active')) { 
-                const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { const spent = cats[cat] || 0; const pct = Math.min(100, (spent / limit) * 100); const color = pct > 90 ? 'bg-rose-500' : pct > 75 ? 'bg-orange-400' : 'bg-emerald-500'; bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="w-full bg-slate-100 h-3 rounded-full mb-2 overflow-hidden"><div class="${color} h-full transition-all duration-500" style="width: ${pct}%"></div></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>${money(spent)} spent</span><span>${money(limit)} limit</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set. Click "Add" to start.</div>`; bContainer.innerHTML = bHtml; } 
-                const gContainer = document.getElementById('goal-container'); if(gContainer) { let gHtml = ""; if(state.goals) { for(const [name, target] of Object.entries(state.goals)) { gHtml += `<div class="neo-card p-5 border-l-4 border-indigo-500"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${name}</h4><button onclick="deleteGoal('${name}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="text-2xl font-bold text-indigo-600">${money(target)}</div><div class="text-[10px] text-slate-400 uppercase font-bold mt-1">Goal Target</div></div>`; } } if(!gHtml) gHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No goals set.</div>`; gContainer.innerHTML = gHtml; } 
-                calcFuture();
-            }
-            if(document.getElementById('view-calendar').classList.contains('active')) renderCalendar();
-            if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
-
-            // RENDER ACTIVITY VIEW
-            if(document.getElementById('view-activity').classList.contains('active')) renderActivity();
-
-            if(document.getElementById('view-dashboard').classList.contains('active')) {
-                const lb = document.getElementById('category-leaderboard');
-                if(lb) {
-                    const sortedCats = Object.keys(cats).map(c => ({name:c, amt:cats[c]})).sort((a,b) => b.amt - a.amt).slice(0, 5);
-                    if(sortedCats.length) {
-                        lb.innerHTML = sortedCats.map(c => { const pct = mExp > 0 ? (c.amt/mExp)*100 : 0; return `<div class="flex items-center justify-between text-sm mb-1"><span class="font-bold text-slate-700">${c.name}</span><span class="font-bold text-slate-900">${money(c.amt)}</span></div><div class="w-full bg-slate-100 h-2 rounded-full mb-3"><div class="bg-indigo-500 h-full rounded-full" style="width:${pct}%"></div></div>`; }).join('');
-                    } else lb.innerHTML = '<div class="text-slate-400 text-sm">No spending data this month.</div>';
-                }
-
-                const buckets=[]; const monthNames=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"]; const cm=new Date().getMonth(); const cy=new Date().getFullYear(); const rangeMonths = analysisRange === '1Y' ? 11 : 5; for(let i=rangeMonths;i>=0;i--){ const d=new Date(cy,cm-i,1); buckets.push({label:`${monthNames[d.getMonth()]}`, month:d.getMonth(), year:d.getFullYear(), income:0, expense:0}); }
-                state.accounts.forEach(a => { if(a.emi && a.emi > 0) buckets.forEach(b => { const bucketDate = new Date(b.year, b.month, 1); const loanStart = a.startDate ? new Date(a.startDate) : new Date(0); loanStart.setDate(1); if (bucketDate >= loanStart) b.expense += a.emi; }); });
-                const flows={}; const WALLET="Wallet"; let si=0, so=0; state.transactions.forEach(tx=>{ if(tx.type === 'transfer') return; const txDate=new Date(tx.date); const bi=buckets.findIndex(b=>b.month===txDate.getMonth()&&b.year===txDate.getFullYear()); if(bi!==-1){ if(tx.type==='income') buckets[bi].income+=tx.amount; else buckets[bi].expense+=tx.amount; } let inc=false; if(analysisRange==='1M'){ if(txDate.getMonth()===cm && txDate.getFullYear()===cy) inc=true; } else if(analysisRange==='6M'){ if(bi !== -1 && bi >= buckets.length - 6) inc=true; } else { if(bi !== -1) inc=true; } if(inc){ const cat=tx.cat||(tx.type==='income'?'Uncat Inc':'Misc'); const amt=tx.amount; if(tx.type==='income'){ const k=`${cat}|${WALLET}`; flows[k]=(flows[k]||0)+amt; si+=amt; } else { const k=`${WALLET}|${cat}`; flows[k]=(flows[k]||0)+amt; so+=amt; } } });
-                let totalSankeyEMI = 0; buckets.forEach(b => { let inRange = false; if(analysisRange === '1M' && b.month === cm && b.year === cy) inRange = true; else if(analysisRange === '6M' && buckets.indexOf(b) >= buckets.length - 6) inRange = true; else if(analysisRange === '1Y') inRange = true; if(inRange) { state.accounts.forEach(a => { if(a.emi && a.emi > 0) { const bDate = new Date(b.year, b.month, 1); const lStart = a.startDate ? new Date(a.startDate) : new Date(0); lStart.setDate(1); if(bDate >= lStart) totalSankeyEMI += a.emi; } }); } });
-                if(totalSankeyEMI>0) { const k=`${WALLET}|EMI`; flows[k]=(flows[k]||0)+totalSankeyEMI; so+=totalSankeyEMI; }
-                const surplus=si-so; if(surplus>0) flows[`${WALLET}|Savings`]=surplus;
-                const sankeyData=Object.keys(flows).map(k=>{const[f,t]=k.split('|');return{from:f,to:t,flow:flows[k]};});
-                const sankeyEl = document.getElementById('sankeyChart'); if(sankeyEl) { const sankeyCtx=sankeyEl.getContext('2d'); if(sankeyInst) sankeyInst.destroy(); const getColor = (name) => { if(!name) return '#ccc'; if(name===WALLET) return '#2563EB'; if(name==='Savings') return '#10B981'; if(name==='EMI') return '#F43F5E'; if(sankeyData.some(d=>d.from===name&&d.to===WALLET)) return '#3B82F6'; return '#F43F5E'; }; sankeyInst = new Chart(sankeyCtx, { type: 'sankey', data: { datasets: [{ data: sankeyData, colorFrom: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].from):'#ccc', colorTo: (c)=>c.dataset.data[c.dataIndex]?getColor(c.dataset.data[c.dataIndex].to):'#ccc', colorMode: 'gradient', labels: { color: '#111827', font: { weight: 'bold', size: 11 }, padding: 10 }, nodeWidth: 20, nodePadding: 20 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { tooltip: { callbacks: { label: (c) => `${c.raw.from} → ${c.raw.to}: ${money(c.raw.flow)}` } } } } }); }
-
-                const barEl = document.getElementById('monthlyBarChart'); if(barEl) { const barCtx = barEl.getContext('2d'); if(barChartInst) barChartInst.destroy(); barChartInst = new Chart(barCtx, { type: 'bar', data: { labels: buckets.map(b => b.label), datasets: [{ label: 'Inc', data: buckets.map(b => b.income), backgroundColor: '#10B981', borderRadius: 4 }, { label: 'Exp', data: buckets.map(b => b.expense), backgroundColor: '#F43F5E', borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false }, ticks: { color: '#6B7280' } }, y: { display: false } } } }); }
-
-                const pieCtxEl = document.getElementById('assetPieChart'); if(pieCtxEl) { const pieCtx = pieCtxEl.getContext('2d'); if(assetPieInst) assetPieInst.destroy(); assetPieInst = new Chart(pieCtx, { type: 'doughnut', data: { labels: ['Cash', 'Inv', 'Prop'], datasets: [{ data: [assetMap['Cash'], assetMap['Investments'], assetMap['Property']], backgroundColor: ['#10B981', '#3B82F6', '#6366F1'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '75%', plugins: { legend: { display: false } } } }); const totalAssets=assets||1; setHtml('asset-legend', `<div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Cash</span></div><span class="font-bold">${((assetMap['Cash']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-blue-500"></span><span>Inv</span></div><span class="font-bold">${((assetMap['Investments']/totalAssets)*100).toFixed(0)}%</span></div><div class="flex justify-between items-center w-full"><div class="flex items-center gap-2"><span class="w-2 h-2 rounded-full bg-indigo-500"></span><span>Prop</span></div><span class="font-bold">${((assetMap['Property']/totalAssets)*100).toFixed(0)}%</span></div>`); }
-
-                if(state.history[state.history.length-1]!==nw) { state.history.push(nw); if(state.history.length>12) state.history.shift(); }
-                const mainCtxEl = document.getElementById('mainChart'); if(mainCtxEl) { const ctx = mainCtxEl.getContext('2d'); if(chartInst) chartInst.destroy(); chartInst = new Chart(ctx, { type: 'line', data: { labels: Array(state.history.length).fill(''), datasets: [{ data: state.history, borderColor: '#4F46E5', backgroundColor: (c)=>{const gradient=c.chart.ctx.createLinearGradient(0,0,0,200);gradient.addColorStop(0,'rgba(79,70,229,0.2)');gradient.addColorStop(1,'rgba(79,70,229,0)');return gradient;}, borderWidth: 3, fill: true, tension: 0.4, pointRadius: 0 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { display: false }, y: { display: false } } } }); }
-            }
-            
-            const debtsView = document.getElementById('view-debts');
-            if(debtsView && debtsView.classList.contains('active')) { const debtSplitEl = document.getElementById('debtSplitChart'); if(debtSplitEl) { const debtSplitCtx = debtSplitEl.getContext('2d'); if(debtSplitInst) debtSplitInst.destroy(); debtSplitInst = new Chart(debtSplitCtx, { type: 'bar', data: { labels: ['Liability'], datasets: [ { label: 'Principal', data: [totalDebtPrincipal], backgroundColor: '#4F46E5', borderRadius: 8 }, { label: 'Interest', data: [totalEstimatedInterest], backgroundColor: '#F43F5E', borderRadius: 8 } ] }, options: { responsive: true, maintainAspectRatio: false, scales: { x: { stacked: true, grid: {display:false} }, y: { stacked: true, display: false } }, plugins: { legend: { position: 'bottom' } } } }); } const debtPieEl = document.getElementById('debtPieChart'); if(debtPieEl) { const debtPieCtx = debtPieEl.getContext('2d'); if(debtPieInst) debtPieInst.destroy(); debtPieInst = new Chart(debtPieCtx, { type: 'doughnut', data: { labels: debtCompositionLabels, datasets: [{ data: debtCompositionData, backgroundColor: ['#F43F5E', '#F97316', '#EAB308', '#84CC16', '#06B6D4'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: {size: 10} } } } } }); } setHtml('debt-list-container', debtListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active debts found.</div>'); }
+        function renderFuture() {
+            // Render Budgets & Goals
+            const bContainer = document.getElementById('budget-container'); if(bContainer) { let bHtml = ""; if(state.budgets) { for(const [cat, limit] of Object.entries(state.budgets)) { bHtml += `<div class="neo-card p-5"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${cat}</h4><button onclick="deleteBudget('${cat}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="flex justify-between text-xs font-bold text-slate-500"><span>Limit</span><span>${money(limit)}</span></div></div>`; } } if(!bHtml) bHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No budgets set.</div>`; bContainer.innerHTML = bHtml; } 
+            const gContainer = document.getElementById('goal-container'); if(gContainer) { let gHtml = ""; if(state.goals) { for(const [name, target] of Object.entries(state.goals)) { gHtml += `<div class="neo-card p-5 border-l-4 border-indigo-500"><div class="flex justify-between items-center mb-2"><h4 class="font-bold text-slate-800">${name}</h4><button onclick="deleteGoal('${name}')" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button></div><div class="text-2xl font-bold text-indigo-600">${money(target)}</div></div>`; } } if(!gHtml) gHtml = `<div class="col-span-full text-center py-8 text-slate-400 border-2 border-dashed border-slate-200 rounded-2xl">No goals set.</div>`; gContainer.innerHTML = gHtml; } 
+            calcFuture();
         }
 
         window.router=(v)=>{document.querySelectorAll('.view-section').forEach(e=>e.classList.remove('active')); const el=document.getElementById('view-'+v); if(el) el.classList.add('active'); document.querySelectorAll('.nav-item, .desktop-nav-item').forEach(e=>e.classList.remove('active')); if(document.getElementById('d-nav-'+v))document.getElementById('d-nav-'+v).classList.add('active'); if(document.getElementById('m-nav-'+v))document.getElementById('m-nav-'+v).classList.add('active'); render();};

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Fortified</title>
+    <title>Cash Flow | Obsidian Flow</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,7 +34,6 @@
         .meter-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .cal-day { aspect-ratio: 1/1; border-radius: 10px; background: #FFF; border: 1px solid #F1F5F9; padding: 2px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.1s; position: relative; }
-        .cal-day:active { transform: scale(0.95); }
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
@@ -53,7 +52,7 @@
 </head>
 <body class="bg-slate-50 text-slate-800">
 
-    <div id="toast"><i class="fas fa-check-circle mr-2"></i>Saved Successfully</div>
+    <div id="toast"><i class="fas fa-check-circle mr-2"></i>Action Successful</div>
 
     <div id="auth-overlay" class="fixed inset-0 z-[60] bg-white/90 backdrop-blur-xl flex flex-col items-center justify-center p-6 transition-all duration-500">
         <div class="bg-white p-8 md:p-10 rounded-[40px] max-w-sm w-full text-center shadow-2xl border border-slate-100">
@@ -61,7 +60,7 @@
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Fortified Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Obsidian Flow Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -82,7 +81,6 @@
                 <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
                 <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
                 <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
-                <button onclick="router('activity')" id="d-nav-activity" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
                 <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
@@ -90,7 +88,7 @@
                 <button onclick="router('reports')" id="d-nav-reports" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-alt w-5"></i> Reports</button>
             </nav>
             <div class="p-6 border-t border-slate-100">
-                <button onclick="openModal('settingsModal')" class="flex items-center gap-3 mb-4 w-full text-left group">
+                <button onclick="router('profile')" class="flex items-center gap-3 mb-4 w-full text-left group">
                     <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
                     <div class="overflow-hidden">
                         <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
@@ -165,17 +163,7 @@
 
                 <div id="view-activity" class="view-section space-y-6">
                     <div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2><p class="text-slate-500 font-medium">All Transactions</p></div>
-                    <div class="neo-card p-6">
-                        <div class="flex flex-col md:flex-row gap-4 mb-4">
-                            <input type="text" id="act-search" placeholder="Search..." onkeyup="renderActivity()" class="neo-input flex-1">
-                            <div class="flex gap-2">
-                                <button onclick="setActFilter('all')" id="btn-act-all" class="filter-btn active">All</button>
-                                <button onclick="setActFilter('income')" id="btn-act-inc" class="filter-btn inactive">Income</button>
-                                <button onclick="setActFilter('expense')" id="btn-act-exp" class="filter-btn inactive">Expense</button>
-                            </div>
-                        </div>
-                        <div id="activity-list" class="space-y-2"></div>
-                    </div>
+                    <div class="neo-card p-6"><div class="flex flex-col md:flex-row gap-4 mb-4"><input type="text" id="act-search" placeholder="Search..." onkeyup="renderActivity()" class="neo-input flex-1"><div class="flex gap-2"><button onclick="setActFilter('all')" id="btn-act-all" class="filter-btn active">All</button><button onclick="setActFilter('income')" id="btn-act-inc" class="filter-btn inactive">Income</button><button onclick="setActFilter('expense')" id="btn-act-exp" class="filter-btn inactive">Expense</button></div></div><div id="activity-list" class="space-y-2"></div></div>
                 </div>
 
                 <div id="view-calendar" class="view-section space-y-6">
@@ -205,8 +193,6 @@
                     <div class="neo-card p-6 space-y-3"><h3 class="font-bold text-slate-900">Data</h3><div class="grid grid-cols-2 gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">INR</button><button onclick="changeCurrency('USD', 'en-US')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">USD</button></div><button onclick="togglePrivacy()" id="btn-privacy-2" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Toggle Privacy</button><button onclick="exportCSV()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Export CSV</button><button onclick="backupData()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Backup JSON</button><input type="file" id="restoreFile" class="hidden" onchange="restoreData(this)"><button onclick="document.getElementById('restoreFile').click()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Restore JSON</button><button onclick="nukeData()" class="w-full py-3 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-200">Reset App</button></div>
                     <button onclick="logout()" class="w-full py-4 bg-white text-rose-500 font-bold rounded-xl border border-rose-100 shadow-sm">Sign Out</button>
                 </div>
-
-                <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
             </div>
         </div>
     </div>
@@ -225,19 +211,7 @@
         </div>
     </nav>
 
-    <div id="settingsModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4">
-        <div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl">
-            <h3 class="text-2xl font-bold text-slate-900 mb-6">Settings</h3>
-            <div class="space-y-6">
-                <div><h4 class="font-bold text-slate-700 mb-3">Theme</h4><div class="flex gap-4"><div onclick="changeTheme('#4F46E5','#EEF2FF')" class="color-swatch bg-indigo-600 active"></div><div onclick="changeTheme('#10B981','#ECFDF5')" class="color-swatch bg-emerald-500"></div><div onclick="changeTheme('#F43F5E','#FFF1F2')" class="color-swatch bg-rose-500"></div><div onclick="changeTheme('#8B5CF6','#F5F3FF')" class="color-swatch bg-violet-500"></div></div></div>
-                <div><h4 class="font-bold text-slate-700 mb-3">Identity</h4><div class="flex gap-2"><input type="text" id="profile-name-input" class="neo-input" placeholder="Your Name"><button onclick="updateProfileName()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold">Save</button></div></div>
-                <div><h4 class="font-bold text-slate-700 mb-3">Currency</h4><div class="flex gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="flex-1 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl">₹ INR</button><button onclick="changeCurrency('USD', 'en-US')" class="flex-1 py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">$ USD</button></div></div>
-                <div><h4 class="font-bold text-slate-700 mb-3">Data</h4><div class="grid grid-cols-2 gap-2"><button onclick="togglePrivacy(); closeModal('settingsModal')" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Privacy</button><button onclick="exportCSV()" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Export CSV</button><button onclick="backupData()" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Backup</button><button onclick="nukeData()" class="py-3 bg-rose-50 text-rose-600 font-bold rounded-xl">Reset App</button></div></div>
-                <button onclick="logout()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl">Sign Out</button>
-                <button onclick="closeModal('settingsModal')" class="w-full py-3 text-slate-400 font-bold">Close</button>
-            </div>
-        </div>
-    </div>
+    <button onclick="openTxModal()" class="md:hidden fixed bottom-24 right-4 z-50 w-14 h-14 bg-indigo-600 rounded-full text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition"><i class="fas fa-plus"></i></button>
 
     <div id="accountModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6">Add Account</h3><form onsubmit="addAccount(event)" class="space-y-5"><input type="text" id="accName" required class="neo-input" placeholder="Name"><input type="number" step="1" id="accBalance" required class="neo-input" placeholder="Balance"><div class="relative"><select id="accType" onchange="toggleAccountFields()" class="neo-input appearance-none"><option value="cash">Cash / Bank</option><option value="investment">Investment / SIP</option><option value="property">Property</option><option value="credit">Credit Card</option><option value="loan">Loan</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div id="debt-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100"><div class="col-span-2"><label class="text-[10px] text-slate-500 font-bold uppercase">Start Date</label><input type="date" id="accStartDate" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Rate %</label><input type="number" step="0.1" id="accRoi" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-slate-500 font-bold uppercase">Months</label><input type="number" id="accTenure" class="neo-input mt-1 p-3 text-sm"></div><div class="col-span-2 text-xs text-indigo-600 font-bold mt-1 text-center bg-indigo-50 py-2 rounded-lg" id="emi-preview">EMI: 0</div></div><div id="invest-fields" class="hidden grid grid-cols-2 gap-4 p-4 bg-emerald-50 rounded-2xl border border-emerald-100"><div class="col-span-2"><label class="text-[10px] text-emerald-600 font-bold uppercase">SIP Amount</label><input type="number" id="accSip" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Target</label><input type="number" id="accTarget" class="neo-input mt-1 p-3 text-sm"></div><div><label class="text-[10px] text-emerald-600 font-bold uppercase">Exp %</label><input type="number" step="0.1" id="accReturn" class="neo-input mt-1 p-3 text-sm"></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('accountModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
     <div id="txModal" class="fixed inset-0 z-[70] hidden bg-slate-900/60 backdrop-blur-sm flex items-end md:items-center justify-center sm:p-4"><div class="bg-white rounded-t-[32px] md:rounded-[32px] p-8 w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto"><h3 class="text-2xl font-bold text-slate-900 mb-6" id="txModalTitle">Transaction</h3><form onsubmit="saveTransaction(event)" class="space-y-5"><input type="hidden" id="txId"><input type="text" id="txDesc" required class="neo-input" placeholder="Description"><div class="grid grid-cols-2 gap-4"><input type="number" step="1" id="txAmount" required class="neo-input" placeholder="0.00"><input type="date" id="txDate" required class="neo-input text-slate-500 p-3"></div><div class="grid grid-cols-2 gap-4"><div class="relative"><select id="txType" onchange="toggleTxFields()" class="neo-input appearance-none"><option value="expense">Expense</option><option value="income">Income</option><option value="transfer">Transfer</option></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div><div class="relative"><select id="txCat" class="neo-input appearance-none"><optgroup label="Common"><option value="Food & Dining">Food</option><option value="Transport">Transport</option><option value="Shopping">Shopping</option></optgroup><optgroup label="Bills"><option value="Housing">Housing</option><option value="Utilities">Utilities</option><option value="EMI">EMI</option><option value="Subscription">Subscription</option></optgroup><optgroup label="Income"><option value="Salary">Salary</option><option value="Business">Business</option></optgroup><optgroup label="Other"><option value="Transfer">Transfer</option><option value="Misc">Misc</option></optgroup></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div class="grid grid-cols-1 gap-4"><div><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block" id="lbl-from-acc">Account</label><div class="relative"><select id="txAccount" required class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div><div id="div-to-acc" class="hidden"><label class="text-[10px] text-slate-400 font-bold uppercase ml-2 mb-1 block">To Account</label><div class="relative"><select id="txToAccount" class="neo-input appearance-none"></select><i class="fas fa-chevron-down absolute right-4 top-5 text-slate-400"></i></div></div></div><div class="flex gap-4 pt-4"><button type="button" onclick="closeModal('txModal')" class="flex-1 py-4 text-slate-500 font-bold bg-slate-100 rounded-2xl">Cancel</button><button type="submit" class="flex-1 py-4 bg-indigo-600 text-white font-bold rounded-2xl">Save</button></div></form></div></div>
@@ -275,7 +249,6 @@
         const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
         const showToast = (msg) => { const t = document.getElementById('toast'); if(t) { t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); } };
         
-        // GLOBAL LOGOUT FUNCTION
         window.logout = async () => { if(confirm("Sign out?")) { showToast("Signing Out..."); await signOut(auth); } };
 
         const btnLogin = document.getElementById('btn-login');
@@ -370,8 +343,8 @@
             }
         };
 
-        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); closeModal('settingsModal'); };
-        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); closeModal('settingsModal'); } };
+        window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); };
+        window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); } };
         window.updateProfileName = async () => { const name = getVal('profile-name-input'); if(name && currentUser) { await updateProfile(currentUser, { displayName: name }); setTxt('user-name', name); alert("Name updated!"); } };
         window.changeTheme = (p, s) => { document.documentElement.style.setProperty('--primary', p); document.documentElement.style.setProperty('--primary-soft', s); const logo = document.getElementById('app-logo-bg'); if(logo) logo.style.backgroundColor = p; };
 

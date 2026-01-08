@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Eternity</title>
+    <title>Cash Flow | Fortified</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -34,6 +34,7 @@
         .meter-fill { transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
         .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; }
         .cal-day { aspect-ratio: 1/1; border-radius: 10px; background: #FFF; border: 1px solid #F1F5F9; padding: 2px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.1s; position: relative; }
+        .cal-day:active { transform: scale(0.95); }
         .cal-day.has-data { border-color: #E2E8F0; background: #F8FAFC; }
         .cal-day.empty { background: transparent; border: none; cursor: default; }
         .cal-dots { display: flex; gap: 2px; justify-content: center; }
@@ -60,7 +61,7 @@
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Eternity Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Fortified Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -84,10 +85,19 @@
                 <button onclick="router('activity')" id="d-nav-activity" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
-                <button onclick="router('reports')" id="d-nav-reports" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-alt w-5"></i> Reports</button>
-                <div class="h-px bg-slate-200 my-2"></div>
                 <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
+                <div class="h-px bg-slate-200 my-2"></div>
+                <button onclick="router('reports')" id="d-nav-reports" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-alt w-5"></i> Reports</button>
             </nav>
+            <div class="p-6 border-t border-slate-100">
+                <button onclick="openModal('settingsModal')" class="flex items-center gap-3 mb-4 w-full text-left group">
+                    <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
+                    <div class="overflow-hidden">
+                        <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
+                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-indigo-600">Settings</div>
+                    </div>
+                </button>
+            </div>
         </aside>
 
         <div class="main-scroll w-full relative">
@@ -132,6 +142,10 @@
                             <div class="grid grid-cols-2 gap-4"><div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-up rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Assets</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-assets">...</div></div><div class="neo-card p-6 flex flex-col justify-center"><div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-4 text-xl"><i class="fas fa-arrow-down rotate-45"></i></div><div class="text-slate-400 text-xs font-bold uppercase tracking-wider">Liabilities</div><div class="text-2xl md:text-3xl font-extrabold text-slate-900 mt-1 money-val" id="dash-debts">...</div></div></div>
                             <div class="neo-card p-6 h-full flex flex-col"><h3 class="font-bold text-slate-900 text-lg mb-6">Asset Allocation</h3><div class="flex-1 flex items-center justify-center"><div style="height: 220px; width: 220px;"><canvas id="assetPieChart"></canvas></div><div id="asset-legend" class="ml-8 space-y-3 text-sm font-medium text-slate-600"></div></div></div>
                         </div>
+                    </div>
+                    <div class="neo-card p-6">
+                        <div class="flex justify-between items-center mb-4"><h3 class="font-bold text-slate-900 text-lg">Recent Activity</h3><button onclick="router('activity')" class="text-indigo-600 font-bold text-xs">View All</button></div>
+                        <div id="dashboard-recent-tx" class="space-y-2"></div>
                     </div>
                 </div>
 
@@ -189,8 +203,10 @@
                     <div class="neo-card p-6"><h3 class="font-bold text-slate-900 mb-4">Theme</h3><div class="flex gap-4"><div onclick="changeTheme('#4F46E5','#EEF2FF')" class="color-swatch bg-indigo-600 active"></div><div onclick="changeTheme('#10B981','#ECFDF5')" class="color-swatch bg-emerald-500"></div><div onclick="changeTheme('#F43F5E','#FFF1F2')" class="color-swatch bg-rose-500"></div><div onclick="changeTheme('#8B5CF6','#F5F3FF')" class="color-swatch bg-violet-500"></div></div></div>
                     <div class="neo-card p-6"><h3 class="font-bold text-slate-900 mb-4">Identity</h3><div class="flex gap-2"><input type="text" id="profile-name-input" class="neo-input" placeholder="Name"><button onclick="updateProfileName()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold">Save</button></div></div>
                     <div class="neo-card p-6 space-y-3"><h3 class="font-bold text-slate-900">Data</h3><div class="grid grid-cols-2 gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">INR</button><button onclick="changeCurrency('USD', 'en-US')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">USD</button></div><button onclick="togglePrivacy()" id="btn-privacy-2" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Toggle Privacy</button><button onclick="exportCSV()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Export CSV</button><button onclick="backupData()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Backup JSON</button><input type="file" id="restoreFile" class="hidden" onchange="restoreData(this)"><button onclick="document.getElementById('restoreFile').click()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Restore JSON</button><button onclick="nukeData()" class="w-full py-3 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-200">Reset App</button></div>
-                    <button onclick="document.getElementById('btn-logout').click()" class="w-full py-4 bg-white text-rose-500 font-bold rounded-xl border border-rose-100 shadow-sm">Sign Out</button>
+                    <button onclick="logout()" class="w-full py-4 bg-white text-rose-500 font-bold rounded-xl border border-rose-100 shadow-sm">Sign Out</button>
                 </div>
+
+                <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
             </div>
         </div>
     </div>
@@ -217,7 +233,7 @@
                 <div><h4 class="font-bold text-slate-700 mb-3">Identity</h4><div class="flex gap-2"><input type="text" id="profile-name-input" class="neo-input" placeholder="Your Name"><button onclick="updateProfileName()" class="bg-indigo-600 text-white px-4 rounded-xl font-bold">Save</button></div></div>
                 <div><h4 class="font-bold text-slate-700 mb-3">Currency</h4><div class="flex gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="flex-1 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl">₹ INR</button><button onclick="changeCurrency('USD', 'en-US')" class="flex-1 py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">$ USD</button></div></div>
                 <div><h4 class="font-bold text-slate-700 mb-3">Data</h4><div class="grid grid-cols-2 gap-2"><button onclick="togglePrivacy(); closeModal('settingsModal')" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Privacy</button><button onclick="exportCSV()" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Export CSV</button><button onclick="backupData()" class="py-3 bg-slate-50 text-slate-700 font-bold rounded-xl">Backup</button><button onclick="nukeData()" class="py-3 bg-rose-50 text-rose-600 font-bold rounded-xl">Reset App</button></div></div>
-                <button onclick="document.getElementById('btn-logout').click()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl">Sign Out</button>
+                <button onclick="logout()" class="w-full py-3 bg-slate-900 text-white font-bold rounded-xl">Sign Out</button>
                 <button onclick="closeModal('settingsModal')" class="w-full py-3 text-slate-400 font-bold">Close</button>
             </div>
         </div>
@@ -258,11 +274,12 @@
         const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
         const getVal = (id) => { const el = document.getElementById(id); return el ? el.value : ''; };
         const showToast = (msg) => { const t = document.getElementById('toast'); if(t) { t.innerText = msg; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); } };
+        
+        // GLOBAL LOGOUT FUNCTION
+        window.logout = async () => { if(confirm("Sign out?")) { showToast("Signing Out..."); await signOut(auth); } };
 
         const btnLogin = document.getElementById('btn-login');
         if(btnLogin) btnLogin.onclick = async () => { setTxt('auth-status', "Connecting..."); try { await signInWithPopup(auth, provider); } catch(e) { setTxt('auth-status', e.message); } };
-        const btnLogout = document.getElementById('btn-logout');
-        if(btnLogout) btnLogout.onclick = () => { if(confirm("Sign out?")) signOut(auth); };
         
         onAuthStateChanged(auth, (user) => {
             const overlay = document.getElementById('auth-overlay'); const avatar = document.getElementById('user-avatar');
@@ -404,6 +421,23 @@
                     } 
                 }
                 if(!hasAccounts) ac.innerHTML = '<div class="text-center text-slate-400 py-10">No accounts yet. Click + to add one.</div>';
+            }
+
+            const tc=document.getElementById('full-tx-list'); 
+            if(tc) { 
+                tc.innerHTML=''; 
+                const term=document.getElementById('tx-search') ? document.getElementById('tx-search').value.toLowerCase() : ''; 
+                const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term)); 
+                if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`; 
+                else { 
+                    let lastDate = null; 
+                    filteredTx.forEach(t => { 
+                        const isInc=t.type==='income'; const isTrf=t.type==='transfer'; const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); let dateStr = formatDateIN(t.date); if(txDate.toDateString() === today.toDateString()) dateStr = "Today"; else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday"; else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); 
+                        if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; } 
+                        let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'; let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900'; let sign = isTrf ? '' : isInc ? '+' : '-'; let icon = getCategoryIcon(t.cat); let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName; 
+                        tc.innerHTML+=`<div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="flex items-center gap-2 mt-0.5"><div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div><span class="text-[10px] text-slate-400 font-medium">${subText}</span></div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span><button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button></div></div>`; 
+                    }); 
+                } 
             }
 
             // 2. MATH

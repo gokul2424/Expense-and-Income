@@ -1,61 +1,127 @@
-# Expense-and-Income
-Personal Finance Dashboard (Community Edition)
+# 💸 Cash Flow - Zenith Ultimate Edition
 
-A privacy-focused, single-page personal finance dashboard inspired by the open-source Sure/Maybe project.
+**Cash Flow** is a powerful, privacy-focused, single-file personal finance dashboard. It combines net worth tracking, expense analysis, wealth simulation, and financial independence (FIRE) planning into one responsive interface.
 
-Live Demo: Click here to view your deployment
+Built with **HTML5, Tailwind CSS, Chart.js, and Firebase**, it runs entirely in the browser with no backend server required.
 
-🔒 Privacy & Security
+---
 
-Your data never leaves your device.
-This application uses your browser's Local Storage to save your financial data.
+## ✨ Key Features
 
-No external database.
+This application is organized into 9 powerful modules:
 
-No tracking.
+1.  **🏠 Dashboard:** Real-time Net Worth, Monthly Burn Rate, AI Insights, Money Flow (Sankey Diagram), and Recent Activity.
+2.  **📉 Debts:** Track liabilities, visualize debt composition, and calculate "True Cost" (Principal vs Interest).
+3.  **📈 Investments:** Monitor asset allocation and visualize Monthly SIP vs Total Invested.
+4.  **👛 Accounts:** Manage liquid cash, bank accounts, credit cards, and loans. Includes auto-summing of liquid vs. debt.
+5.  **📝 Activity:** A searchable, filterable history of all income, expenses, and transfers with Edit/Delete capabilities.
+6.  **📅 Calendar:** A visual heatmap of your spending habits. Click any day to see transaction details.
+7.  **🚀 Future (Strategy):**
+    * **FIRE Calculator:** Calculate your "Freedom Number."
+    * **Wealth Simulator:** Project compound interest over time.
+    * **Budgets & Goals:** Set monthly limits and savings targets.
+    * **Quick Tools:** Instant SIP and EMI calculators.
+8.  **📄 Reports:** Generate printable, month-by-month Financial Statements and Category Breakdowns.
+9.  **👤 Profile & Settings:**
+    * **Theme Switcher:** Choose between Indigo, Emerald, Rose, or Violet themes.
+    * **Data Management:** Export CSV, Backup JSON, Restore JSON, or Reset App.
+    * **Currency:** Toggle between ₹ (INR) and $ (USD).
 
-No servers.
+---
 
-If you clear your browser cache, your data is gone (unless you use the Export feature).
+## 🚀 Quick Start
 
-✨ Features
+### Prerequisites
+* A modern web browser (Chrome, Safari, Edge, Firefox).
+* A Google Account (for Firebase).
 
-Dashboard Overview: Real-time calculation of Net Worth, Assets, and Debts.
+### Installation
 
-Account Management: Add/Remove Accounts (Cash, Investment, Credit, Property).
+1.  **Download** the `index.html` file.
+2.  **Open** the file in any code editor (VS Code, Notepad++, etc.).
+3.  **Configure Firebase** (See section below).
+4.  **Open** `index.html` in your browser. That's it!
 
-Transaction Tracking: Log income and expenses with a searchable table.
+---
 
-Data Persistence: Autosaves to local storage.
+## 🔥 Firebase Configuration (Required)
 
-Import/Export: Backup your data to a JSON file to move between devices.
+To make the app save your data to the cloud, you need your own free Firebase API keys.
 
-Responsive Design: Works on Mobile and Desktop (Tailwind CSS).
+1.  Go to the [Firebase Console](https://console.firebase.google.com/).
+2.  Click **"Add Project"** and give it a name (e.g., "MyCashFlow").
+3.  **Disable Google Analytics** (not needed) and create the project.
+4.  **Setup Authentication:**
+    * Go to **Build** -> **Authentication** -> **Get Started**.
+    * Select **Google** -> **Enable** -> Save.
+5.  **Setup Database:**
+    * Go to **Build** -> **Firestore Database** -> **Create Database**.
+    * Choose **Start in production mode** -> Next -> Enable.
+    * Go to the **Rules** tab in Firestore and change `allow read, write: if false;` to:
+        ```javascript
+        allow read, write: if request.auth != null;
+        ```
+    * Click **Publish**.
+6.  **Get API Keys:**
+    * Click the **Project Settings** (Gear icon) -> General.
+    * Scroll down to "Your apps" -> Click the **</> (Web)** icon.
+    * Register app (nickname it "Web").
+    * **Copy the `firebaseConfig` object.**
 
-🚀 How to Deploy (Free)
+### Applying the Keys
+Open your `index.html` file, scroll to the bottom script section, and replace the placeholder with your keys:
 
-Fork this repository or create a new one.
+```javascript
+// --- PASTE YOUR FIREBASE CONFIG HERE ---
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+    storageBucket: "YOUR_PROJECT.appspot.com",
+    messagingSenderId: "YOUR_SENDER_ID",
+    appId: "YOUR_APP_ID"
+};
 
-Upload index.html.
+```
 
-Go to Settings > Pages.
+---
 
-Set Source to Deploy from a branch.
+## 📱 Mobile vs Desktop
 
-Set Branch to main (or master) and folder to / (root).
+* **Desktop:** Features a persistent sidebar for easy navigation and expanded charts.
+* **Mobile:** Features a **scrollable bottom dock**, streamlined headers, and touch-optimized inputs. Also includes a floating "Add Transaction" button (FAB).
 
-Click Save.
+---
 
-🛠 Tech Stack
+## 💾 Data Management
 
-HTML5 (Single File Architecture)
+Your data belongs to you.
 
-Tailwind CSS (Styling via CDN)
+* **Cloud Sync:** Data is synced to your private Firebase Firestore instance.
+* **Backup:** Go to **Profile -> Backup JSON** to download a local copy of all your data.
+* **Restore:** Go to **Profile -> Restore JSON** to load data from a backup file.
+* **Export:** Go to **Profile -> Export CSV** to get a spreadsheet-compatible file of all transactions.
 
-Chart.js (Visualizations)
+---
 
-FontAwesome (Icons)
+## 🛠️ Built With
 
-Vanilla JavaScript (Logic)
+* **Core:** HTML5, Vanilla JavaScript (ES6 Modules).
+* **Styling:** [Tailwind CSS](https://tailwindcss.com/) (via CDN).
+* **Charts:** [Chart.js](https://www.chartjs.org/) (via CDN).
+* **Database & Auth:** [Firebase v10](https://firebase.google.com/) (via CDN).
+* **Icons:** [FontAwesome](https://fontawesome.com/).
 
-Based on the open-source mission to make personal finance transparent.
+---
+
+## 📄 License
+
+This project is open-source. Feel free to modify and distribute it for personal use.
+
+---
+
+**Happy Tracking! 🚀**
+
+```
+
+```

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#F8FAFC">
-    <title>Cash Flow | Zenith Pro</title>
+    <title>Cash Flow | Eternity</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -60,7 +60,7 @@
                 <i class="fas fa-wallet text-white text-4xl"></i>
             </div>
             <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">Cash Flow.</h1>
-            <p class="text-slate-500 mb-8 font-medium">Zenith Pro Edition.</p>
+            <p class="text-slate-500 mb-8 font-medium">Eternity Edition.</p>
             <button id="btn-login" class="w-full bg-slate-900 text-white font-bold py-4 rounded-2xl hover:scale-[1.02] transition-transform flex items-center justify-center gap-3 shadow-lg">
                 <i class="fab fa-google text-lg"></i> Continue with Google
             </button>
@@ -81,21 +81,13 @@
                 <button onclick="router('debts')" id="d-nav-debts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-invoice-dollar w-5"></i> Debts</button>
                 <button onclick="router('investments')" id="d-nav-investments" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-chart-line w-5"></i> Investments</button>
                 <button onclick="router('accounts')" id="d-nav-accounts" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-university w-5"></i> Accounts</button>
+                <button onclick="router('activity')" id="d-nav-activity" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-list-ul w-5"></i> Activity</button>
                 <button onclick="router('calendar')" id="d-nav-calendar" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-calendar-alt w-5"></i> Calendar</button>
                 <button onclick="router('future')" id="d-nav-future" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-rocket w-5"></i> Future</button>
-                <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
-                <div class="h-px bg-slate-200 my-2"></div>
                 <button onclick="router('reports')" id="d-nav-reports" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-file-alt w-5"></i> Reports</button>
+                <div class="h-px bg-slate-200 my-2"></div>
+                <button onclick="router('profile')" id="d-nav-profile" class="desktop-nav-item w-full flex items-center px-4 py-3 text-sm gap-4 rounded-xl font-semibold text-slate-500 transition-all"><i class="fas fa-user-circle w-5"></i> Profile</button>
             </nav>
-            <div class="p-6 border-t border-slate-100">
-                <button onclick="openModal('settingsModal')" class="flex items-center gap-3 mb-4 w-full text-left group">
-                    <img id="user-avatar" src="" class="w-10 h-10 rounded-full bg-slate-200 hidden ring-2 ring-white">
-                    <div class="overflow-hidden">
-                        <div id="user-name" class="text-sm font-bold text-slate-900 truncate">User</div>
-                        <div class="text-[10px] text-slate-400 font-bold uppercase tracking-wider group-hover:text-indigo-600">Settings</div>
-                    </div>
-                </button>
-            </div>
         </aside>
 
         <div class="main-scroll w-full relative">
@@ -105,8 +97,8 @@
                     <p class="text-slate-500 text-sm font-medium">Financial Command</p>
                 </div>
                 <div class="flex gap-2">
-                    <button onclick="togglePrivacy()" id="mob-btn-privacy" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-eye"></i></button>
-                    <button onclick="openModal('settingsModal')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-cog"></i></button>
+                    <button onclick="openTxModal()" class="w-10 h-10 bg-indigo-600 text-white rounded-full flex items-center justify-center shadow-lg"><i class="fas fa-plus"></i></button>
+                    <button onclick="router('profile')" class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600"><i class="fas fa-user-circle"></i></button>
                     <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 relative">
                         <div id="mob-sync-status" class="w-2.5 h-2.5 rounded-full bg-emerald-500 absolute top-0 right-0 m-1"></div>
                         <i class="fas fa-cloud text-slate-400 text-xs"></i>
@@ -157,6 +149,21 @@
 
                 <div id="view-accounts" class="view-section space-y-6"><div class="flex justify-between items-center mb-8 sticky top-0 z-10 py-2"><div><h2 class="text-3xl font-extrabold text-slate-900">Accounts</h2></div><button onclick="openModal('accountModal')" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div id="accounts-container" class="space-y-6"></div></div>
 
+                <div id="view-activity" class="view-section space-y-6">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2><p class="text-slate-500 font-medium">All Transactions</p></div>
+                    <div class="neo-card p-6">
+                        <div class="flex flex-col md:flex-row gap-4 mb-4">
+                            <input type="text" id="act-search" placeholder="Search..." onkeyup="renderActivity()" class="neo-input flex-1">
+                            <div class="flex gap-2">
+                                <button onclick="setActFilter('all')" id="btn-act-all" class="filter-btn active">All</button>
+                                <button onclick="setActFilter('income')" id="btn-act-inc" class="filter-btn inactive">Income</button>
+                                <button onclick="setActFilter('expense')" id="btn-act-exp" class="filter-btn inactive">Expense</button>
+                            </div>
+                        </div>
+                        <div id="activity-list" class="space-y-2"></div>
+                    </div>
+                </div>
+
                 <div id="view-calendar" class="view-section space-y-6">
                     <div class="flex justify-between items-center mb-2"><div><h2 class="text-3xl font-extrabold text-slate-900">Calendar</h2><p class="text-slate-500 font-medium">Financial Heatmap</p></div><div class="text-xl font-bold text-slate-700 bg-white px-4 py-2 rounded-xl shadow-sm" id="cal-month-name">...</div></div>
                     <div class="neo-card p-4 md:p-6"><div class="grid grid-cols-7 gap-2 mb-4 text-center"><div class="text-[10px] md:text-xs font-bold text-slate-400">SUN</div><div class="text-[10px] md:text-xs font-bold text-slate-400">MON</div><div class="text-[10px] md:text-xs font-bold text-slate-400">TUE</div><div class="text-[10px] md:text-xs font-bold text-slate-400">WED</div><div class="text-[10px] md:text-xs font-bold text-slate-400">THU</div><div class="text-[10px] md:text-xs font-bold text-slate-400">FRI</div><div class="text-[10px] md:text-xs font-bold text-slate-400">SAT</div></div><div id="calendar-grid" class="calendar-grid"></div></div>
@@ -172,6 +179,11 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6"><div class="neo-card p-6 border-l-4 border-indigo-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-indigo-500 mr-2"></i>Quick SIP</h3><div class="grid grid-cols-2 gap-3 mb-4"><input type="number" id="calc-sip-amt" class="neo-input p-2 text-sm" placeholder="Amount" oninput="runSipCalc()"><input type="number" id="calc-sip-yrs" class="neo-input p-2 text-sm" placeholder="Years" oninput="runSipCalc()"></div><div class="flex justify-between items-center bg-indigo-50 p-3 rounded-xl"><span class="text-xs text-indigo-900 font-bold uppercase">FV (12%)</span><span class="font-bold text-indigo-700" id="calc-sip-res">0</span></div></div><div class="neo-card p-6 border-l-4 border-rose-500"><h3 class="font-bold text-slate-900 text-lg mb-4"><i class="fas fa-calculator text-rose-500 mr-2"></i>Quick EMI</h3><div class="grid grid-cols-3 gap-2 mb-4"><input type="number" id="calc-emi-p" class="neo-input p-2 text-sm" placeholder="Loan" oninput="runEmiCalc()"><input type="number" id="calc-emi-r" class="neo-input p-2 text-sm" placeholder="Rate" oninput="runEmiCalc()"><input type="number" id="calc-emi-n" class="neo-input p-2 text-sm" placeholder="Yrs" oninput="runEmiCalc()"></div><div class="flex justify-between items-center bg-rose-50 p-3 rounded-xl"><span class="text-xs text-rose-900 font-bold uppercase">EMI</span><span class="font-bold text-rose-700" id="calc-emi-res">0</span></div></div></div>
                 </div>
 
+                <div id="view-reports" class="view-section space-y-6">
+                    <div><h2 class="text-3xl font-extrabold text-slate-900">Reports</h2><p class="text-slate-500 font-medium">Statements & Breakdowns</p></div>
+                    <div class="neo-card p-6"><div class="flex gap-4 mb-6"><input type="month" id="report-month" class="neo-input w-full" onchange="renderReport()"><button onclick="window.print()" class="bg-slate-900 text-white px-6 rounded-xl font-bold"><i class="fas fa-print"></i></button></div><div id="report-content" class="space-y-6 text-center text-slate-400 py-10">Select a month to view report</div></div>
+                </div>
+
                 <div id="view-profile" class="view-section space-y-6">
                     <h2 class="text-3xl font-extrabold text-slate-900">Profile</h2>
                     <div class="neo-card p-6"><h3 class="font-bold text-slate-900 mb-4">Theme</h3><div class="flex gap-4"><div onclick="changeTheme('#4F46E5','#EEF2FF')" class="color-swatch bg-indigo-600 active"></div><div onclick="changeTheme('#10B981','#ECFDF5')" class="color-swatch bg-emerald-500"></div><div onclick="changeTheme('#F43F5E','#FFF1F2')" class="color-swatch bg-rose-500"></div><div onclick="changeTheme('#8B5CF6','#F5F3FF')" class="color-swatch bg-violet-500"></div></div></div>
@@ -179,24 +191,9 @@
                     <div class="neo-card p-6 space-y-3"><h3 class="font-bold text-slate-900">Data</h3><div class="grid grid-cols-2 gap-2"><button onclick="changeCurrency('INR', 'en-IN')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">INR</button><button onclick="changeCurrency('USD', 'en-US')" class="py-2 bg-slate-50 text-slate-700 font-bold rounded-lg">USD</button></div><button onclick="togglePrivacy()" id="btn-privacy-2" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Toggle Privacy</button><button onclick="exportCSV()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Export CSV</button><button onclick="backupData()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Backup JSON</button><input type="file" id="restoreFile" class="hidden" onchange="restoreData(this)"><button onclick="document.getElementById('restoreFile').click()" class="w-full py-3 bg-slate-50 font-bold rounded-xl text-slate-700">Restore JSON</button><button onclick="nukeData()" class="w-full py-3 bg-rose-50 text-rose-600 font-bold rounded-xl border border-rose-200">Reset App</button></div>
                     <button onclick="document.getElementById('btn-logout').click()" class="w-full py-4 bg-white text-rose-500 font-bold rounded-xl border border-rose-100 shadow-sm">Sign Out</button>
                 </div>
-
-                <div id="view-reports" class="view-section space-y-6">
-                    <div><h2 class="text-3xl font-extrabold text-slate-900">Reports</h2><p class="text-slate-500 font-medium">Statements & Breakdowns</p></div>
-                    <div class="neo-card p-6">
-                        <div class="flex gap-4 mb-6">
-                            <input type="month" id="report-month" class="neo-input w-full" onchange="renderReport()">
-                            <button onclick="window.print()" class="bg-slate-900 text-white px-6 rounded-xl font-bold"><i class="fas fa-print"></i></button>
-                        </div>
-                        <div id="report-content" class="space-y-6 text-center text-slate-400 py-10">Select a month to view report</div>
-                    </div>
-                </div>
-
-                <div id="view-transactions" class="view-section space-y-6"><div class="flex justify-between items-center mb-8"><div><h2 class="text-3xl font-extrabold text-slate-900">Activity</h2></div><button onclick="openTxModal()" class="bg-slate-900 text-white w-12 h-12 rounded-2xl flex items-center justify-center shadow-xl"><i class="fas fa-plus"></i></button></div><div class="neo-card overflow-hidden"><div class="p-4 border-b border-slate-100"><div class="relative"><i class="fas fa-search absolute left-4 top-4 text-slate-400"></i><input type="text" id="tx-search" placeholder="Search..." onkeyup="renderTransactions()" class="neo-input pl-11"></div></div><div id="full-tx-list" class="p-2 space-y-2"></div></div></div>
             </div>
         </div>
     </div>
-
-    <button onclick="openTxModal()" class="md:hidden fixed bottom-24 right-4 z-50 w-14 h-14 bg-indigo-600 rounded-full text-white shadow-2xl flex items-center justify-center text-2xl hover:scale-110 transition"><i class="fas fa-plus"></i></button>
 
     <nav class="md:hidden fixed bottom-4 left-4 right-4 z-50">
         <div class="nav-dock flex justify-between items-center px-2 py-3 rounded-[24px]">
@@ -204,10 +201,11 @@
             <button onclick="router('debts')" id="m-nav-debts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-file-invoice text-lg"></i>Debt</button>
             <button onclick="router('investments')" id="m-nav-investments" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-chart-line text-lg"></i>Inv</button>
             <button onclick="router('accounts')" id="m-nav-accounts" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-wallet text-lg"></i>Acc</button>
+            <button onclick="router('activity')" id="m-nav-activity" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-list-ul text-lg"></i>Act</button>
             <button onclick="router('calendar')" id="m-nav-calendar" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-calendar-alt text-lg"></i>Cal</button>
             <button onclick="router('future')" id="m-nav-future" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-rocket text-lg"></i>Fut</button>
-            <button onclick="router('profile')" id="m-nav-profile" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-user-circle text-lg"></i>Pro</button>
             <button onclick="router('reports')" id="m-nav-reports" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-file-alt text-lg"></i>Rpt</button>
+            <button onclick="router('profile')" id="m-nav-profile" class="nav-item flex flex-col items-center gap-1 min-w-[50px]"><i class="fas fa-user-circle text-lg"></i>Pro</button>
         </div>
     </nav>
 
@@ -254,6 +252,7 @@
         let state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} };
         let chartInst=null, sankeyInst=null, barChartInst=null, assetPieInst=null, debtSplitInst=null, debtPieInst=null, invPieInst=null, futureChartInst=null, analysisRange='6M';
         let isPrivacyMode = false;
+        let activityFilter = 'all';
 
         const setHtml = (id, val) => { const el = document.getElementById(id); if(el) el.innerHTML = val; };
         const setTxt = (id, val) => { const el = document.getElementById(id); if(el) el.innerText = val; };
@@ -295,6 +294,7 @@
         window.saveTransaction = (e) => { e.preventDefault(); const id = getVal('txId'); const isEdit = !!id; const amount = parseFloat(getVal('txAmount')); const type = getVal('txType'); const accId = parseFloat(getVal('txAccount')); const toAccId = type === 'transfer' ? parseFloat(getVal('txToAccount')) : null; const modifyBalance = (aId, amt, direction) => { const a = state.accounts.find(x => x.id === aId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(!isDebt) a.balance += (amt * direction); else a.balance -= (amt * direction); } return a ? a.name : 'Unknown'; }; if(isEdit) { const oldTx = state.transactions.find(t => t.id == id); if(oldTx) { if(oldTx.type === 'income') modifyBalance(oldTx.accId, oldTx.amount, -1); else if(oldTx.type === 'expense') modifyBalance(oldTx.accId, oldTx.amount, 1); else if(oldTx.type === 'transfer') { modifyBalance(oldTx.accId, oldTx.amount, 1); modifyBalance(oldTx.toAccId, oldTx.amount, -1); } state.transactions = state.transactions.filter(t => t.id != id); } } let accName = '', toAccName = ''; if(type === 'income') accName = modifyBalance(accId, amount, 1); else if(type === 'expense') accName = modifyBalance(accId, amount, -1); else if(type === 'transfer') { accName = modifyBalance(accId, amount, -1); toAccName = modifyBalance(toAccId, amount, 1); } const newTx = { id: isEdit ? parseFloat(id) : Date.now(), desc: getVal('txDesc'), amount: amount, date: getVal('txDate'), type: type, cat: getVal('txCat'), accId: accId, accName: accName, toAccId: toAccId, toAccName: toAccName }; state.transactions.unshift(newTx); state.transactions.sort((a,b) => new Date(b.date) - new Date(a.date)); save(); closeModal('txModal'); e.target.reset(); showToast("Transaction Saved!"); };
         window.deleteItem = (list, id) => { if(confirm('Delete this item?')) { if(list === 'transactions') { const t = state.transactions.find(x => x.id === id); if(t) { const a = state.accounts.find(x => x.id === t.accId); if(a) { const isDebt = ['credit','loan'].includes(a.type); if(t.type === 'income') a.balance -= t.amount * (isDebt?-1:1); else if(t.type === 'expense') a.balance += t.amount * (isDebt?-1:1); else if(t.type === 'transfer') { a.balance += t.amount * (isDebt?-1:1); const dest = state.accounts.find(x => x.id === t.toAccId); if(dest) dest.balance -= t.amount * (['credit','loan'].includes(dest.type)?-1:1); } } } } state[list] = state[list].filter(i=>i.id!==id); save(); showToast("Item Deleted"); } };
         window.setAnalysisRange = (range) => { analysisRange = range; render(); };
+        window.setActFilter = (f) => { activityFilter = f; renderActivity(); };
         function updateAccountSelect() { const select = document.getElementById('txAccount'); const toSelect = document.getElementById('txToAccount'); if(!select || !toSelect) return; const genOpts = () => { let html = ''; const assets = state.accounts.filter(a => ['cash', 'investment', 'property'].includes(a.type)); const debts = state.accounts.filter(a => ['credit', 'loan'].includes(a.type)); if(assets.length) { html+=`<optgroup label="Assets">`+assets.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } if(debts.length) { html+=`<optgroup label="Credit/Loan">`+debts.map(a=>`<option value="${a.id}">${a.name}</option>`).join('')+`</optgroup>`; } return html; }; const h = genOpts(); select.innerHTML = h; toSelect.innerHTML = h; }
 
         function generateInsights(assets, debts, burnPct, topCat) { const card = document.getElementById('smart-insights'); const txt = document.getElementById('insight-text'); if(!card || !txt) return; const debtRatio = assets > 0 ? (debts / assets) * 100 : 0; let msg = ""; if (burnPct > 90) msg = "⚠️ <b>High Spend Alert:</b> You've used over 90% of your monthly income."; else if (debtRatio > 50) msg = "📉 <b>Debt Alert:</b> Your liabilities are over 50% of your assets."; else if (topCat) msg = `📊 <b>Top Category:</b> You spent the most on <b>${topCat.name}</b> (${money(topCat.amt)}) this month.`; else if (burnPct < 40 && burnPct > 0) msg = "🌟 <b>Great Job!</b> You are saving more than 60% of your income this month."; else msg = "💡 <b>Tip:</b> Log more transactions to get personalized financial advice."; txt.innerHTML = msg; card.classList.remove('hidden'); }
@@ -311,24 +311,48 @@
         
         // NEW REPORTS LOGIC
         window.renderReport = () => {
-            const input = document.getElementById('report-month').value;
-            if(!input) return;
-            const date = new Date(input);
-            const m = date.getMonth(); const y = date.getFullYear();
+            const input = document.getElementById('report-month').value; if(!input) return;
+            const date = new Date(input); const m = date.getMonth(); const y = date.getFullYear();
             const txs = state.transactions.filter(t => { const d = new Date(t.date); return d.getMonth() === m && d.getFullYear() === y; });
             const inc = txs.filter(t=>t.type==='income').reduce((a,b)=>a+b.amount,0);
             const exp = txs.filter(t=>t.type==='expense').reduce((a,b)=>a+b.amount,0);
             const cats = {}; txs.filter(t=>t.type==='expense').forEach(t=>{cats[t.cat] = (cats[t.cat]||0)+t.amount});
-            
             let html = `<div class="text-center mb-8"><h2 class="text-3xl font-extrabold text-slate-900 mb-1">Financial Statement</h2><p class="text-slate-500 font-medium">${date.toLocaleString('default', {month:'long', year:'numeric'})}</p></div>`;
             html += `<div class="grid grid-cols-2 gap-6 mb-8"><div class="p-6 bg-emerald-50 rounded-2xl border border-emerald-100 text-center"><div class="text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">Total Income</div><div class="text-3xl font-bold text-emerald-900">${money(inc)}</div></div><div class="p-6 bg-rose-50 rounded-2xl border border-rose-100 text-center"><div class="text-xs font-bold text-rose-600 uppercase tracking-wider mb-1">Total Expense</div><div class="text-3xl font-bold text-rose-900">${money(exp)}</div></div></div>`;
             html += `<div class="p-6 bg-slate-900 text-white rounded-2xl mb-8 flex justify-between items-center shadow-xl"><span class="font-bold text-lg">Net Savings</span><span class="font-bold text-2xl ${inc-exp>=0?'text-emerald-400':'text-rose-400'}">${money(inc-exp)}</span></div>`;
             html += `<h3 class="font-bold text-slate-900 text-lg mb-4 border-b border-slate-200 pb-2">Expense Breakdown</h3><div class="space-y-3">`;
-            for(const [c, amt] of Object.entries(cats)) { html += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-slate-700">${c}</span><span class="font-bold text-slate-900">${money(amt)}</span></div>`; }
-            html += `</div>`;
-            setHtml('report-content', html);
+            for(const [c, amt] of Object.entries(cats)) { html += `<div class="flex justify-between items-center p-3 bg-slate-50 rounded-xl"><span class="font-bold text-slate-700">${c}</span><span class="font-bold text-slate-900">${money(amt)}</span></div>`; } html += `</div>`; setHtml('report-content', html);
         };
         
+        // NEW ACTIVITY LOGIC
+        window.renderActivity = () => {
+            const list = document.getElementById('activity-list'); if(!list) return;
+            const term = document.getElementById('act-search').value.toLowerCase();
+            const filtered = state.transactions.filter(t => (activityFilter === 'all' || t.type === activityFilter) && t.desc.toLowerCase().includes(term));
+            
+            // Highlight Buttons
+            document.getElementById('btn-act-all').className = activityFilter === 'all' ? 'filter-btn active' : 'filter-btn inactive';
+            document.getElementById('btn-act-inc').className = activityFilter === 'income' ? 'filter-btn active' : 'filter-btn inactive';
+            document.getElementById('btn-act-exp').className = activityFilter === 'expense' ? 'filter-btn active' : 'filter-btn inactive';
+
+            if(filtered.length === 0) list.innerHTML = '<div class="text-center text-slate-400 py-10">No transactions found.</div>';
+            else {
+                list.innerHTML = filtered.map(t => {
+                    const isInc = t.type === 'income';
+                    return `<div onclick="editTransaction(${t.id})" class="flex justify-between items-center p-4 bg-white border border-slate-100 rounded-xl hover:shadow-md cursor-pointer transition group">
+                        <div class="flex gap-4 items-center">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center ${isInc?'bg-emerald-100 text-emerald-600':'bg-rose-100 text-rose-600'}"><i class="fas ${isInc?'fa-arrow-down':'fa-arrow-up'}"></i></div>
+                            <div><div class="font-bold text-slate-900">${t.desc}</div><div class="text-xs text-slate-500">${formatDateIN(t.date)} • ${t.cat}</div></div>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="font-bold ${isInc?'text-emerald-600':'text-slate-900'}">${isInc?'+':'-'}${money(t.amount)}</span>
+                            <button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-300 hover:text-rose-500"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+        };
+
         window.changeCurrency = (c, l) => { config.currency = c; config.locale = l; state.settings = { currency: c, locale: l }; save(); render(); closeModal('settingsModal'); };
         window.nukeData = () => { if(confirm("Are you sure? This will delete EVERYTHING.")) { state = { accounts: [], transactions: [], history: [0], budgets: {}, goals: {}, settings: {} }; save(); render(); closeModal('settingsModal'); } };
         window.updateProfileName = async () => { const name = getVal('profile-name-input'); if(name && currentUser) { await updateProfile(currentUser, { displayName: name }); setTxt('user-name', name); alert("Name updated!"); } };
@@ -382,23 +406,6 @@
                 if(!hasAccounts) ac.innerHTML = '<div class="text-center text-slate-400 py-10">No accounts yet. Click + to add one.</div>';
             }
 
-            const tc=document.getElementById('full-tx-list'); 
-            if(tc) { 
-                tc.innerHTML=''; 
-                const term=document.getElementById('tx-search') ? document.getElementById('tx-search').value.toLowerCase() : ''; 
-                const filteredTx = state.transactions.filter(t=>t.desc.toLowerCase().includes(term)); 
-                if(filteredTx.length === 0) tc.innerHTML = `<div class="flex flex-col items-center justify-center h-48 text-slate-400"><i class="fas fa-receipt text-3xl mb-2 opacity-50"></i><p class="text-sm font-medium">No transactions found</p></div>`; 
-                else { 
-                    let lastDate = null; 
-                    filteredTx.forEach(t => { 
-                        const isInc=t.type==='income'; const isTrf=t.type==='transfer'; const txDate = new Date(t.date); const today = new Date(); const yesterday = new Date(); yesterday.setDate(yesterday.getDate() - 1); let dateStr = formatDateIN(t.date); if(txDate.toDateString() === today.toDateString()) dateStr = "Today"; else if(txDate.toDateString() === yesterday.toDateString()) dateStr = "Yesterday"; else dateStr = txDate.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' }); 
-                        if(dateStr !== lastDate) { tc.innerHTML += `<div class="date-header px-4 md:px-2">${dateStr}</div>`; lastDate = dateStr; } 
-                        let iconColor = isTrf ? 'bg-slate-100 text-slate-600' : isInc ? 'bg-emerald-100 text-emerald-600' : 'bg-rose-100 text-rose-600'; let amountColor = isTrf ? 'text-slate-900' : isInc ? 'text-emerald-600' : 'text-slate-900'; let sign = isTrf ? '' : isInc ? '+' : '-'; let icon = getCategoryIcon(t.cat); let subText = isTrf ? `${t.accName} <i class="fas fa-arrow-right text-[10px]"></i> ${t.toAccName}` : t.accName; 
-                        tc.innerHTML+=`<div onclick="editTransaction(${t.id})" class="cursor-pointer flex justify-between items-center p-3 mb-2 bg-white md:bg-slate-50 md:hover:bg-white rounded-2xl border border-transparent md:border-slate-100 hover:shadow-md transition mx-2 md:mx-0 group"><div class="flex gap-4 items-center"><div class="w-10 h-10 rounded-full flex items-center justify-center ${iconColor}"><i class="fas fa-${icon} text-sm"></i></div><div><div class="font-bold text-slate-800 text-sm">${t.desc}</div><div class="flex items-center gap-2 mt-0.5"><div class="text-[10px] text-slate-400 font-bold bg-slate-100 px-1.5 py-0.5 rounded">${t.cat || 'Misc'}</div><span class="text-[10px] text-slate-400 font-medium">${subText}</span></div></div></div><div class="flex gap-3 items-center"><span class="font-bold text-sm ${amountColor}">${sign}${money(t.amount)}</span><button onclick="event.stopPropagation(); deleteItem('transactions', ${t.id})" class="text-slate-200 hover:text-rose-500 transition px-2"><i class="fas fa-times"></i></button></div></div>`; 
-                    }); 
-                } 
-            }
-
             // 2. MATH
             updateAccountSelect();
             ['1M','6M','1Y'].forEach(r => { const btn=document.getElementById(`btn-range-${r.toLowerCase()}`); if(btn) btn.className = r===analysisRange ? "filter-btn active" : "filter-btn inactive"; });
@@ -436,6 +443,9 @@
             }
             if(document.getElementById('view-calendar').classList.contains('active')) renderCalendar();
             if(document.getElementById('view-investments').classList.contains('active')) { setHtml('inv-total', money(totalInvested)); setHtml('inv-sip-total', money(totalMonthlySip)); setHtml('invest-list-container', investListHTML || '<div class="col-span-2 text-center text-slate-400 py-10">No active investments found.</div>'); const invCtxEl = document.getElementById('invPieChart'); if(invCtxEl) { const ctx = invCtxEl.getContext('2d'); if(invPieInst) invPieInst.destroy(); invPieInst = new Chart(ctx, { type: 'doughnut', data: { labels: investNames, datasets: [{ data: investBalances, backgroundColor: ['#10B981', '#3B82F6', '#6366F1', '#8B5CF6', '#EC4899'], borderWidth: 0 }] }, options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: {size: 10} } } } } }); } }
+
+            // RENDER ACTIVITY VIEW
+            if(document.getElementById('view-activity').classList.contains('active')) renderActivity();
 
             if(document.getElementById('view-dashboard').classList.contains('active')) {
                 const lb = document.getElementById('category-leaderboard');
